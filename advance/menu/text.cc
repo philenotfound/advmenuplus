@@ -42,7 +42,7 @@ using namespace std;
 static unsigned int_orientation = 0; // orientation flags
 static unsigned int_font_dx; // font width
 static unsigned int_font_dy; // font height
-static adv_font* int_font; // font (already orientation corrected)
+static adv_font* int_font = 0; // font (already orientation corrected)
 
 static inline void swap(unsigned& a, unsigned& b)
 {
@@ -86,6 +86,22 @@ void int_rotate(int& x, int& y, int& dx, int& dy)
 	}
 }
 
+int size_win_sort(int x, int y, int dx, int dy)
+{
+	int size = y;
+	
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY) {
+		size = x;
+		if (ADV_ORIENTATION_FLIP_Y) {
+			size = video_size_x() - x - dx;
+		}
+	} else if (int_orientation & ADV_ORIENTATION_FLIP_Y) {
+		size = video_size_y() - y - dy;
+	}
+
+	return size;
+}
+
 int int_dx_get()
 {
 	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
@@ -124,6 +140,35 @@ int int_font_dy_get()
 		return int_font_dx;
 	else
 		return int_font_dy;
+}
+
+int int_font_info_dx_get(adv_font* font)
+{
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+		return adv_font_sizey(font);
+	else
+		return adv_font_sizex(font);;
+}
+int int_font_info_dx_get(adv_font* font, const string& s)
+{
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+		return adv_font_sizey_string(font, s.c_str(), s.c_str() + s.length());
+	else
+		return adv_font_sizex_string(font, s.c_str(), s.c_str() + s.length());
+}
+int int_font_info_dy_get(adv_font* font)
+{
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+		return adv_font_sizex(font);
+	else
+		return adv_font_sizey(font);
+}
+
+void usar_fuente(adv_font* font)
+{
+	int_font = font;
+	int_font_dx = adv_font_sizex(font);
+	int_font_dy = adv_font_sizey(font);
 }
 
 // -----------------------------------------------------------------------
@@ -699,12 +744,12 @@ bool int_set(double gamma, double brightness, unsigned idle_0, unsigned idle_0_r
 		goto err_mouse;
 	}
 
-	video_alpha_flag = translucency != 255;
+	video_alpha_flag = 1; 
 	video_alpha_color_def = color_def_make_rgb_from_sizelenpos(4, 8, 16, 8, 8, 8, 0); /* BGRA */
 	video_alpha_bytes_per_pixel = color_def_bytes_per_pixel_get(video_alpha_color_def);
 
 	color_setup(video_color_def(), video_alpha_color_def, translucency);
-
+	
 	if (!int_key_enable()) {
 		video_mode_restore();
 		target_err("%s\n", error_get());
@@ -778,21 +823,29 @@ void int_unset(bool reset_video_mode)
 	int_key_done();
 }
 
-bool int_enable(int fontx, int fonty, const string& font, unsigned orientation)
+void int_enable_orientation(unsigned orientation)
 {
+	int_orientation = orientation;
+}
+
+bool int_enable_font_custom(int fontx, int fonty, const string& font, unsigned orientation)
+{
+	if(int_font)
+		adv_font_free(int_font);
+	
 	int_orientation = orientation;
 	unsigned font_size_x;
 	unsigned font_size_y;
 
-	if (fonty >= 5 && fonty <= 100)
-		font_size_y = video_size_y() / fonty;
+	if (fonty)
+		font_size_y = fonty;
 	else
 		font_size_y = video_size_y() / 45;
-	if (fontx >= 5 && fontx <= 200)
-		font_size_x = video_size_x() / fontx;
+	if (fontx)
+		font_size_x = fontx;
 	else
-		font_size_x = font_size_y * video_size_x() * 3 / video_size_y() / 4;
-
+		font_size_x = font_size_y;
+		
 	// load the font
 	int_font = 0;
 	if (font != "none" && font != "auto") {
@@ -800,6 +853,8 @@ bool int_enable(int fontx, int fonty, const string& font, unsigned orientation)
 		if (f) {
 			int_font = adv_font_load(f, font_size_x, font_size_y);
 			fzclose(f);
+		} else {
+			log_std(("ERROR:text: error opening font path %s\n", font.c_str()));
 		}
 	}
 	if (!int_font)
@@ -811,6 +866,15 @@ bool int_enable(int fontx, int fonty, const string& font, unsigned orientation)
 	// compute font size
 	int_font_dx = adv_font_sizex(int_font);
 	int_font_dy = adv_font_sizey(int_font);
+
+	int_updating_active = false;
+
+	return true;
+}
+
+bool int_enable(int fontx, int fonty, const string& font, unsigned orientation)
+{
+	int_orientation = orientation;
 
 	video_buffer_pixel_size = video_bytes_per_pixel();
 	video_buffer_line_size = video_size_x() * video_bytes_per_pixel();
@@ -828,9 +892,92 @@ bool int_enable(int fontx, int fonty, const string& font, unsigned orientation)
 	return true;
 }
 
+bool int_enable_font_info(adv_font* &font, int fontx, int fonty, const string& fontpath, unsigned orientation)
+{
+	if(font)
+		adv_font_free(font);
+
+	int_orientation = orientation;
+	
+	unsigned font_size_x;
+	unsigned font_size_y;
+
+	if (fonty)
+		font_size_y = fonty;
+	else
+		font_size_y = video_size_y() / 45;
+	if (fontx)
+		font_size_x = fontx;
+	else
+		font_size_x = font_size_y;	
+
+	// load the font
+	font = 0;
+	if (fontpath != "none" && fontpath != "auto") {
+		adv_fz* f = fzopen(fontpath.c_str(), "rb");
+		if (f) {
+			font = adv_font_load(f, font_size_x, font_size_y);
+			fzclose(f);
+		}
+	}
+	if (!font)
+		font = adv_font_default(font_size_x, font_size_y, 0);
+
+	adv_font_orientation(font, int_orientation);
+
+	return true;
+}
+
+bool int_enable_font_lay(adv_font* &font, int fontx, int fonty, const string& fontpath, unsigned orientation)
+{
+	if(font)
+		adv_font_free(font);
+
+	int_orientation = orientation;
+	
+	unsigned font_size_x;
+	unsigned font_size_y;
+
+	if (fonty)
+		font_size_y = fonty;
+	else
+		font_size_y = video_size_y() / 45;
+	if (fontx)
+		font_size_x = fontx;
+	else
+		font_size_x = font_size_y;	
+
+	// load the font
+	font = 0;
+	if (fontpath != "none" && fontpath != "auto") {
+		adv_fz* f = fzopen(fontpath.c_str(), "rb");
+		if (f) {
+			font = adv_font_load(f, font_size_x, font_size_y);
+			fzclose(f);
+		}
+	}
+	if (!font)
+		font = adv_font_default(font_size_x, font_size_y, 0);
+
+	// set the orientation
+	adv_font_orientation(font, int_orientation);
+
+	return true;
+}
+
+void int_disable_font_info(adv_font* font)
+{
+	adv_font_free(font);
+}
+
+void int_disable_font()
+{
+	if(int_font)
+		adv_font_free(int_font);
+}
+
 void int_disable()
 {
-	adv_font_free(int_font);
 	operator delete(video_foreground_buffer);
 	adv_bitmap_free(video_foreground_bitmap);
 	operator delete(video_background_buffer);
@@ -2224,6 +2371,23 @@ unsigned int_put_width(const string& s)
 	return size;
 }
 
+unsigned int_put_info_width(adv_font* font, char c)
+{
+	adv_bitmap* src = font->data[(unsigned char)c];
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+		return src->size_y;
+	else
+		return src->size_x;
+}
+
+unsigned int_put_info_width(adv_font* font, const string& s)
+{
+	unsigned size = 0;
+	for(unsigned i=0;i<s.length();++i)
+		size += int_put_info_width(font, s[i]);
+	return size;
+}
+
 void int_put(int x, int y, char c, const int_color& color)
 {
 	if (x>=0 && y>=0 && x+int_put_width(c)<=int_dx_get() && y+int_font_dy_get()<=int_dy_get()) {
@@ -2266,6 +2430,34 @@ void int_put_alpha(int x, int y, char c, const int_color& color)
 			adv_bitmap_free(flat);
 		} else {
 			adv_font_put_char_map(int_font, video_foreground_bitmap, x, y, c, color.opaque);
+		}
+	}
+}
+
+void int_put_info_alpha(adv_font* font, int x, int y, char c, const int_color& color)
+{
+	if (x>=0 && y>=0 && x+int_put_info_width(font, c)<=int_dx_get() && y+int_font_info_dy_get(font)<=int_dy_get()) {
+		adv_bitmap* src = font->data[(unsigned char)c];
+
+		if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+			swap(x, y);
+		if (int_orientation & ADV_ORIENTATION_FLIP_X)
+			x = video_size_x() - src->size_x - x;
+		if (int_orientation & ADV_ORIENTATION_FLIP_Y)
+			y = video_size_y() - src->size_y - y;
+
+		assert(x>=0 && y>=0 && x+src->size_x<=video_size_x() && y+src->size_y<=video_size_y());
+
+		if (video_alpha_flag) {
+			adv_bitmap* flat = adv_bitmap_alloc(src->size_x, src->size_y, video_alpha_bytes_per_pixel);
+
+			adv_font_put_char_map(font, flat, 0, 0, c, color.alpha);
+
+			adv_bitmap_put_alphaback(video_foreground_bitmap, x, y, video_color_def(), video_background_bitmap, x, y, flat, 0, 0, flat->size_x, flat->size_y, video_alpha_color_def);
+
+			adv_bitmap_free(flat);
+		} else {
+			adv_font_put_char_map(font, video_foreground_bitmap, x, y, c, color.opaque);
 		}
 	}
 }
@@ -2356,6 +2548,14 @@ void int_put_alpha(int x, int y, const string& s, const int_color& color)
 	for(unsigned i=0;i<s.length();++i) {
 		int_put_alpha(x, y, s[i], color);
 		x += int_put_width(s[i]);
+	}
+}
+
+void int_put_info_alpha(adv_font* font, int x, int y, const string& s, const int_color& color)
+{
+	for(unsigned i=0;i<s.length();++i) {
+		int_put_info_alpha(font, x, y, s[i], color);
+		x += int_put_info_width(font, s[i]);
 	}
 }
 

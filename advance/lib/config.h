@@ -218,7 +218,7 @@
 #define SIZEOF_INT 4
 
 /* The size of `long', as computed by sizeof. */
-#define SIZEOF_LONG 4
+#define SIZEOF_LONG 8
 
 /* The size of `long long', as computed by sizeof. */
 #define SIZEOF_LONG_LONG 8
@@ -227,7 +227,7 @@
 #define SIZEOF_SHORT 2
 
 /* The size of `void*', as computed by sizeof. */
-#define SIZEOF_VOIDP 4
+#define SIZEOF_VOIDP 8
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
@@ -244,7 +244,7 @@
 #define TIME_WITH_SYS_TIME 1
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 64
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

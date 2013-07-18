@@ -764,7 +764,7 @@ static adv_font* adv_font_adjust(adv_font* font)
 	adv_font_set_char(font, ADV_FONT_FIXSPACE, bitmap);
 
 	/* ensure that every number is wide at least like '0' */
-	for(c='1';c<='9';++c) {
+	for(c='2';c<='9';++c) { //for(c='1';c<='9';++c) {
 		if (adv_font_sizex_char(font, c) < adv_font_sizex_char(font, '0')) {
 			unsigned x, y;
 			adv_bitmap* src = font->data[(unsigned char)c];
@@ -799,7 +799,8 @@ static adv_font* font_load_unscaled(adv_fz* f, unsigned sizex, unsigned sizey)
 #ifdef USE_FREETYPE
 	font = adv_font_load_freetype2(f, sizex, sizey);
 	if (font)
-		return adv_font_adjust(font);
+		return font;
+		//return adv_font_adjust(font);
 
 	fzseek(f, pos, SEEK_SET); /* ignore error */
 #endif

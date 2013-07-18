@@ -26,6 +26,7 @@
 #include "color.h"
 #include "conf.h"
 #include "bitmap.h"
+#include "font.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -40,6 +41,10 @@ bool int_init(unsigned video_size);
 void int_done();
 bool int_set(double gamma, double brightness, unsigned idle_0, unsigned idle_0_rep, unsigned idle_1, unsigned idle_1_rep, bool backdrop_fast, unsigned translucency, bool disable_special);
 void int_unset(bool reset_video_mode);
+bool int_enable_font_custom(int fontx, int fonty, const std::string& font, unsigned orientation);
+bool int_enable_font_info(adv_font* &font, int fontx, int fonty, const std::string& fontpath, unsigned orientation);
+void int_disable_font_info(adv_font* font);
+
 bool int_enable(int fontx, int fonty, const std::string& font, unsigned orientation);
 void int_disable();
 void int_unplug();
@@ -57,12 +62,18 @@ void int_invrotate(int& x, int& y, int& dx, int& dy);
 
 unsigned int_put_width(char c);
 unsigned int_put_width(const std::string& s);
+unsigned int_put_info_width(adv_font* font, char c);
+unsigned int_put_info_width(adv_font* font, const std::string& s);
+
 void int_put(int x, int y, char c, const int_color& color);
 void int_put(int x, int y, const std::string& s, const int_color& color);
 void int_put_filled(int x, int y, int dx, const std::string& s, const int_color& color);
 void int_put_special(bool& in, int x, int y, int dx, const std::string& s, const int_color& c0, const int_color& c1, const int_color& c2);
 void int_put_alpha(int x, int y, char c, const int_color& color);
 void int_put_alpha(int x, int y, const std::string& s, const int_color& color);
+void int_put_info_alpha(adv_font* font, int x, int y, char c, const int_color& color);
+void int_put_info_alpha(adv_font* font, int x, int y, const std::string& s, const int_color& color);
+
 void int_put_filled_alpha(int x, int y, int dx, const std::string& s, const int_color& color);
 void int_put_special_alpha(bool& in, int x, int y, int dx, const std::string& s, const int_color& c0, const int_color& c1, const int_color& c2);
 
@@ -101,6 +112,19 @@ int int_font_dy_get();
 
 int int_dx_get();
 int int_dy_get();
+
+int int_font_info_dx_get(adv_font* font);
+int int_font_info_dx_get(adv_font* font, const std::string& s);
+int int_font_info_dy_get(adv_font* font);
+
+void usar_fuente(adv_font* font);
+bool int_enable_font_lay(adv_font* &font, int fontx, int fonty, const std::string& fontpath, unsigned orientation);
+void int_disable_font();
+
+int size_win_sort(int x, int y, int dx, int dy);
+
+void int_enable_orientation(unsigned orientation);
+
 
 #endif
 

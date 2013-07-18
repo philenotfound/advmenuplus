@@ -192,6 +192,21 @@ const char* file_config_dir_singledir(const char* tag);
  */
 const char* file_config_dir_singlefile(void);
 
+void load_current_dir_custom(const char* dir);
+
+/**
+ * Complete path of a file in the current custom data directory.
+ * If the path is relative, the current custom directory is added.
+ * If the path beginning is ~/ the home directory is added.
+ * If the path beginning is ./ the current directory is added.
+ *	If the path is absolute (/) the path isn't changed.
+ * \note The arg and the returned value are in the OS format.
+ * \return The complete path. It's always != 0.
+ */
+const char* file_config_file_custom(const char* file);
+
+	
+
 #ifdef __cplusplus
 }
 #endif

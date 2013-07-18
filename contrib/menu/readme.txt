@@ -7,3 +7,4 @@ ttffonts/
 hiscore/
 	Hiscore data file.
 
+	

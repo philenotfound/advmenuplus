@@ -297,7 +297,7 @@ static void process_videoorientation(struct state_t* state, enum token_t t, cons
 			return;
 		}
 		string v = string(s, len);
-		state->g->flag_set(v == "vertical", emulator::flag_derived_vertical);
+		state->g->flag_set(v == "90" || v == "270" || v == "vertical", emulator::flag_derived_vertical);
 	}
 }
 
@@ -388,6 +388,7 @@ static struct conversion_t CONV3[] = {
 	{ 3, { match_mamemessraine, match_gamemachine, "driver", "status", 0 }, process_driverstatus },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "screen", 0 }, process_videoscreen },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "orientation", 0 }, process_videoorientation },
+	{ 3, { match_mamemessraine, match_gamemachine, "display", "rotate", 0 }, process_videoorientation },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "width", 0 }, process_videowidth },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "height", 0 }, process_videoheight },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "aspectx", 0 }, process_videoaspectx },

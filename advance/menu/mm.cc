@@ -37,10 +37,9 @@ using namespace std;
 
 int run_sub(config_state& rs, bool silent)
 {
-
 	log_std(("menu: int_enable call\n"));
 
-	if (!int_enable(rs.video_fontx, rs.video_fonty, rs.video_font_path, rs.video_orientation_effective)) {
+	if (!int_enable(-1, -1, "none", rs.video_orientation_effective)) {
 		return EVENT_ESC;
 	}
 
@@ -53,6 +52,7 @@ int run_sub(config_state& rs, bool silent)
 	while (!done) {
 		emulator* emu;
 
+			
 		key = run_menu(rs, (rs.video_orientation_effective & ADV_ORIENTATION_FLIP_XY) != 0, silent);
 
 		// don't replay the sound and clip
@@ -79,10 +79,15 @@ int run_sub(config_state& rs, bool silent)
 					silent = false;
 					run_group_next(rs);
 					break;
-				case EVENT_EMU :
+				case EVENT_EMU_NEXT :
 					// replay the sound and clip
 					silent = false;
 					run_emu_next(rs);
+					break;
+				case EVENT_EMU_PRE :
+					// replay the sound and clip
+					silent = false;
+					run_emu_pre(rs);
 					break;
 				case EVENT_TYPE :
 					// replay the sound and clip
@@ -229,8 +234,8 @@ int run_main(config_state& rs, bool is_first, bool silent)
 		silent = true;
 
 		if (!rs.lock_effective)
-		switch (key) {
-			case EVENT_ROTATE : {
+			switch (key) {
+				case EVENT_ROTATE : {
 					unsigned mirror = rs.video_orientation_effective & (ADV_ORIENTATION_FLIP_X | ADV_ORIENTATION_FLIP_Y);
 					unsigned flip = rs.video_orientation_effective & ADV_ORIENTATION_FLIP_XY;
 					if (mirror == 0) {
@@ -282,7 +287,7 @@ int run_main(config_state& rs, bool is_first, bool silent)
 
 	if (is_terminate) {
 		if (rs.ui_exit != "none") {
-			if (int_enable(-1, -1, "none", rs.video_orientation_effective)) {
+			if (int_enable(-1, -1, "none",  rs.video_orientation_effective)) {
 				wait = int_clip(rs.ui_exit, false);
 				int_disable();
 			}
@@ -385,7 +390,7 @@ int run_all(adv_conf* config_context, config_state& rs)
 static void version(void)
 {
 	char report_buffer[128];
-	target_out("AdvanceMENU %s\n", ADV_VERSION);
+	target_out("AdvMenuPLUS %s\n", ADV_VERSION);
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__) /* OSDEF Detect compiler version */
 #define COMPILER_RESOLVE(a) #a
 #define COMPILER(a, b, c) COMPILER_RESOLVE(a) "." COMPILER_RESOLVE(b) "." COMPILER_RESOLVE(c)
@@ -432,7 +437,7 @@ static void help(void)
 #endif
 	target_out(ADV_COPY);
 	target_out("\n");
-	target_out("Usage: advmenu [options]\n\n");
+	target_out("Usage: advmenup [options]\n\n");
 	target_out("Options:\n");
 	target_out("%sdefault  add all the default options at the configuration file\n", slash);
 	target_out("%sremove   remove all the default option from the configuration file\n", slash);
@@ -440,7 +445,7 @@ static void help(void)
 	target_out("%sversion  print the version\n", slash);
 	target_out("\n");
 #if !defined(__MSDOS__) && !defined(__WIN32__)
-	target_out("To get an extensive help type 'man advmenu'\n");
+	target_out("To get an extensive help type 'man advmenup'\n");
 	target_out("\n");
 #endif
 }
@@ -614,6 +619,50 @@ void os_signal(int signum, void* info, void* context)
 }
 
 //---------------------------------------------------------------------------
+// Lectura de archivos amp - Layouts
+
+bool layouts_load(config_state& rs)
+{
+	adv_conf* custom_context;
+	char* section_map_custom[1];
+	
+	for(pemulator_container::iterator j = rs.emu.begin(); j!=rs.emu.end(); j++) {
+
+		string path_archivo_custom = (*j)->custom_file_path_get();
+		string nombre_emulador = (*j)->user_name_get();
+
+		if (path_archivo_custom != "") {
+			string path_custom_completo = file_config_file_home(path_archivo_custom.c_str());
+			string dir_custom = file_dir_custom(path_custom_completo); 
+			load_current_dir_custom(slash_remove(dir_custom).c_str());
+			
+			if (access(path_custom_completo.c_str(), F_OK)==0) {
+				custom_context = conf_init();
+				config_state::conf_register_custom(custom_context);
+				section_map_custom[0] = (char*)"";
+				conf_section_set(custom_context, section_map_custom, 1);
+
+				if (conf_input_file_load_adv(custom_context, 3, path_custom_completo.c_str(), 0, 0, 1, STANDARD, sizeof(STANDARD)/sizeof(STANDARD[0]), error_callback, 0) != 0) {
+					conf_done(custom_context);
+					return false;
+				}
+
+				if (!rs.load_custom(custom_context, nombre_emulador)) {
+					conf_done(custom_context);
+					return false;
+				}
+
+				conf_done(custom_context);
+
+			} else {
+				target_err("Error opening file '%s'\n", path_custom_completo.c_str());
+			}
+		}
+	}
+	return true;
+}
+
+//---------------------------------------------------------------------------
 // Main
 
 int os_main(int argc, char* argv[])
@@ -700,9 +749,9 @@ int os_main(int argc, char* argv[])
 	}
 
 	if (opt_log || opt_logsync) {
-		remove("advmenu.log");
-		if (log_init("advmenu.log", opt_logsync) != 0) {
-			target_err("Error opening the log file 'advmenu.log'.\n");
+		remove("advmenup.log");
+		if (log_init("advmenup.log", opt_logsync) != 0) {
+			target_err("Error opening the log file 'advmenup.log'.\n");
 			goto err_init;
 		}
 	}
@@ -756,7 +805,7 @@ int os_main(int argc, char* argv[])
 	}
 
 	/* set the used section */
-	section_map[0] = "";
+	section_map[0] = (char*)"";
 	conf_section_set(config_context, section_map, 1);
 
 	/* setup the include configuration file */
@@ -770,6 +819,11 @@ int os_main(int argc, char* argv[])
 	if (!rs.load(config_context, opt_verbose)) {
 		goto err_init;
 	}
+
+	if(!layouts_load(rs)) {
+		goto err_init;
+	}
+	
 	if (!int_load(config_context)) {
 		goto err_init;
 	}
@@ -777,7 +831,7 @@ int os_main(int argc, char* argv[])
 		goto err_init;
 	}
 
-	if (os_inner_init("AdvanceMENU") != 0) {
+	if (os_inner_init("AdvMenuPlus 2012.11.27") != 0) {
 		target_err("Error initializing the inner OS support.\n");
 		goto err_init;
 	}
@@ -836,4 +890,5 @@ err_init:
 err_conf:
 	conf_done(config_context);
 	return EXIT_FAILURE;
+
 }

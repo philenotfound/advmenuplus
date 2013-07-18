@@ -56,6 +56,8 @@ struct file_context {
 	char file_data_buffer[FILE_MAXPATH]; /**< Static buffer for the returned strings. */
 	char file_home_buffer[FILE_MAXPATH]; /**< Static buffer for the returned strings. */
 	char list_buffer[FILE_MAXPATH*4]; /**< Static buffer for the returned strings. */
+	char current_dir_custom_buffer[FILE_MAXPATH];
+	char file_custom_buffer[FILE_MAXPATH];
 };
 
 static struct file_context FL;
@@ -283,5 +285,21 @@ const char* file_config_list(const char* const_list, const char* (*expand_dir)(c
 	free(list);
 
 	return FL.list_buffer;
+}
+
+void load_current_dir_custom(const char* dir) {
+	snprintf(FL.current_dir_custom_buffer, sizeof(FL.current_dir_custom_buffer), "%s", dir);
+}
+
+const char* file_config_file_custom(const char* file)
+{
+	if (strncmp(file, "./", 2) == 0)
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s/%s", FL.current_dir_custom_buffer, file + 2);
+	else if (file[0] == '/')
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s", file);
+	else
+		/* if relative add the current custom data dir */
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s/%s", FL.current_dir_custom_buffer, file);
+	return FL.file_custom_buffer;
 }
 

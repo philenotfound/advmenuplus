@@ -536,3 +536,19 @@ string file_read(const string& file)
 	return ss;
 }
 
+string file_dir_custom(const string& s)
+{
+	string path = s;
+
+	for(unsigned i=0;path[i];++i)
+		if (path[i] == '\\')
+			path[i] = '/';
+
+	int i = path.find_last_of("/");
+	if (i == string::npos)
+		return "";
+	else 
+		return string(s, 0, i+1);
+}
+
+

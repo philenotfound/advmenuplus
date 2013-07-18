@@ -51,6 +51,7 @@ static adv_conf_enum_int OPTION_SORT[] = {
 static adv_conf_enum_int OPTION_MODE[] = {
 { "list", mode_list },
 { "list_mixed", mode_list_mixed },
+{ "custom", mode_custom },
 { "tile_small", mode_tile_small },
 { "tile_normal", mode_tile_normal },
 { "tile_big", mode_tile_big },
@@ -169,8 +170,8 @@ static bool config_path(const string& s, string& a0)
 		config_error_a(s);
 		return false;
 	}
-
-	if (a0 == "none" || a0 == "default")
+	
+	if (a0 == "none" || a0 == "default" || a0 == "auto")
 		return true;
 
 	a0 = file_config_file_home(a0.c_str());
@@ -230,6 +231,98 @@ static string config_normalize(const string& a)
 	return r;
 }
 
+bool config_split_custom(const string& s, string& a0)
+{
+	return config_split(s, a0);
+}
+bool config_split_custom(const string& s, string& a0, string& a1)
+{
+	return config_split(s, a0, a1);
+}
+bool config_split_custom(const string& s, string& a0, string& a1, string& a2)
+{
+	return config_split(s, a0, a1, a2);
+}
+bool config_split_custom(const string& s, string& a0, string& a1, string& a2, string& a3)
+{
+	return config_split(s, a0, a1, a2, a3);
+}
+
+static string borrar_comillas(const string& s) {
+	string r = s;
+	if (r[0] == '"' && r[r.length()-1] == '"')
+		r = s.substr(1, s.length()-2);
+	else {
+		if (r[0] == '"') 
+			r = s.substr(1, s.length()-1);
+		else if (r[r.length()-1] == '"') 
+			r = s.substr(0, s.length()-1);
+	}
+	return r;
+}
+
+void config_state::conf_register_custom(adv_conf* config_context)
+{
+	conf_string_register_default(config_context, "background_image_path", "none");
+	conf_string_register_default(config_context, "help_image_path", "none");
+	conf_string_register_default(config_context, "start_image_path", "none");
+	conf_string_register_default(config_context, "list_font_path", "auto");
+	conf_string_register_default(config_context, "ui_list_left", "20");
+	conf_string_register_default(config_context, "ui_list_top", "20");
+	conf_string_register_default(config_context, "ui_list_width", "60");
+	conf_string_register_default(config_context, "ui_list_height", "200");
+	conf_string_register_default(config_context, "list_pos_size", "");
+	conf_string_register_default(config_context, "scroll_pos_size", "");
+	conf_string_register_default(config_context, "list_cols", "1 0");
+	conf_string_register_default(config_context, "list_rows", "auto");
+	conf_string_register_default(config_context, "list_diagonal", "0");
+	conf_string_register_default(config_context, "list_selected_pos", "none");
+	conf_string_register_default(config_context, "list_align", "left");
+	conf_string_register_default(config_context, "list_font_color", "");
+	conf_string_register_default(config_context, "list_font_select_color", "");
+	conf_string_register_default(config_context, "scroll_color", "");
+	conf_string_register_default(config_context, "list_font_size", "");
+	conf_string_register_default(config_context, "win_snaps", "none");
+	conf_string_register_default(config_context, "win_flyers", "none");
+	conf_string_register_default(config_context, "win_cabinets", "none");
+	conf_string_register_default(config_context, "win_icons", "none");
+	conf_string_register_default(config_context, "win_marquees", "none");
+	conf_string_register_default(config_context, "win_titles", "none");
+	conf_string_register_default(config_context, "win_color", "none");
+	conf_string_register_default(config_context, "bar_info_1", "none");
+	conf_string_register_default(config_context, "bar_info_1_text", "");
+	conf_string_register_default(config_context, "bar_info_1_color", "");
+	conf_string_register_default(config_context, "bar_info_1_font", "auto");
+	conf_string_register_default(config_context, "bar_info_1_align", "left");
+	conf_string_register_default(config_context, "bar_info_2", "none");
+	conf_string_register_default(config_context, "bar_info_2_text", "");
+	conf_string_register_default(config_context, "bar_info_2_color", "");
+	conf_string_register_default(config_context, "bar_info_2_font", "auto");
+	conf_string_register_default(config_context, "bar_info_2_align", "left");
+	conf_string_register_default(config_context, "bar_info_3", "none");
+	conf_string_register_default(config_context, "bar_info_3_text", "");
+	conf_string_register_default(config_context, "bar_info_3_color", "");
+	conf_string_register_default(config_context, "bar_info_3_font", "auto");
+	conf_string_register_default(config_context, "bar_info_3_align", "left");
+	conf_string_register_default(config_context, "bar_info_4", "none");
+	conf_string_register_default(config_context, "bar_info_4_text", "");
+	conf_string_register_default(config_context, "bar_info_4_color", "");
+	conf_string_register_default(config_context, "bar_info_4_font", "auto");
+	conf_string_register_default(config_context, "bar_info_4_align", "left");
+	conf_string_register_default(config_context, "bar_info_5", "none");
+	conf_string_register_default(config_context, "bar_info_5_text", "");
+	conf_string_register_default(config_context, "bar_info_5_color", "");
+	conf_string_register_default(config_context, "bar_info_5_font", "auto");
+	conf_string_register_default(config_context, "bar_info_5_align", "left");
+	conf_string_register_default(config_context, "background_color", "");
+	conf_string_register_default(config_context, "menu_font_path", "auto");
+	conf_string_register_default(config_context, "menu_font_size", "");
+	conf_string_register_default(config_context, "menu_title_color", "");
+	conf_string_register_default(config_context, "menu_font_color", "");
+	conf_string_register_default(config_context, "menu_font_select_color", "");
+	conf_string_register_default(config_context, "orientation", "");	
+}
+
 void config_state::conf_register(adv_conf* config_context)
 {
 	conf_string_register_multi(config_context, "emulator");
@@ -243,6 +336,14 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_multi(config_context, "emulator_titles");
 	conf_string_register_multi(config_context, "emulator_include");
 	conf_string_register_multi(config_context, "emulator_attrib");
+	conf_string_register_multi(config_context, "emulator_file_custom");
+	conf_string_register_multi(config_context, "emulator_background");
+	conf_string_register_multi(config_context, "emulator_help");
+	conf_string_register_multi(config_context, "emulator_start");
+	conf_string_register_multi(config_context, "emulator_font");
+	conf_string_register_multi(config_context, "emulator_font_size");
+	conf_string_register_multi(config_context, "emulator_font_color");
+	conf_string_register_multi(config_context, "emulator_font_color_select");
 	conf_string_register_multi(config_context, "group");
 	conf_string_register_multi(config_context, "type");
 	conf_string_register_multi(config_context, "group_include");
@@ -320,6 +421,7 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_default(config_context, "ui_command_menu", "Command...");
 	conf_string_register_default(config_context, "ui_command_error", "Error running the command");
 	conf_string_register_multi(config_context, "ui_command");
+	conf_bool_register_default(config_context, "rem_selected", 1);
 }
 
 // -------------------------------------------------------------------------
@@ -441,6 +543,51 @@ static bool config_load_iterator(adv_conf* config_context, const string& tag, bo
 		string a0 = conf_iterator_string_get(&i);
 		if (!func(a0)) {
 			config_error_a(a0);
+			return false;
+		}
+		conf_iterator_next(&i);
+	}
+	return true;
+}
+
+static bool config_load_iterator_emu_custom_set(adv_conf* config_context, const string& nombre_emulador, const string& tag, pemulator_container& emu, void (emulator::*set)(const string& s), bool type_path)
+{
+	adv_conf_iterator i;
+	conf_iterator_begin(&i, config_context, tag.c_str());
+	while (!conf_iterator_is_end(&i)) {
+		string arg = borrar_comillas(conf_iterator_string_get(&i));
+		
+		if (type_path) { 
+			if (arg != "none" && arg != "default" && arg != "auto") {
+				arg = file_config_file_custom(arg.c_str());
+			}
+		}
+		
+		if (!config_emulator_load(nombre_emulador, emu, set, arg)) {
+			config_error_a(arg);
+			return false;
+		}
+		conf_iterator_next(&i);
+	}
+	return true;
+}
+
+static bool config_load_iterator_emu_path_set(adv_conf* config_context, const string& tag, pemulator_container& emu, void (emulator::*set)(const string& s))
+{
+	adv_conf_iterator i;
+	conf_iterator_begin(&i, config_context, tag.c_str());
+	while (!conf_iterator_is_end(&i)) {
+		string s, a0, a1;
+		s = conf_iterator_string_get(&i);
+		if (!config_split(s, a0, a1))
+			return false;
+
+		if (a1 != "none" && a1 != "default") {
+			a1 = file_config_file_home(a1.c_str());
+		}
+		
+		if (!config_emulator_load(a0, emu, set, a1)) {
+			config_error_a(s);
 			return false;
 		}
 		conf_iterator_next(&i);
@@ -749,6 +896,119 @@ static bool config_load_orientation(adv_conf* config_context, unsigned& mask)
 	return true;
 }
 
+bool config_state::load_custom(adv_conf* config_context, const string& nombre_emulador)
+{
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "background_image_path", emu, &emulator::custom_background_path_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "help_image_path", emu, &emulator::custom_help_path_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "start_image_path", emu, &emulator::custom_start_path_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_path", emu, &emulator::custom_font_path_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_pos_size", emu, &emulator::custom_list_pos_size_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "scroll_pos_size", emu, &emulator::custom_scroll_pos_size_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_cols", emu, &emulator::custom_list_cols_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_diagonal", emu, &emulator::custom_list_diagonal_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_rows", emu, &emulator::custom_list_rows_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_selected_pos", emu, &emulator::custom_list_selected_pos_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_align", emu, &emulator::custom_list_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_color", emu, &emulator::custom_color_font_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_select_color", emu, &emulator::custom_color_font_select_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "scroll_color", emu, &emulator::custom_color_scroll_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_size", emu, &emulator::custom_font_size_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_snaps", emu, &emulator::custom_win_snaps_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_flyers", emu, &emulator::custom_win_flyers_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_cabinets", emu, &emulator::custom_win_cabinets_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_icons", emu, &emulator::custom_win_icons_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_marquees", emu, &emulator::custom_win_marquees_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_titles", emu, &emulator::custom_win_titles_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_color", emu, &emulator::custom_win_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1", emu, &emulator::custom_bar_info_1_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_text", emu, &emulator::custom_bar_info_1_text_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_color", emu, &emulator::custom_bar_info_1_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_font", emu, &emulator::custom_bar_info_1_font_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_align", emu, &emulator::custom_bar_info_1_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2", emu, &emulator::custom_bar_info_2_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_text", emu, &emulator::custom_bar_info_2_text_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_color", emu, &emulator::custom_bar_info_2_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_font", emu, &emulator::custom_bar_info_2_font_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_align", emu, &emulator::custom_bar_info_2_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3", emu, &emulator::custom_bar_info_3_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_text", emu, &emulator::custom_bar_info_3_text_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_color", emu, &emulator::custom_bar_info_3_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_font", emu, &emulator::custom_bar_info_3_font_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_align", emu, &emulator::custom_bar_info_3_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4", emu, &emulator::custom_bar_info_4_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_text", emu, &emulator::custom_bar_info_4_text_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_color", emu, &emulator::custom_bar_info_4_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_font", emu, &emulator::custom_bar_info_4_font_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_align", emu, &emulator::custom_bar_info_4_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5", emu, &emulator::custom_bar_info_5_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_text", emu, &emulator::custom_bar_info_5_text_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_color", emu, &emulator::custom_bar_info_5_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_font", emu, &emulator::custom_bar_info_5_font_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_align", emu, &emulator::custom_bar_info_5_align_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "background_color", emu, &emulator::custom_background_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_path", emu, &emulator::custom_menu_font_path_set, true))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_size", emu, &emulator::custom_menu_font_size_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_title_color", emu, &emulator::custom_menu_title_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_color", emu, &emulator::custom_menu_font_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_select_color", emu, &emulator::custom_menu_font_select_color_set, false))
+		return false;
+	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "orientation", emu, &emulator::custom_video_orientation_set, false))
+		return false;
+	return true;
+}
+
 bool config_state::load(adv_conf* config_context, bool opt_verbose)
 {
 	string a0, a1;
@@ -762,6 +1022,15 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 
 	default_sort_orig = (listsort_t)conf_int_get_default(config_context, "sort");
 	default_mode_orig = (listmode_t)conf_int_get_default(config_context, "mode");
+
+	if(conf_bool_get_default(config_context, "rem_selected")) {
+		default_menu_base_orig = 0;
+		default_menu_rel_orig = 0;
+	} else {
+		default_menu_base_orig = (int)conf_int_get_default(config_context, "menu_base");
+		default_menu_rel_orig = (int)conf_int_get_default(config_context, "menu_rel");
+	}
+	
 	default_preview_orig = (listpreview_t)conf_int_get_default(config_context, "preview");
 
 	double d = conf_float_get_default(config_context, "ui_translucency");
@@ -780,13 +1049,13 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	ui_right = conf_int_get_default(config_context, "ui_skipright");
 	ui_top = conf_int_get_default(config_context, "ui_skiptop");
 	ui_bottom = conf_int_get_default(config_context, "ui_skipbottom");
+	rem_selected = conf_bool_get_default(config_context, "rem_selected");
 	ui_top_bar = conf_bool_get_default(config_context, "ui_topbar");
 	ui_bottom_bar = conf_bool_get_default(config_context, "ui_bottombar");
 	script_menu = conf_string_get_default(config_context, "ui_command_menu");
 	script_error = conf_string_get_default(config_context, "ui_command_error");
 	if (!load_iterator_script(config_context, "ui_command"))
 		return false;
-
 	lock_orig = (bool)conf_bool_get_default(config_context, "lock");
 	restore = (restore_t)conf_int_get_default(config_context, "config");
 	if (!config_load_skip(config_context, mode_skip_mask))
@@ -896,7 +1165,23 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	if (!config_load_iterator_emu_set(config_context, "emulator_titles", emu, &emulator::user_title_path_set))
 		return false;
-
+	if (!config_load_iterator_emu_set(config_context, "emulator_file_custom", emu, &emulator::custom_file_path_set))
+		return false;
+	if (!config_load_iterator_emu_path_set(config_context, "emulator_background", emu, &emulator::nocustom_background_path_set))
+		return false;
+	if (!config_load_iterator_emu_path_set(config_context, "emulator_help", emu, &emulator::nocustom_help_path_set))
+		return false;
+	if (!config_load_iterator_emu_path_set(config_context, "emulator_start", emu, &emulator::nocustom_start_path_set))
+		return false;
+	if (!config_load_iterator_emu_path_set(config_context, "emulator_font", emu, &emulator::nocustom_font_path_set))
+		return false;
+	if (!config_load_iterator_emu_set(config_context, "emulator_font_size", emu, &emulator::nocustom_font_size_set))
+		return false;
+	if (!config_load_iterator_emu_set(config_context, "emulator_font_color", emu, &emulator::nocustom_font_color_set))
+		return false;
+	if (!config_load_iterator_emu_set(config_context, "emulator_font_color_select", emu, &emulator::nocustom_font_color_select_set))
+		return false;
+	
 	for(pemulator_container::iterator i=emu.begin();i!=emu.end();++i) {
 		if (!(*i)->config_get().load(config_context, config_normalize((*i)->user_name_get())))
 			return false;
@@ -1216,10 +1501,12 @@ void config_state::conf_default(adv_conf* config_context)
 bool config_state::save(adv_conf* config_context) const
 {
 	conf_int_set(config_context, "", "mode", default_mode_orig);
+	conf_int_set(config_context, "", "menu_base", default_menu_base_orig);
+	conf_int_set(config_context, "", "menu_rel", default_menu_rel_orig);
 	conf_int_set(config_context, "", "sort", default_sort_orig);
 	conf_int_set(config_context, "", "preview", default_preview_orig);
-
 	conf_remove(config_context, "", "group_include");
+
 	for(category_container::const_iterator i=default_include_group_orig.begin();i!=default_include_group_orig.end();++i) {
 		conf_string_set(config_context, "", "group_include", config_out(*i).c_str());
 	}
@@ -1326,10 +1613,11 @@ void config_state::restore_load()
 {
 	default_sort_effective = default_sort_orig;
 	default_mode_effective = default_mode_orig;
+	default_menu_base_effective = default_menu_base_orig;
+	default_menu_rel_effective = default_menu_rel_orig;
 	default_preview_effective = default_preview_orig;
 	default_include_group_effective = default_include_group_orig;
 	default_include_type_effective = default_include_type_orig;
-
 	difficulty_effective = difficulty_orig;
 	include_emu_set(include_emu_orig);
 	menu_base_effective = menu_base_orig;
@@ -1346,10 +1634,11 @@ void config_state::restore_save_default()
 {
 	default_sort_orig = default_sort_effective;
 	default_mode_orig = default_mode_effective;
+	default_menu_base_orig = default_menu_base_effective;
+	default_menu_rel_orig = default_menu_rel_effective;
 	default_preview_orig = default_preview_effective;
 	default_include_group_orig = default_include_group_effective;
 	default_include_type_orig = default_include_type_effective;
-
 	difficulty_orig = difficulty_effective;
 	include_emu_orig = include_emu_effective;
 	menu_base_orig = menu_base_effective;
@@ -1444,6 +1733,22 @@ listmode_t config_state::mode_get()
 		return default_mode_effective;
 }
 
+int config_state::menu_base_get()
+{
+	if (sub_has() && sub_get().menu_base_has())
+		return sub_get().menu_base_get();
+	else
+		return default_menu_base_effective;
+}
+
+int config_state::menu_rel_get()
+{
+	if (sub_has() && sub_get().menu_rel_has())
+		return sub_get().menu_rel_get();
+	else
+		return default_menu_rel_effective;
+}
+
 listpreview_t config_state::preview_get()
 {
 	if (sub_has() && sub_get().preview_has())
@@ -1500,6 +1805,22 @@ void config_state::mode_set(listmode_t A)
 		sub_get().mode_set(A);
 	else
 		default_mode_effective = A;
+}
+
+void config_state::menu_base_set(int A)
+{
+	if (sub_has())
+		sub_get().menu_base_set(A);
+	else
+		default_menu_base_effective = A;
+}
+
+void config_state::menu_rel_set(int A)
+{
+	if (sub_has())
+		sub_get().menu_rel_set(A);
+	else
+		default_menu_rel_effective = A;
 }
 
 void config_state::preview_set(listpreview_t A)
@@ -1660,6 +1981,20 @@ bool config_emulator_state::load(adv_conf* config_context, const string& section
 		mode_set_orig = false;
 	}
 
+	if (conf_int_section_get(config_context, section.c_str(), "menu_base", &i) == 0) {
+		menu_base_set_orig = true;
+		menu_base_orig = (int)i;
+	} else {
+		menu_base_set_orig = false;
+	}
+
+	if (conf_int_section_get(config_context, section.c_str(), "menu_rel", &i) == 0) {
+		menu_rel_set_orig = true;
+		menu_rel_orig = (int)i;
+	} else {
+		menu_rel_set_orig = false;
+	}
+
 	if (conf_int_section_get(config_context, section.c_str(), "preview", &i) == 0) {
 		preview_set_orig = true;
 		preview_orig = (listpreview_t)i;
@@ -1701,6 +2036,18 @@ void config_emulator_state::save(adv_conf* config_context, const string& section
 		conf_remove(config_context, section.c_str(), "mode");
 	}
 
+	if (menu_base_set_orig) {
+		conf_int_set(config_context, section.c_str(), "menu_base", menu_base_orig);
+	} else {
+		conf_remove(config_context, section.c_str(), "menu_base");
+	}
+
+	if (menu_rel_set_orig) {
+		conf_int_set(config_context, section.c_str(), "menu_rel", menu_rel_orig);
+	} else {
+		conf_remove(config_context, section.c_str(), "menu_rel");
+	}
+	
 	if (sort_set_orig) {
 		conf_int_set(config_context, section.c_str(), "sort", sort_orig);
 	} else {
@@ -1732,11 +2079,19 @@ void config_emulator_state::restore_load()
 {
 	sort_effective = sort_orig;
 	mode_effective = mode_orig;
+
+	menu_base_effective = menu_base_orig;
+	menu_rel_effective = menu_rel_orig;
+	
 	preview_effective = preview_orig;
 	include_group_effective = include_group_orig;
 	include_type_effective = include_type_orig;
 	sort_set_effective = sort_set_orig;
 	mode_set_effective = mode_set_orig;
+
+	menu_base_set_effective = menu_base_set_orig;
+	menu_rel_set_effective = menu_rel_set_orig;
+	
 	preview_set_effective = preview_set_orig;
 	include_group_set_effective = include_group_set_orig;
 	include_type_set_effective = include_type_set_orig;
@@ -1746,11 +2101,19 @@ void config_emulator_state::restore_save()
 {
 	sort_orig = sort_effective;
 	mode_orig = mode_effective;
+
+	menu_base_orig = menu_base_effective;
+	menu_rel_orig = menu_rel_effective;
+	
 	preview_orig = preview_effective;
 	include_group_orig = include_group_effective;
 	include_type_orig = include_type_effective;
 	sort_set_orig = sort_set_effective;
 	mode_set_orig = mode_set_effective;
+
+	menu_base_set_orig = menu_base_set_effective;
+	menu_rel_set_orig = menu_rel_set_effective;
+	
 	preview_set_orig = preview_set_effective;
 	include_group_set_orig = include_group_set_effective;
 	include_type_set_orig = include_type_set_effective;
@@ -1764,6 +2127,16 @@ bool config_emulator_state::sort_has()
 bool config_emulator_state::mode_has()
 {
 	return mode_set_effective;
+}
+
+bool config_emulator_state::menu_base_has()
+{
+	return menu_base_set_effective;
+}
+
+bool config_emulator_state::menu_rel_has()
+{
+	return menu_rel_set_effective;
 }
 
 bool config_emulator_state::preview_has()
@@ -1794,6 +2167,16 @@ listsort_t config_emulator_state::sort_get()
 listmode_t config_emulator_state::mode_get()
 {
 	return mode_effective;
+}
+
+int config_emulator_state::menu_base_get()
+{
+	return menu_base_effective;
+}
+
+int config_emulator_state::menu_rel_get()
+{
+	return menu_rel_effective;
 }
 
 listpreview_t config_emulator_state::preview_get()
@@ -1828,6 +2211,18 @@ void config_emulator_state::mode_set(listmode_t A)
 	mode_effective = A;
 }
 
+void config_emulator_state::menu_base_set(int A)
+{
+	menu_base_set_effective = true;
+	menu_base_effective = A;
+}
+
+void config_emulator_state::menu_rel_set(int A)
+{
+	menu_rel_set_effective = true;
+	menu_rel_effective = A;
+}
+
 void config_emulator_state::preview_set(listpreview_t A)
 {
 	preview_set_effective = true;
@@ -1856,6 +2251,16 @@ void config_emulator_state::mode_unset()
 	mode_set_effective = false;
 }
 
+void config_emulator_state::menu_base_unset()
+{
+	menu_base_set_effective = false;
+}
+
+void config_emulator_state::menu_rel_unset()
+{
+	menu_rel_set_effective = false;
+}
+
 void config_emulator_state::preview_unset()
 {
 	preview_set_effective = false;
@@ -1871,3 +2276,8 @@ void config_emulator_state::include_type_unset()
 	include_type_set_effective = false;
 }
 
+void invertir_colores(string& s, string& color) {
+	string c0, c1;
+	if(config_split(color, c0, c1))
+		s = c1 + " " + c0;
+}

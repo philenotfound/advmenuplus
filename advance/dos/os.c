@@ -457,7 +457,7 @@ void os_default_signal(int signum, void* info, void* context)
 }
 
 /***************************************************************************/
-/* Main */
+/* Main Dos */
 
 static int os_fixed(void)
 {

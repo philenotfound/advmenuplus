@@ -263,6 +263,7 @@ int run_mode(config_state& rs)
 	ch.insert(ch.end(), choice("Tile Giant", mode_tile_giant));
 	ch.insert(ch.end(), choice("Tile Icon", mode_tile_icon));
 	ch.insert(ch.end(), choice("Tile Marquee", mode_tile_marquee));
+	ch.insert(ch.end(), choice("Custom", mode_custom));
 
 	choice_bag::iterator i = ch.find_by_value(rs.mode_get());
 	if (i == ch.end())
@@ -465,6 +466,31 @@ void run_emu_next(config_state& rs)
 
 	if (next_select.length() != 0)
 		c.insert(c.end(), next_select);
+
+	rs.include_emu_set(c);
+}
+
+void run_emu_pre(config_state& rs)
+{
+	string pre_select = "";
+	string pre_emu = "";
+	for(pemulator_container::const_iterator j=rs.emu_active.begin();j!=rs.emu_active.end();++j) {
+		for(emulator_container::const_iterator k = rs.include_emu_get().begin();k!=rs.include_emu_get().end();++k) {
+			if ((*j)->user_name_get() == *k) {
+				pre_select = pre_emu;
+				break;
+			}
+			
+		}
+		pre_emu = (*j)->user_name_get();
+	}
+	if (pre_select.length() == 0 && rs.emu_active.begin() != rs.emu_active.end())
+		pre_select = pre_emu;
+
+	emulator_container c;
+
+	if (pre_select.length() != 0)
+			c.insert(c.end(), pre_select);
 
 	rs.include_emu_set(c);
 }
@@ -926,7 +952,7 @@ int run_submenu(config_state& rs)
 		ch.insert(ch.end(), choice("Listing...", 1));
 		ch.insert(ch.end(), choice("Settings...", 0));
 		if (rs.emu.size() > 1)
-			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU), 7));
+			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU_NEXT), 7));
 		ch.insert(ch.end(), choice("Volume...", 16));
 		ch.insert(ch.end(), choice("Difficulty...", 17));
 		ch.insert(ch.end(), choice(menu_name(rs, rs.script_menu, EVENT_COMMAND), 8));
@@ -936,7 +962,7 @@ int run_submenu(config_state& rs)
 	} else {
 		ch.insert(ch.end(), choice(menu_name(rs, "Help", EVENT_HELP), 10));
 		if (rs.emu.size() > 1)
-			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU), 7));
+			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU_NEXT), 7));
 		ch.insert(ch.end(), choice("Volume...", 16));
 		ch.insert(ch.end(), choice("Difficulty...", 17));
 		if (rs.script_bag.size()!=0)
@@ -1019,12 +1045,26 @@ int run_submenu(config_state& rs)
 
 void run_help(config_state& rs)
 {
+	string img_help = "";
+	for(pemulator_container::iterator j = rs.emu.begin();j!=rs.emu.end();j++) {
+		if ((*j)->state_get() == 1) {
+			if (rs.mode_get() == mode_custom) {
+				img_help = (*j)->custom_help_path_get();
+			} else {
+				img_help = (*j)->nocustom_help_path_get();
+				if (img_help == "" || img_help == "default")
+					img_help = rs.ui_help;
+			}
+			break;
+		}
+	}	
+	
 	bool wait = true;
 
 	int_clear(COLOR_HELP_NORMAL.background);
 
-	if (rs.ui_help != "none") {
-		wait = int_clip(rs.ui_help, true);
+	if (img_help != "" && img_help != "none") {
+		wait = int_clip(img_help, true);
 	} else {
 		if (rs.ui_back != "none") {
 			unsigned x, y;
@@ -1087,7 +1127,10 @@ void run_help(config_state& rs)
 			int_put_alpha(xd, y, "Select the game sort method", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
-		int_put_alpha(xt, y, event_name(EVENT_EMU), COLOR_HELP_TAG);
+		int_put_alpha(xt, y, event_name(EVENT_EMU_PRE), COLOR_HELP_TAG);
+		int_put_alpha(xd, y, "Previous emulator", COLOR_HELP_NORMAL);
+		y += int_font_dy_get();
+		int_put_alpha(xt, y, event_name(EVENT_EMU_NEXT), COLOR_HELP_TAG);
 		int_put_alpha(xd, y, "Next emulator", COLOR_HELP_NORMAL);
 		y += int_font_dy_get();
 		if (!rs.console_mode) {
@@ -1361,4 +1404,5 @@ void run_stat(config_state& rs)
 
 	int_event_get();
 }
+
 

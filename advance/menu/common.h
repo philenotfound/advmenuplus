@@ -117,5 +117,6 @@ bool is_glob(const char* str_begin, const char* str_end, const char* glob_begin,
 bool is_glob(const std::string& str, const std::string& glob);
 bool is_globlist(const std::string& file, const std::string& globlist);
 
+std::string file_dir_custom(const std::string& s);
 
 #endif

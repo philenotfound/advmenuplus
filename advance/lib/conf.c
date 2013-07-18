@@ -676,6 +676,25 @@ void conf_int_register_limit_default(adv_conf* context, const char* tag, int lim
 	option_insert(context, option);
 }
 
+void conf_int_register_limit_default_multi(adv_conf* context, const char* tag, int limit_low, int limit_high, int def)
+{
+	struct adv_conf_option_struct* option = option_alloc();
+
+	assert(option_search_tag(context, tag) == 0);
+
+	option->type = conf_type_int;
+	option->is_multi = 1;
+	option->tag = strdup(tag);
+	option->data.base_int.has_def = 1;
+	option->data.base_int.def = def;
+	option->data.base_int.has_limit = 1;
+	option->data.base_int.limit_low = limit_low;
+	option->data.base_int.limit_high = limit_high;
+	option->data.base_int.has_enum = 0;
+
+	option_insert(context, option);
+}
+
 /**
  * Register a tag.
  * A tag can be registered only one time.
@@ -1608,12 +1627,12 @@ adv_error conf_input_file_load_adv(adv_conf* context, int priority, const char* 
 {
 	struct adv_conf_input_struct* input;
 
-	adv_bool is_file_in_exist = file_in != 0 && access(file_in, F_OK) == 0;
+	adv_bool is_file_in_exist = file_in != 0 && (access(file_in, F_OK) == 0);
 
 	/* ignore if it doesn't exist and isn't writable */
 	if (!is_file_in_exist && !file_out)
 		return 0;
-
+	
 	input = input_alloc();
 
 	input->priority = priority;

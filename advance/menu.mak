@@ -513,15 +513,15 @@ $(sort $(MENUOBJDIRS)):
 	$(ECHO) $@
 	$(MD) $@
 
-$(MENUOBJ)/advmenu$(EXE) : $(sort $(MENUOBJDIRS)) $(MENUOBJS)
+$(MENUOBJ)/advmenup$(EXE) : $(sort $(MENUOBJDIRS)) $(MENUOBJS)
 	$(ECHO) $@ $(MSG)
 	$(LDXX) $(MENUOBJS) $(MENULIBS) $(MENULDFLAGS) $(LDFLAGS) -o $@
 ifeq ($(CONF_DEBUG),yes)
 	$(RM) advmenud$(EXE)
 	$(LN_S) $@ advmenud$(EXE)
 else
-	$(RM) advmenu$(EXE)
-	$(LN_S) $@ advmenu$(EXE)
+	$(RM) advmenup$(EXE)
+	$(LN_S) $@ advmenup$(EXE)
 endif
 
 ############################################################################
@@ -644,7 +644,7 @@ MENU_DOC_BIN += \
 endif
 
 MENU_ROOT_BIN = \
-	$(MENUOBJ)/advmenu$(EXE) \
+	$(MENUOBJ)/advmenup$(EXE) \
 	$(VOBJ)/advv$(EXE) \
 	$(CFGOBJ)/advcfg$(EXE)
 ifeq ($(CONF_SYSTEM),unix)

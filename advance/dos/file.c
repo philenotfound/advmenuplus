@@ -47,6 +47,8 @@ struct file_context {
 	char file_home_buffer[FILE_MAXPATH];
 	char list_buffer[FILE_MAXPATH*4];
 	char universal_map[UNIVERSAL_MAX][UNIVERSAL_SIZE];
+	char current_dir_custom_buffer[FILE_MAXPATH]; 
+	char file_custom_buffer[FILE_MAXPATH];
 	unsigned universal_mac;
 };
 
@@ -269,6 +271,7 @@ const char* file_config_file_data(const char* file)
 const char* file_config_file_home(const char* file)
 {
 	snprintf(FL.file_home_buffer, sizeof(FL.file_home_buffer), "%s", file);
+	
 	return FL.file_home_buffer;
 }
 
@@ -313,6 +316,23 @@ const char* file_config_list(const char* const_list, const char* (*expand_dir)(c
 	free(list);
 
 	return FL.list_buffer;
+}
+
+void load_current_dir_custom(const char* dir) {
+	snprintf(FL.current_dir_custom_buffer, sizeof(FL.current_dir_custom_buffer), "%s", dir);
+}
+
+const char* file_config_file_custom(const char* file)
+{	
+	if (file[0] == '.' && (file[1] == '\\' || file[1] == '/')) {
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s/%s", FL.current_dir_custom_buffer, file + 2);
+	} else if (file[1] == ':') {
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s", file);
+	} else {
+		snprintf(FL.file_custom_buffer, sizeof(FL.file_custom_buffer), "%s/%s", FL.current_dir_custom_buffer, file);
+	}
+	
+	return FL.file_custom_buffer;
 }
 
 

@@ -339,17 +339,17 @@ choice_container::iterator choice_bag::find_by_desc(const string& desc)
 void menu_pos(int pos, int& pos_base, int& pos_rel, int pos_rel_max, int pos_base_upper, int coln, int pos_max)
 {
 
-	while (pos >= pos_base_upper + pos_rel_max)
+	while (pos >= pos_base_upper + pos_rel_max) 
 		pos -= coln;
 	while (pos < 0)
 		pos += coln;
 
-	if (pos >= pos_max) {
+	if (pos >= pos_max) { 
 		pos_base = pos_base_upper;
 		pos_rel = pos_rel_max - 1;
-		if (pos_base + pos_rel >= pos_max) {
+		if (pos_base + pos_rel >= pos_max) { 
 			pos_rel = pos_max - 1 - pos_base;
-			if (pos_rel < 0) {
+			if (pos_rel < 0) { 
 				pos_base = 0;
 				pos_rel = pos_max ? pos_max - 1 : 0;
 			}
@@ -357,15 +357,15 @@ void menu_pos(int pos, int& pos_base, int& pos_rel, int pos_rel_max, int pos_bas
 		return;
 	}
 
-	if (pos >= pos_base && pos < pos_base + pos_rel_max) {
+	if (pos >= pos_base && pos < pos_base + pos_rel_max) { 
 		pos_rel = pos - pos_base;
-	} else if (pos < pos_base) {
+	} else if (pos < pos_base) { 
 		pos_rel = pos % coln;
 		pos_base = pos - pos_rel;
-	} else {
+	} else { 
 		pos_rel = pos % coln + pos_rel_max - coln;
 		pos_base = pos - pos_rel;
-		if (pos_base < 0) {
+		if (pos_base < 0) { 
 			pos_base = 0;
 			pos_rel = pos;
 		}
@@ -426,4 +426,63 @@ int menu_key(int key, int& pos_base, int& pos_rel, int pos_rel_max, int pos_base
 
 	return EVENT_NONE;
 }
+
+int menu_key_custom(int key, int& pos_base, int& pos_rel, int pos_rel_max, int pos_base_upper, int coln, int pos_max)
+{
+	switch (key) {
+		case EVENT_HOME :
+			pos_base = -pos_rel;
+			break;
+		case EVENT_END :
+			pos_base = pos_max - pos_rel - 1;
+			break;
+		case EVENT_LEFT :
+			if (coln > 1) {
+				if (pos_base + pos_rel - 1 <= 0)
+					pos_base = -pos_rel;
+				else
+					pos_base--;
+				break;
+			}
+			// otherwise continue
+		case EVENT_PGUP :
+			if (pos_base >= pos_rel_max)
+				pos_base -= pos_rel_max;
+			else
+				pos_base = -pos_rel;
+			break;
+		case EVENT_RIGHT :
+			if (coln > 1) {
+				if (pos_base + pos_rel + 1 >= pos_max)
+					pos_base = pos_max - pos_rel - 1;
+				else
+					pos_base++;
+				break;
+			}
+			// otherwise continue
+		case EVENT_PGDN :
+			if (pos_base + pos_rel_max <= pos_max - pos_rel)
+				pos_base += pos_rel_max;
+			else
+				pos_base = pos_max - pos_rel - 1;
+			break;
+		case EVENT_UP :
+			if (pos_base + pos_rel - coln <= 0)
+				pos_base = -pos_rel;
+			else
+				pos_base -= coln;
+			break;
+		case EVENT_DOWN :
+			if (pos_base + pos_rel + coln >= pos_max)
+				pos_base = pos_max - pos_rel - 1;
+			else
+				pos_base += coln;
+			break;
+		default:
+			return key;
+	}
+
+	return EVENT_NONE;
+}
+
 

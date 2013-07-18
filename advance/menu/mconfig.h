@@ -30,7 +30,7 @@
 #include <list>
 
 #define ADV_COPY \
-	"AdvanceMENU - Copyright (C) 1999-2008 by Andrea Mazzoleni\n"
+	"AdvMenuPLUS - Copyright (C) 2009-2012 by daesdae\nAdvanceMENU - Copyright (C) 1999-2008 by Andrea Mazzoleni\n"
 
 enum clip_mode_t {
 	clip_none,
@@ -128,7 +128,6 @@ typedef bool (*pgame_sort_func)(const game*, const game*);
 
 typedef std::set<const game*, pgame_sort_func> pgame_sort_set;
 
-/// Type of mode.
 enum listmode_t {
 	mode_list = 1,
 	mode_tile_small = 2,
@@ -141,7 +140,8 @@ enum listmode_t {
 	mode_tile_icon = 256,
 	mode_tile_marquee = 512,
 	mode_list_mixed = 1024,
-	mode_text = 2048
+	mode_text = 2048,
+	mode_custom = 4096
 };
 
 /// Type of image to display.
@@ -200,6 +200,15 @@ class config_emulator_state {
 	bool mode_set_effective; ///< If the mode is set.
 	listmode_t mode_effective; ///< List mode.
 
+	bool menu_base_set_orig; ///< If the base position is set.
+	int menu_base_orig; ///< Original base position.
+	bool menu_base_set_effective; ///< If the base position is set.
+	int menu_base_effective; ///< Base position.
+	bool menu_rel_set_orig; ///< If the relative position is set.
+	int menu_rel_orig; ///< Original relative position.
+	bool menu_rel_set_effective; ///< If the relative position is set.
+	int menu_rel_effective; ///< Relative position.
+		
 	bool preview_set_orig; ///< If the preview is set.
 	listpreview_t preview_orig; ///< Original preview type selected.
 	bool preview_set_effective; ///< If the preview is set.
@@ -227,12 +236,20 @@ public:
 
 	listsort_t sort_get();
 	listmode_t mode_get();
+
+	int menu_base_get();
+	int menu_rel_get();
+	
 	listpreview_t preview_get();
 	const category_container& include_group_get();
 	const category_container& include_type_get();
 
 	bool sort_has();
 	bool mode_has();
+
+	bool menu_base_has();
+	bool menu_rel_has();
+
 	bool preview_has();
 	bool include_group_has();
 	bool include_type_has();
@@ -240,12 +257,20 @@ public:
 
 	void sort_unset();
 	void mode_unset();
+
+	void menu_base_unset();
+	void menu_rel_unset();
+
 	void preview_unset();
 	void include_group_unset();
 	void include_type_unset();
 
 	void sort_set(listsort_t A);
 	void mode_set(listmode_t A);
+
+	void menu_base_set(int A);
+	void menu_rel_set(int A);
+
 	void preview_set(listpreview_t A);
 	void include_group_set(const category_container& A);
 	void include_type_set(const category_container& A);
@@ -272,6 +297,11 @@ class config_state {
 	listmode_t default_mode_orig; ///< Original list mode.
 	listmode_t default_mode_effective; ///< List mode.
 
+	int default_menu_base_orig; ///< Original base position.
+	int default_menu_base_effective; ///< Base position.
+	int default_menu_rel_orig; ///< Original relative position.
+	int default_menu_rel_effective; ///< Relative position.
+		
 	listpreview_t default_preview_orig; ///< Original preview type selected.
 	listpreview_t default_preview_effective; ///< Preview type selected.
 
@@ -290,6 +320,10 @@ class config_state {
 public:
 	listsort_t sort_get();
 	listmode_t mode_get();
+	
+	int menu_base_get();
+	int menu_rel_get();
+
 	listpreview_t preview_get();
 	const category_container& include_group_get();
 	const category_container& include_type_get();
@@ -298,6 +332,10 @@ public:
 
 	void sort_set(listsort_t A);
 	void mode_set(listmode_t A);
+
+	void menu_base_set(int A);
+	void menu_rel_set(int A);
+
 	void preview_set(listpreview_t A);
 	void include_group_set(const category_container& A);
 	void include_type_set(const category_container& A);
@@ -409,6 +447,9 @@ public:
 	unsigned ui_right; ///< User interface right border
 	unsigned ui_top; ///< User interface top border
 	unsigned ui_bottom; ///< User interface bottom border
+
+	bool rem_selected; ///< Recordar el juego seleccionado de los emuladores
+	
 	bool ui_top_bar; ///< User interface need top bar
 	bool ui_bottom_bar; ///< User interface need bottom bar
 	std::string ui_gamemsg; ///< Message to display before a game run.
@@ -434,6 +475,9 @@ public:
 
 	static void conf_register(adv_conf* config_context);
 	static void conf_default(adv_conf* config_context);
+
+	static void conf_register_custom(adv_conf* config_context);
+	bool load_custom(adv_conf* config_context, const std::string& nombre_emulador);
 };
 
 // ------------------------------------------------------------------------
@@ -453,5 +497,18 @@ public:
 
 	void import(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
 };
+
+enum align_t {
+	left,
+	right,
+	center
+};
+
+bool config_split_custom(const std::string& s, std::string& a0);
+bool config_split_custom(const std::string& s, std::string& a0, std::string& a1);
+bool config_split_custom(const std::string& s, std::string& a0, std::string& a1, std::string& a2);
+bool config_split_custom(const std::string& s, std::string& a0, std::string& a1, std::string& a2, std::string& a3);
+
+void invertir_colores(std::string& s, std::string& color);
 
 #endif

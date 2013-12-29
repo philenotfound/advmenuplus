@@ -831,7 +831,7 @@ int os_main(int argc, char* argv[])
 		goto err_init;
 	}
 
-	if (os_inner_init("AdvMenuPlus 2012.11.27") != 0) {
+	if (os_inner_init("AdvMenuPlus " ADV_VERSION) != 0) {
 		target_err("Error initializing the inner OS support.\n");
 		goto err_init;
 	}

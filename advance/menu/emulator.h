@@ -167,6 +167,12 @@ public:
 	static const unsigned flag_derived_neogeo = game::flag_user << 4;
 	static const unsigned flag_derived_deco = game::flag_user << 5;
 	static const unsigned flag_derived_playchoice = game::flag_user << 6;
+	static const unsigned flag_derived_mechanical = game::flag_user << 7;
+	static const unsigned flag_derived_mahjong = game::flag_user << 8;
+	static const unsigned flag_derived_beatmania = game::flag_user << 9;
+	static const unsigned flag_derived_pokercasino = game::flag_user << 10;
+	static const unsigned flag_derived_quiztrivial = game::flag_user << 11;
+	static const unsigned flag_derived_golfdarfish = game::flag_user << 12;
 
 	virtual int attrib_run(int x, int y) = 0;
 	virtual void attrib_load();
@@ -413,6 +419,18 @@ protected:
 	tristate_t exclude_deco_orig;
 	tristate_t exclude_playchoice_effective;
 	tristate_t exclude_playchoice_orig;
+	tristate_t exclude_mechanical_effective;
+	tristate_t exclude_mechanical_orig;
+	tristate_t exclude_mahjong_effective;
+	tristate_t exclude_mahjong_orig;
+	tristate_t exclude_beatmania_effective;
+	tristate_t exclude_beatmania_orig;
+	tristate_t exclude_pokercasino_effective;
+	tristate_t exclude_pokercasino_orig;
+	tristate_t exclude_quiztrivial_effective;
+	tristate_t exclude_quiztrivial_orig;
+	tristate_t exclude_golfdarfish_effective;
+	tristate_t exclude_golfdarfish_orig;
 	bool support_difficulty;
 	bool support_attenuation;
 public:

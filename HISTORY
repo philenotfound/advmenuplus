@@ -3,6 +3,20 @@
                             =======================
 
 
+ADVMENUPLUS VERSION 2012.12.13
+==============================
+
+* Added new filters for M.A.M.E. games (by VeS)
+	Mechanical (M.A.M.E. >= 0.142)
+	Mahjongs (M.A.M.E. >= 0.142)
+	Beatmania
+	Bets & Poker & Casino & Card & Jocker
+	Quiz & Trivial
+	Golf & Darts & Fish
+
+* Fixed some bugs for information of the XML for M.A.M.E. >= 0.106 (by VeS)
+
+
 ADVMENUPLUS VERSION 2012.12.11
 ==============================
 

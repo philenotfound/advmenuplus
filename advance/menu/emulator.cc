@@ -974,6 +974,12 @@ mame_mame::mame_mame(const string& Aname, const string& Aexe_path, const string&
 	exclude_neogeo_orig = include;
 	exclude_deco_orig = exclude;
 	exclude_playchoice_orig = exclude;
+	exclude_mechanical_orig = exclude;
+	exclude_mahjong_orig = exclude;
+	exclude_beatmania_orig = exclude;
+	exclude_pokercasino_orig = exclude;
+	exclude_quiztrivial_orig = exclude;
+	exclude_golfdarfish_orig = exclude;
 }
 
 int mame_mame::attrib_run(int x, int y)
@@ -988,6 +994,12 @@ int mame_mame::attrib_run(int x, int y)
 	ch.insert(ch.end(), choice("Neogeo", exclude_neogeo_effective, 0));
 	ch.insert(ch.end(), choice("Cassette", exclude_deco_effective, 0));
 	ch.insert(ch.end(), choice("PlayChoice-10", exclude_playchoice_effective, 0));
+	ch.insert(ch.end(), choice("Mechanical", exclude_mechanical_effective, 0));
+	ch.insert(ch.end(), choice("Mahjongs", exclude_mahjong_effective, 0));
+	ch.insert(ch.end(), choice("Beatmania", exclude_beatmania_effective, 0));
+	ch.insert(ch.end(), choice("Bets & Poker & Casino & Card & Jocker", exclude_pokercasino_effective, 0));
+	ch.insert(ch.end(), choice("Quiz & Trivial", exclude_quiztrivial_effective, 0));
+	ch.insert(ch.end(), choice("Golf & Darts & fish", exclude_golfdarfish_effective, 0));
 
 	choice_bag::iterator i = ch.begin();
 
@@ -1002,6 +1014,12 @@ int mame_mame::attrib_run(int x, int y)
 		exclude_neogeo_effective = ch[5].tristate_get();
 		exclude_deco_effective = ch[6].tristate_get();
 		exclude_playchoice_effective = ch[7].tristate_get();
+		exclude_mechanical_effective = ch[8].tristate_get();
+		exclude_mahjong_effective = ch[9].tristate_get();
+		exclude_beatmania_effective = ch[10].tristate_get();
+		exclude_pokercasino_effective = ch[11].tristate_get();
+		exclude_quiztrivial_effective = ch[12].tristate_get();
+		exclude_golfdarfish_effective = ch[13].tristate_get();
 	}
 
 	return key;
@@ -1014,6 +1032,12 @@ void mame_mame::attrib_load()
 	exclude_neogeo_effective = exclude_neogeo_orig;
 	exclude_deco_effective = exclude_deco_orig;
 	exclude_playchoice_effective = exclude_playchoice_orig;
+	exclude_mechanical_effective = exclude_mechanical_orig;
+	exclude_mahjong_effective = exclude_mahjong_orig;
+	exclude_beatmania_effective = exclude_beatmania_orig;
+	exclude_pokercasino_effective = exclude_pokercasino_orig;
+	exclude_quiztrivial_effective = exclude_quiztrivial_orig;
+	exclude_golfdarfish_effective = exclude_golfdarfish_orig;
 }
 
 void mame_mame::attrib_save()
@@ -1023,6 +1047,12 @@ void mame_mame::attrib_save()
 	exclude_neogeo_orig = exclude_neogeo_effective;
 	exclude_deco_orig = exclude_deco_effective;
 	exclude_playchoice_orig = exclude_playchoice_effective;
+	exclude_mechanical_orig = exclude_mechanical_effective;
+	exclude_mahjong_orig = exclude_mahjong_effective;
+	exclude_beatmania_orig = exclude_beatmania_effective;
+	exclude_pokercasino_orig = exclude_pokercasino_effective;
+	exclude_quiztrivial_orig = exclude_quiztrivial_effective;
+	exclude_golfdarfish_orig = exclude_golfdarfish_effective;
 }
 
 bool mame_mame::attrib_set(const std::string& value0, const std::string& value1)
@@ -1039,6 +1069,24 @@ bool mame_mame::attrib_set(const std::string& value0, const std::string& value1)
 	} else if (value0 == "playchoice") {
 		if (!tristate(exclude_playchoice_orig, value1))
 			return false;
+	} else if (value0 == "mechanical") {
+		if (!tristate(exclude_mechanical_orig, value1))
+			return false;
+	} else if (value0 == "mahjong") {
+		if (!tristate(exclude_mahjong_orig, value1))
+			return false;
+	} else if (value0 == "beatmania") {
+		if (!tristate(exclude_beatmania_orig, value1))
+			return false;
+	} else if (value0 == "pokercasino") {
+		if (!tristate(exclude_pokercasino_orig, value1))
+			return false;
+	} else if (value0 == "quiztrivial") {
+		if (!tristate(exclude_quiztrivial_orig, value1))
+			return false;
+	} else if (value0 == "golfdarfish") {
+		if (!tristate(exclude_golfdarfish_orig, value1))
+			return false;
 	} else {
 		return false;
 	}
@@ -1052,6 +1100,12 @@ void mame_mame::attrib_get(adv_conf* config_context, const char* section, const 
 	conf_string_set(config_context, section, tag, attrib_compile("neogeo", tristate(exclude_neogeo_orig)).c_str());
 	conf_string_set(config_context, section, tag, attrib_compile("deco", tristate(exclude_deco_orig)).c_str());
 	conf_string_set(config_context, section, tag, attrib_compile("playchoice", tristate(exclude_playchoice_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("mechanical", tristate(exclude_mechanical_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("mahjong", tristate(exclude_mahjong_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("beatmania", tristate(exclude_beatmania_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("pokercasino", tristate(exclude_pokercasino_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("quiztrivial", tristate(exclude_quiztrivial_orig)).c_str());
+	conf_string_set(config_context, section, tag, attrib_compile("golfdarfish", tristate(exclude_golfdarfish_orig)).c_str());
 }
 
 bool mame_mame::filter(const game& g) const
@@ -1071,7 +1125,31 @@ bool mame_mame::filter(const game& g) const
 		return false;
 	if (exclude_playchoice_effective == exclude_not && !g.flag_get(flag_derived_playchoice))
 		return false;
-
+	if (exclude_mechanical_effective == exclude && g.flag_get(flag_derived_mechanical))
+		return false;
+	if (exclude_mechanical_effective == exclude_not && !g.flag_get(flag_derived_mechanical))
+		return false;
+	if (exclude_mahjong_effective == exclude && g.flag_get(flag_derived_mahjong))
+		return false;
+	if (exclude_mahjong_effective == exclude_not && !g.flag_get(flag_derived_mahjong))
+		return false;
+	if (exclude_beatmania_effective == exclude && g.flag_get(flag_derived_beatmania))
+		return false;
+	if (exclude_beatmania_effective == exclude_not && !g.flag_get(flag_derived_beatmania))
+		return false;
+	if (exclude_pokercasino_effective == exclude && g.flag_get(flag_derived_pokercasino))
+		return false;
+	if (exclude_pokercasino_effective == exclude_not && !g.flag_get(flag_derived_pokercasino))
+		return false;
+	if (exclude_quiztrivial_effective == exclude && g.flag_get(flag_derived_quiztrivial))
+		return false;
+	if (exclude_quiztrivial_effective == exclude_not && !g.flag_get(flag_derived_quiztrivial))
+		return false;
+	if (exclude_golfdarfish_effective == exclude && g.flag_get(flag_derived_golfdarfish))
+		return false;
+	if (exclude_golfdarfish_effective == exclude_not && !g.flag_get(flag_derived_golfdarfish))
+		return false;
+	
 	return true;
 }
 

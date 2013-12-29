@@ -146,6 +146,41 @@ static void process_description(struct state_t* state, enum token_t t, const cha
 			return;
 		}
 		state->g->auto_description_set(string(s, len));
+
+		string v = string(s, len);
+				
+		if(v.find("Casino")!= string::npos || v.find("casino")!= string::npos || v.find("Poker")!= string::npos 
+		|| v.find("poker")!= string::npos || v.find("Card")!= string::npos || v.find("Fruit Bonus")!= string::npos
+		|| v.find("Fruit Cocktail")!= string::npos || v.find("Brasil 8")!= string::npos || v.find("Bra$il")!= string::npos
+		|| v.find("Brasil 9")!= string::npos || v.find("Ruleta")!= string::npos || v.find("Jockey")!= string::npos
+		|| v.find("Lucky 2")!= string::npos || v.find("Lucky 7")!= string::npos || v.find("Lucky Roulette")!= string::npos
+		|| v.find("Cherry Bonu")!= string::npos || v.find("Cherry Gold")!= string::npos || v.find("Cherry Master")!= string::npos
+		|| v.find("Ruleta")!= string::npos || v.find("Buena Suerte")!= string::npos || v.find("Player's Edge")!= string::npos
+		|| v.find("Touchmaster")!= string::npos)
+		{
+			string a = v;
+			state->g->flag_set(v == a, emulator::flag_derived_pokercasino);
+		}	
+		
+		if(v.find("Beatmania")!= string::npos || v.find("beatmania")!= string::npos || v.find("Dance Dance Revo")!= string::npos
+		|| v.find("Dance Maniax")!= string::npos || v.find("Dance Freaks")!= string::npos || v.find("Dancing S")!= string::npos)
+		{
+			string b = v;
+			state->g->flag_set(v == b, emulator::flag_derived_beatmania);
+		}		
+
+		if(v.find("Quiz")!= string::npos || v.find("Trivia")!= string::npos || v.find("Funcube")!= string::npos)
+		{
+			string b = v;
+			state->g->flag_set(v == b, emulator::flag_derived_quiztrivial);
+		}	
+
+		if(v.find("Golf")!= string::npos || v.find("Bowling")!= string::npos || v.find("Darts")!= string::npos || v.find("Fisherman")!= string::npos)
+		{
+			string b = v;
+			state->g->flag_set(v == b, emulator::flag_derived_golfdarfish);
+		}
+		
 	}
 }
 
@@ -301,6 +336,31 @@ static void process_videoorientation(struct state_t* state, enum token_t t, cons
 	}
 }
 
+static void process_mechanical(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
+{
+	if (t == token_data) {
+		if (!state->g) {
+			process_error(state, 0, "invalid state");
+			return;
+		}
+		string v = string(s, len);
+		state->g->flag_set(v == "yes", emulator::flag_derived_mechanical);
+	}
+}
+
+static void process_mahjong(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
+{
+	if (t == token_data) {
+		if (!state->g) {
+			process_error(state, 0, "invalid state");
+			return;
+		}
+		string v = string(s, len);
+		if (v == "mahjong")
+			state->g->flag_set(v == "mahjong", emulator::flag_derived_mahjong);
+	}
+}
+
 static void process_videowidth(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
 {
 	if (t == token_data) {
@@ -378,6 +438,7 @@ static struct conversion_t CONV2[] = {
 	{ 2, { match_mamemessraine, match_gamemachine, "romof", 0, 0 }, process_romof },
 	{ 2, { match_mamemessraine, match_gamemachine, "rom", 0, 0 }, process_rom },
 	{ 2, { match_mamemessraine, match_gamemachine, "device", 0, 0 }, process_device },
+	{ 2, { match_mamemessraine, match_gamemachine, "ismechanical", 0, 0 }, process_mechanical },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 
@@ -388,16 +449,20 @@ static struct conversion_t CONV3[] = {
 	{ 3, { match_mamemessraine, match_gamemachine, "driver", "status", 0 }, process_driverstatus },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "screen", 0 }, process_videoscreen },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "orientation", 0 }, process_videoorientation },
-	{ 3, { match_mamemessraine, match_gamemachine, "display", "rotate", 0 }, process_videoorientation },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "width", 0 }, process_videowidth },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "height", 0 }, process_videoheight },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "aspectx", 0 }, process_videoaspectx },
 	{ 3, { match_mamemessraine, match_gamemachine, "video", "aspecty", 0 }, process_videoaspecty },
+	{ 3, { match_mamemessraine, match_gamemachine, "display", "rotate", 0 }, process_videoorientation },
+	{ 3, { match_mamemessraine, match_gamemachine, "display", "type", 0 }, process_videoscreen },
+    { 3, { match_mamemessraine, match_gamemachine, "display", "width", 0 }, process_videowidth },
+    { 3, { match_mamemessraine, match_gamemachine, "display", "height", 0 }, process_videoheight },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 
 static struct conversion_t CONV4[] = {
 	{ 4, { match_mamemessraine, match_gamemachine, "device", "extension", "name" }, process_deviceextensionname },
+	{ 4, { match_mamemessraine, match_gamemachine, "input", "control", "type" }, process_mahjong },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 

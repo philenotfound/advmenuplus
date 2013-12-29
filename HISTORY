@@ -3,6 +3,16 @@
                             =======================
 
 
+ADVMENUPLUS VERSION 2012.12.11
+==============================
+
+* Fixed:
+	size of the marquees in vetical orientation
+	reading XML the latest M.A.M.E.
+	bug of de mode tile icon
+	gray screenshot
+
+
 ADVMENUPLUS VERSION 2012.12.02
 ==============================
 
@@ -12,7 +22,7 @@ ADVMENUPLUS VERSION 2012.12.02
 ADVMENUPLUS VERSION 2012.11.27
 ==============================
 
-* Fixed filter vertical/horizontal games for M.A.M.E > 0.106.
+* Fixed filter vertical/horizontal games for M.A.M.E. > 0.106.
 * Font size in pixels.
 * Added event 'emulator_pre' showing the previous emulator and changed 'emulator' for 'emulator_next'.
 * Added the option 'rem_selected yes | no' remenber the game selected for each emulator to exit.

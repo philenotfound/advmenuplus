@@ -95,6 +95,9 @@ void int_clip_clear(int index);
 void int_clip_start(int index);
 bool int_clip_is_active(int index);
 
+//arregla bug: pantallazos video start emu
+void int_clip_start_emu(const std::string& file, bool loop);
+
 void int_update(bool progressive = true);
 unsigned int_update_pre(bool progressive = false);
 void int_update_post(unsigned y = 0);

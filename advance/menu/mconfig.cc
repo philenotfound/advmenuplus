@@ -558,7 +558,7 @@ static bool config_load_iterator_emu_custom_set(adv_conf* config_context, const 
 		string arg = borrar_comillas(conf_iterator_string_get(&i));
 		
 		if (type_path) { 
-			if (arg != "none" && arg != "default" && arg != "auto") {
+			if (arg != ""  && arg != "none" && arg != "default" && arg != "auto") { 
 				arg = file_config_file_custom(arg.c_str());
 			}
 		}

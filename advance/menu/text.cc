@@ -44,6 +44,9 @@ static unsigned int_font_dx; // font width
 static unsigned int_font_dy; // font height
 static adv_font* int_font = 0; // font (already orientation corrected)
 
+//arregla bug: pantallazos video start emu
+bool start_emu = false;
+
 static inline void swap(unsigned& a, unsigned& b)
 {
 	unsigned t = a;
@@ -1065,12 +1068,6 @@ void cell_pos_t::redraw()
 
 void cell_pos_t::compute_size(unsigned* rx, unsigned* ry, const adv_bitmap* bitmap, unsigned aspectx, unsigned aspecty, double aspect_expand)
 {
-	if (int_orientation & ADV_ORIENTATION_FLIP_XY) {
-		unsigned t = aspectx;
-		aspectx = aspecty;
-		aspecty = t;
-	}
-
 	if (!aspectx || !aspecty) {
 		aspectx = bitmap->size_x;
 		aspecty = bitmap->size_y;
@@ -1079,6 +1076,13 @@ void cell_pos_t::compute_size(unsigned* rx, unsigned* ry, const adv_bitmap* bitm
 	if (!aspectx || !aspecty) {
 		aspectx = 1;
 		aspecty = 1;
+	}
+
+	//arreglo bug marquees en vertical
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY) { 
+		unsigned t = aspectx;
+		aspectx = aspecty;
+		aspecty = t;
 	}
 
 	aspectx *= 3 * video_size_x();
@@ -2102,6 +2106,8 @@ void cell_manager::backdrop_update(int index)
 				// the image need to be update when loaded
 				back->pos.clear(backdrop_missing_color.background);
 			}
+		} else if (start_emu) { //arregla bug: pantallazos video start emu
+			back->redraw = false;
 		} else {
 			back->redraw = false;
 			back->pos.clear(backdrop_missing_color.background);
@@ -2730,6 +2736,14 @@ bool int_clip(const string& file, bool loop)
 	int_backdrop_done();
 
 	return wait;
+}
+
+//arregla bug: pantallazos video start emu
+void int_clip_start_emu(const string& file, bool loop)
+{
+	start_emu = true;
+	int_clip(file, loop);
+	start_emu = false;
 }
 
 bool int_image(const string& file, unsigned& scale_x, unsigned& scale_y)

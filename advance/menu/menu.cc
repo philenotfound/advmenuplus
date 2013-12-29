@@ -1700,10 +1700,11 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		}
 	}
 
-	int_clear(COLOR_MENU_GRID.background);
-
+	//arregla bug: pantallazos video start emu
 	if (!is_loaded && emu_start != "none") {
-		int_clip(emu_start, false);
+		int_clip_start_emu(emu_start, false);
+	} else {
+		int_clear(COLOR_MENU_GRID.background);
 	}
 	
 	// load the background image
@@ -2397,10 +2398,11 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 						backdrop_map[i].dx = 32+2*cursor_size;
 						backdrop_map[i].dy = 32+2*cursor_size;
 						int name_row = 3;
-						int space_up;
+						int space_up = 0; //arreglo bug: mode tile icon
 						do {
 							--name_row;
-							space_up = (cell_dy - backdrop_map[i].dy - name_dy*name_row) / 3;
+							space_up = (cell_dy - backdrop_map[i].dy - name_dy*name_row);
+							space_up = space_up/3;
 						} while (space_up < 0);
 						backdrop_map[i].x = x + (cell_dx - 32 - 2*cursor_size) / 2;
 						backdrop_map[i].y = y + space_up;

@@ -1300,6 +1300,15 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 					}
 				}
 
+				if (fontsize_Y >= 5 && fontsize_Y <= 100)
+					fontsize_Y = video_size_y() / fontsize_Y;
+				else
+					fontsize_Y = video_size_y() / 45;
+				if (fontsize_X >= 5 && fontsize_X <= 200)
+					fontsize_X = video_size_x() / fontsize_X;
+				else
+					fontsize_X = fontsize_Y * video_size_x() * 3 / video_size_y() / 4;
+				
 				translucency = rs.ui_translucency;
 
 				color_rc_load();
@@ -1709,12 +1718,13 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 				ui_top = rs.ui_top * video_size_y() / scale_y;
 				ui_bottom = rs.ui_bottom * video_size_y() / scale_y;
 
-				if (fontsize_X==0)
-					fontsize_X =  fontsize_Y;
-				fontsize_X = fontsize_X  * video_size_x() / scale_x;
-				fontsize_Y = fontsize_Y  * video_size_y() / scale_y;
-				
 				if(rs.mode_get() == mode_custom) {
+					
+					if (fontsize_X==0)
+						fontsize_X =  fontsize_Y;
+					fontsize_X = fontsize_X  * video_size_x() / scale_x;
+					fontsize_Y = fontsize_Y  * video_size_y() / scale_y;
+
 					if (menu_fontsize_X==0)
 						menu_fontsize_X = menu_fontsize_Y;
 					menu_fontsize_X = menu_fontsize_X  * video_size_x() / scale_x;

@@ -108,7 +108,8 @@ class game {
 	unsigned sizey;
 	unsigned aspectx;
 	unsigned aspecty;
-
+	std::string refresh;
+	
 	mutable const category* group;
 	mutable const category* type;
 	mutable unsigned time;
@@ -165,6 +166,9 @@ public:
 	void romof_set(const std::string& A) { romof = A; }
 	const std::string& romof_get() const { return romof; }
 
+	void refresh_set(const std::string& A) { refresh = A; }
+	const std::string& refresh_get() const { return refresh; }
+	
 	void auto_description_set(const std::string& A) const;
 	bool is_user_description_set() const { return flag_get(flag_user_description_set); }
 	void user_description_set(const std::string& A) const { flag |= flag_user_description_set; description = A; }

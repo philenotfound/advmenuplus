@@ -442,14 +442,19 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 				os << g->aspectx_get() << ":" << g->aspecty_get();
 				info_tag = os.str();
 			}
-		}	else if (tag_info == "name") {
-			ostringstream os;
-			if (g->emulator_get()->tree_get()) {
-				const game* gb = &g->clone_best_get();
-				os << gb->name_get();
-			} else
-				os << g->name_get();
-			info_tag = os.str();
+		}	else if (tag_info == "rom") {
+			if (g->emulator_get()->tree_get())
+				info_tag = (g->clone_best_get()).name_without_emulator_get();
+			else
+				info_tag = g->name_without_emulator_get();
+		} else	if (tag_info == "emulator") {
+			info_tag = g->emulator_get()->user_name_get();
+		} else if (tag_info == "type"){
+			info_tag = g->type_get()->name_get();
+		} else if (tag_info == "group"){
+			info_tag = g->group_get()->name_get();
+		} else if (tag_info == "refresh"){
+			info_tag = g->refresh_get();
 		} else	if (tag_info == "manufacturer") {
 			info_tag = g->manufacturer_get();
 		} else	if (tag_info == "year") {
@@ -2716,6 +2721,8 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			int_box(x-2*border-dx/2, y-border, dx+4*border, dy+border*2, 1, COLOR_CHOICE_NORMAL.foreground);
 			int_clear(x-2*border-dx/2+1, y-border+1, dx+4*border-2, dy+border*2-2, COLOR_CHOICE_NORMAL.background);
 			int_put(x-dx/2, y, dx, over_msg, COLOR_CHOICE_TITLE);
+
+			if(menu_font_path != "none") usar_fuente(int_font_list);
 		}
 
 		int_update(rs.mode_get() != mode_full_mixed && rs.mode_get() != mode_list_mixed);

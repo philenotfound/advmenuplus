@@ -228,6 +228,17 @@ static void process_romof(struct state_t* state, enum token_t t, const char* s, 
 	}
 }
 
+static void process_refresh(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
+{
+	if (t == token_data) {
+		if (!state->g) {
+			process_error(state, 0, "invalid state");
+			return;
+		}
+		state->g->refresh_set(string(s, len));
+	}
+}
+
 static void process_driverstatus(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
 {
 	if (t == token_data) {
@@ -457,6 +468,8 @@ static struct conversion_t CONV3[] = {
 	{ 3, { match_mamemessraine, match_gamemachine, "display", "type", 0 }, process_videoscreen },
     { 3, { match_mamemessraine, match_gamemachine, "display", "width", 0 }, process_videowidth },
     { 3, { match_mamemessraine, match_gamemachine, "display", "height", 0 }, process_videoheight },
+	{ 3, { match_mamemessraine, match_gamemachine, "video", "refresh", 0 }, process_refresh },
+	{ 3, { match_mamemessraine, match_gamemachine, "display", "refresh", 0 }, process_refresh },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 

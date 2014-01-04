@@ -78,7 +78,7 @@ game::game(const game& A) :
 	description(A.description), info(A.info), year(A.year),
 	manufacturer(A.manufacturer), software_path(A.software_path),
 	sizex(A.sizex), sizey(A.sizey),
-	aspectx(A.aspectx), aspecty(A.aspecty),
+	aspectx(A.aspectx), aspecty(A.aspecty), refresh(A.refresh),
 	group(A.group), type(A.type), time(A.time),
 	session(A.session),
 	size(A.size),

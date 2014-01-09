@@ -326,11 +326,7 @@ int run_favorites(config_state& rs)
 	int key = ch.run(" Include Game List", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
-		string f;
-		for(choice_bag::const_iterator j=ch.begin();j!=ch.end();++j) {
-			if (j->bistate_get())
-				f = j->desc_get();
-		}
+		string f = i->desc_get();
 		rs.include_favorites_set(f);
 	}
 
@@ -784,7 +780,7 @@ int run_suballmenu(config_state& rs)
 
 	rs.sub_disable(); // force the use of the default config
 	if (rs.favorites.size() > 1)
-		ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_SETGROUP), 7, rs.current_game != 0));
+		ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_SETFAVORITES), 7, rs.current_game != 0));
 	if (rs.type.size() > 1)
 		ch.insert(ch.end(), choice(menu_name(rs, "Game Type...", EVENT_SETTYPE), 8, rs.current_game != 0));
 	ch.insert(ch.end(), choice("Calibration...", 9));
@@ -861,7 +857,7 @@ int run_subthismenu(config_state& rs)
 	ch.insert(ch.end(), choice(menu_name(rs, "Sort...", EVENT_SORT), 0));
 	ch.insert(ch.end(), choice(menu_name(rs, "Mode...", EVENT_MODE), 1));
 	ch.insert(ch.end(), choice(menu_name(rs, "Preview...", EVENT_PREVIEW), 2));
-	ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_GROUP), 4));
+	ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_FAVORITES_NEXT), 4));
 	ch.insert(ch.end(), choice(menu_name(rs, "Types...", EVENT_TYPE), 3));
 	ch.insert(ch.end(), choice(menu_name(rs, "Filters...", EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
 
@@ -1106,7 +1102,7 @@ void run_help(config_state& rs)
 			y += int_font_dy_get();
 		}
 		if (rs.favorites.size() > 1) {
-			int_put_alpha(xt, y, event_name(EVENT_GROUP), COLOR_HELP_TAG);
+			int_put_alpha(xt, y, event_name(EVENT_FAVORITES_NEXT), COLOR_HELP_TAG);
 			int_put_alpha(xd, y, "Next game list", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
@@ -1135,7 +1131,7 @@ void run_help(config_state& rs)
 			y += int_font_dy_get();
 		}
 		if (rs.favorites.size() > 1) {
-			int_put_alpha(xt, y, event_name(EVENT_SETGROUP), COLOR_HELP_TAG);
+			int_put_alpha(xt, y, event_name(EVENT_SETFAVORITES), COLOR_HELP_TAG);
 			int_put_alpha(xd, y, "Change the current game lists", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}

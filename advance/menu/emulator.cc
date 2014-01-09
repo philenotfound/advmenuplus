@@ -999,7 +999,7 @@ int mame_mame::attrib_run(int x, int y)
 	ch.insert(ch.end(), choice("Beatmania", exclude_beatmania_effective, 0));
 	ch.insert(ch.end(), choice("Bets & Poker & Casino & Card & Jocker", exclude_pokercasino_effective, 0));
 	ch.insert(ch.end(), choice("Quiz & Trivial", exclude_quiztrivial_effective, 0));
-	ch.insert(ch.end(), choice("Golf & Darts & fish", exclude_golfdarfish_effective, 0));
+	ch.insert(ch.end(), choice("Golf & Darts & Fish", exclude_golfdarfish_effective, 0));
 
 	choice_bag::iterator i = ch.begin();
 

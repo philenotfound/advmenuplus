@@ -3,6 +3,18 @@
                             =======================
 
 
+ADVMENUPLUS VERSION 2013.02.02
+==============================
+
+* Fixed bug "select the list to show"
+* New tags for bars information layouts (favorites, game_favorites, clone)
+* Changed the names of the options "advmenu.rc"
+	group -> favorites
+	group_include -> favorites_include
+	event_assign group f2 -> event_assign favorites f2
+	event_assign setgroup f9 -> event_assign setfavorites f9
+
+
 ADVMENUPLUS VERSION 2013.01.15
 ==============================
 

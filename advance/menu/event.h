@@ -42,11 +42,11 @@
 
 #define EVENT_MODE (9 << 16)
 #define EVENT_HELP (14 << 16)
-#define EVENT_GROUP (15 << 16)
+#define EVENT_FAVORITES_NEXT (15 << 16)
 #define EVENT_TYPE (16 << 16)
 #define EVENT_ATTRIB (17 << 16)
 #define EVENT_SORT (18 << 16)
-#define EVENT_SETGROUP (19 << 16)
+#define EVENT_SETFAVORITES (19 << 16)
 #define EVENT_SETTYPE (20 << 16)
 #define EVENT_CLONE (21 << 16)
 #define EVENT_IDLE_0 (22 << 16)

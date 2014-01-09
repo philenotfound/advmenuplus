@@ -74,7 +74,7 @@ int run_sub(config_state& rs, bool silent)
 					silent = false;
 					run_help(rs);
 					break;
-				case EVENT_GROUP :
+				case EVENT_FAVORITES_NEXT :
 					// replay the sound and clip
 					silent = false;
 					run_favorites_next(rs);
@@ -109,7 +109,7 @@ int run_sub(config_state& rs, bool silent)
 					silent = false;
 					run_sort(rs);
 					break;
-				case EVENT_SETGROUP :
+				case EVENT_SETFAVORITES :
 					// replay the sound and clip
 					silent = false;
 					run_favorites_move(rs);

@@ -343,9 +343,9 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_multi(config_context, "emulator_font_size");
 	conf_string_register_multi(config_context, "emulator_font_color");
 	conf_string_register_multi(config_context, "emulator_font_color_select");
-	conf_string_register_multi(config_context, "group");
+	conf_string_register_multi(config_context, "favorites");
 	conf_string_register_multi(config_context, "type");
-	conf_string_register_default(config_context, "group_include", "All Games");
+	conf_string_register_default(config_context, "favorites_include", "All Games");
 	conf_string_register_multi(config_context, "type_include");
 	conf_string_register_multi(config_context, "type_import");
 	conf_string_register_multi(config_context, "desc_import");
@@ -1309,13 +1309,13 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	if (opt_verbose)
 		target_nfo("log: load game lists and types\n");
 
-	// load the group/type informations
-	if (!config_load_iterator_favorites(config_context, "group", favorites))
+	// load the favorites/type informations
+	if (!config_load_iterator_favorites(config_context, "favorites", favorites))
 		return false;
 	if (!config_load_iterator_pcategory(config_context, "type", type))
 		return false;
 
-	default_include_favorites_orig = borrar_comillas(conf_string_get_default(config_context, "group_include"));
+	default_include_favorites_orig = borrar_comillas(conf_string_get_default(config_context, "favorites_include"));
 
 	if (!config_load_iterator_category(config_context, "type_include", default_include_type_orig))
 		return false;
@@ -1471,11 +1471,11 @@ void config_state::conf_default(adv_conf* config_context)
 #endif
 	}
 
-	conf_iterator_begin(&i, config_context, "group");
+	conf_iterator_begin(&i, config_context, "favorites");
 	if (conf_iterator_is_end(&i)) {
-		conf_set(config_context, "", "group", "\"Very Good\"");
-		conf_set(config_context, "", "group", "\"Good\"");
-		conf_set(config_context, "", "group", "\"Bad\"");
+		conf_set(config_context, "", "favorites", "\"Very Good\"");
+		conf_set(config_context, "", "favorites", "\"Good\"");
+		conf_set(config_context, "", "favorites", "\"Bad\"");
 	}
 
 	conf_iterator_begin(&i, config_context, "type");
@@ -1520,8 +1520,8 @@ bool config_state::save(adv_conf* config_context) const
 	conf_int_set(config_context, "", "sort", default_sort_orig);
 	conf_int_set(config_context, "", "preview", default_preview_orig);
 
-	conf_remove(config_context, "", "group_include");
-	conf_string_set(config_context, "", "group_include", config_out(default_include_favorites_orig).c_str());
+	conf_remove(config_context, "", "favorites_include");
+	conf_string_set(config_context, "", "favorites_include", config_out(default_include_favorites_orig).c_str());
 
 	conf_remove(config_context, "", "type_include");
 	for(category_container::const_iterator i=default_include_type_orig.begin();i!=default_include_type_orig.end();++i) {
@@ -1541,10 +1541,10 @@ bool config_state::save(adv_conf* config_context) const
 		conf_string_set(config_context, "", "emulator_include", config_out(*i).c_str());
 	}
 
-	conf_remove(config_context, "", "group");
+	conf_remove(config_context, "", "favorites");
 	for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
 		if (*i != "All Games")
-			conf_string_set(config_context, "", "group", config_out(*i).c_str());
+			conf_string_set(config_context, "", "favorites", config_out(*i).c_str());
 	}
 
 	conf_remove(config_context, "", "type");

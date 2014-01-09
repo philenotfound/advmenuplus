@@ -394,10 +394,12 @@ void draw_tag_right_whole(const string& s, int& xl, int& xr, int y, int sep, con
 		draw_tag_right(s, xl, xr, y, sep, color);
 }
 
-string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
+string tag_info_get(const game* g, int gs, int ga, const string favorites, const string tag_info) {
 	string info_tag = "";
 
-	if (g) {
+	if (tag_info == "favorites") {
+		info_tag = favorites;
+	} else if (g) {
 		if (tag_info == "time") {
 			ostringstream os;
 			unsigned time;
@@ -451,7 +453,7 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 			info_tag = g->emulator_get()->user_name_get();
 		} else if (tag_info == "type"){
 			info_tag = g->type_get()->name_get();
-		} else if (tag_info == "refresh"){
+		} else if (tag_info == "refresh") {
 			info_tag = g->refresh_get();
 		} else	if (tag_info == "manufacturer") {
 			info_tag = g->manufacturer_get();
@@ -465,22 +467,35 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 				clones = g->clone_get();
 			os << clones;
 			info_tag = os.str();
-		} else if (tag_info == "selected"){
+		} else if (tag_info == "selected") {
 			ostringstream os;
 			os << gs;
 			info_tag = os.str();
-		} else if (tag_info == "games"){
+		} else if (tag_info == "games") {
 			ostringstream os;
 			os << ga;
 			info_tag = os.str();
-		} else {
-			info_tag = tag_info;
+		} else if (tag_info == "game_favorites") {
+			favorites_container fav = g->gfavorites_get();
+			for(favorites_container::const_iterator i=fav.begin();i!=fav.end();++i) {
+				info_tag += (*i) + "/";
+			}
+			if (info_tag != "")
+				info_tag.erase(info_tag.length() - 1);
+		} else if (tag_info == "clone") {
+			if (g->parent_get())
+				info_tag = "Clone of " + g->parent_get()->name_get();
+			else if (g->clone_get()) {
+				ostringstream os;
+				os << g->clone_get() << " clones";
+				info_tag = os.str();
+			}
 		}
 	}
-	return info_tag;		
+	return info_tag;
 }
 
-string info_get(const game* g, int gs, int ga, const string s_info) {
+string info_get(const game* g, int gs, int ga, const string favorites, const string s_info) {
 	int pos_ini = 0;
 	int pos_fin = 0;
 	string tag = "";
@@ -496,7 +511,7 @@ string info_get(const game* g, int gs, int ga, const string s_info) {
 			pos_fin = s.find('%');
 			if (pos_fin > 0) {
 				tag = s.substr(0, pos_fin);
-				info += tag_info_get(g, gs, ga, tag);
+				info += tag_info_get(g, gs, ga, favorites, tag);
 				s.erase(0, pos_fin+1);
 			}
 		} else {
@@ -507,14 +522,14 @@ string info_get(const game* g, int gs, int ga, const string s_info) {
 	return info;
 }
 
-void draw_bar_info(adv_font* font, const game* g, const string s, int gs, int ga, int x, int y, int dx, int dy, const int_color& color, const string align)
+void draw_bar_info(adv_font* font, const game* g, const string s, int gs, int ga, const string favorites, int x, int y, int dx, int dy, const int_color& color, const string align)
 {
-	string info = info_get(g, gs, ga, s);
+	string info = info_get(g, gs, ga, favorites, s);
 
 	draw_tag_info(font, info, x, y, dx, color, align);
 }
 
-void draw_menu_bar(const game* g, int g2, int x, int y, int dx)
+void draw_menu_bar(const game* g, const string favorites, int g2, int x, int y, int dx)
 {
 	int_clear_alpha(x, y, dx, int_font_dy_get(), COLOR_MENU_BAR.background);
 
@@ -540,12 +555,9 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx)
 		draw_tag_right(os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
 	}
 
-	if (g) {
+	if (favorites != "") {
 		ostringstream os;
-		favorites_container favorites = g->gfavorites_get();
-		for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
-			os << (*i) << "/";
-		}
+		os << favorites;
 		draw_tag_right(os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR_TAG);
 	}
 
@@ -2607,19 +2619,19 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		
 		if (rs.mode_get() == mode_custom) {
 			if (bar_info_1_dy)
-				draw_bar_info(int_font_info_1, rs.current_game, bar_info_1_text, game_selected, game_count, bar_info_1_x, bar_info_1_y, bar_info_1_dx, bar_info_1_dy, LCOLOR_BAR_INFO_A, bar_info_1_align);
+				draw_bar_info(int_font_info_1, rs.current_game, bar_info_1_text, game_selected, game_count, rs.include_favorites_get(), bar_info_1_x, bar_info_1_y, bar_info_1_dx, bar_info_1_dy, LCOLOR_BAR_INFO_A, bar_info_1_align);
 			if (bar_info_2_dy)
-				draw_bar_info(int_font_info_2, rs.current_game, bar_info_2_text, game_selected, game_count, bar_info_2_x, bar_info_2_y, bar_info_2_dx, bar_info_2_dy, LCOLOR_BAR_INFO_B, bar_info_2_align);
+				draw_bar_info(int_font_info_2, rs.current_game, bar_info_2_text, game_selected, game_count, rs.include_favorites_get(), bar_info_2_x, bar_info_2_y, bar_info_2_dx, bar_info_2_dy, LCOLOR_BAR_INFO_B, bar_info_2_align);
 			if (bar_info_3_dy)
-				draw_bar_info(int_font_info_3, rs.current_game, bar_info_3_text, game_selected, game_count, bar_info_3_x, bar_info_3_y, bar_info_3_dx, bar_info_3_dy, LCOLOR_BAR_INFO_C, bar_info_3_align);
+				draw_bar_info(int_font_info_3, rs.current_game, bar_info_3_text, game_selected, game_count, rs.include_favorites_get(), bar_info_3_x, bar_info_3_y, bar_info_3_dx, bar_info_3_dy, LCOLOR_BAR_INFO_C, bar_info_3_align);
 			if (bar_info_4_dy)
-				draw_bar_info(int_font_info_4, rs.current_game, bar_info_4_text, game_selected, game_count, bar_info_4_x, bar_info_4_y, bar_info_4_dx, bar_info_4_dy, LCOLOR_BAR_INFO_D, bar_info_4_align);
+				draw_bar_info(int_font_info_4, rs.current_game, bar_info_4_text, game_selected, game_count, rs.include_favorites_get(), bar_info_4_x, bar_info_4_y, bar_info_4_dx, bar_info_4_dy, LCOLOR_BAR_INFO_D, bar_info_4_align);
 			if (bar_info_5_dy)
-				draw_bar_info(int_font_info_5, rs.current_game, bar_info_5_text, game_selected, game_count, bar_info_5_x, bar_info_5_y, bar_info_5_dx, bar_info_5_dy, LCOLOR_BAR_INFO_E, bar_info_5_align);
+				draw_bar_info(int_font_info_5, rs.current_game, bar_info_5_text, game_selected, game_count, rs.include_favorites_get(), bar_info_5_x, bar_info_5_y, bar_info_5_dx, bar_info_5_dy, LCOLOR_BAR_INFO_E, bar_info_5_align);
 		}
 		
 		if (bar_top_dy)
-			draw_menu_bar(rs.current_game, game_count, bar_top_x, bar_top_y, bar_top_dx);
+			draw_menu_bar(rs.current_game, rs.include_favorites_get(), game_count, bar_top_x, bar_top_y, bar_top_dx);
 		if (bar_bottom_dy)
 			draw_menu_info(rs.gar, rs.current_game, bar_bottom_x, bar_bottom_y, bar_bottom_dx, rs.merge, effective_preview, rs.sort_get(), rs.difficulty_effective, rs.lock_effective);
 		if (bar_right_dx) {
@@ -2831,10 +2843,10 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			if (rs.mode_get() == mode_custom) {
 				break;
 			}
-		case EVENT_SETGROUP :
+		case EVENT_SETFAVORITES :
 			if (!rs.current_game) break;
 		case EVENT_HELP :
-		case EVENT_GROUP :
+		case EVENT_FAVORITES_NEXT :
 		case EVENT_TYPE :
 		case EVENT_ATTRIB :
 		case EVENT_SORT :
@@ -3295,7 +3307,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	}
 
 	bool has_emu = false;
-	bool has_group = false;
+	bool has_favorites = false;
 	bool has_type = false;
 	bool has_filter = false;
 
@@ -3325,7 +3337,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		if (!state_favorites)
 			continue;
 
-		has_group = true;
+		has_favorites = true;
 
 		// type
 		if (rs.include_favorites_get() == "All Games" && !i->type_derived_get()->state_get())
@@ -3362,8 +3374,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		empty_msg = "No game was found";
 	else if (!has_emu)
 		empty_msg = "No game was found for the emulator " + emu_msg;
-	else if (!has_group)
-		empty_msg = "No game matches the group selection for " + emu_msg;
+	else if (!has_favorites)
+		empty_msg = "No games in list \"" + rs.include_favorites_get() + "\" for emulator \"" + emu_msg + "\"";
 	else if (!has_type)
 		empty_msg = "No game matches the type selection for " + emu_msg;
 	else if (!has_filter)
@@ -3449,11 +3461,11 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_IDLE_1 :
 		case EVENT_LOCK :
 		case EVENT_HELP :
-		case EVENT_GROUP :
+		case EVENT_FAVORITES_NEXT :
 		case EVENT_TYPE :
 		case EVENT_ATTRIB :
 		case EVENT_SORT :
-		case EVENT_SETGROUP :
+		case EVENT_SETFAVORITES :
 		case EVENT_SETTYPE :
 		case EVENT_COMMAND :
 		case EVENT_MENU :

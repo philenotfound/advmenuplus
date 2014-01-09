@@ -55,11 +55,6 @@ public:
 	bool operator<(const category& A) const { return case_less(name, A.name); }
 };
 
-inline bool pgame_by_group_less(const game* A, const game* B)
-{
-	return *A->group_derived_get() < *B->group_derived_get();
-}
-
 inline bool pgame_by_type_less(const game* A, const game* B)
 {
 	return *A->type_derived_get() < *B->type_derived_get();

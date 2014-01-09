@@ -423,26 +423,26 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 			else
 				os << g->description_get();
 			info_tag = os.str();
-		}	else if (tag_info == "size") {
+		} else if (tag_info == "size") {
 			ostringstream os;
 			if (g->size_get() >= 10*1000*1000)
 				os << setw(4) << g->size_get()/1000/1000 << "M";
 			else
 				os << setw(4) << g->size_get()/1000 << "k";
 			info_tag = os.str();
-		}	else if (tag_info == "resolution") {
+		} else if (tag_info == "resolution") {
 			if (g->sizex_get() && g->sizey_get()) {
 				ostringstream os;
 				os << g->sizex_get() << "x" << g->sizey_get();
 				info_tag = os.str();
 			}
-		}	else if (tag_info == "proportion") {
+		} else if (tag_info == "proportion") {
 			if (g->aspectx_get() && g->aspecty_get()) {
 				ostringstream os;
 				os << g->aspectx_get() << ":" << g->aspecty_get();
 				info_tag = os.str();
 			}
-		}	else if (tag_info == "rom") {
+		} else if (tag_info == "rom") {
 			if (g->emulator_get()->tree_get())
 				info_tag = (g->clone_best_get()).name_without_emulator_get();
 			else
@@ -451,8 +451,6 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 			info_tag = g->emulator_get()->user_name_get();
 		} else if (tag_info == "type"){
 			info_tag = g->type_get()->name_get();
-		} else if (tag_info == "group"){
-			info_tag = g->group_get()->name_get();
 		} else if (tag_info == "refresh"){
 			info_tag = g->refresh_get();
 		} else	if (tag_info == "manufacturer") {
@@ -475,7 +473,7 @@ string tag_info_get(const game* g, int gs, int ga, const string tag_info) {
 			ostringstream os;
 			os << ga;
 			info_tag = os.str();
-		}	else {
+		} else {
 			info_tag = tag_info;
 		}
 	}
@@ -542,9 +540,12 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx)
 		draw_tag_right(os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
 	}
 
-	if (g && !g->group_derived_get()->undefined_get()) {
+	if (g) {
 		ostringstream os;
-		os << g->group_derived_get()->name_get();
+		favorites_container favorites = g->gfavorites_get();
+		for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+			os << (*i) << "/";
+		}
 		draw_tag_right(os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR_TAG);
 	}
 
@@ -638,7 +639,6 @@ void draw_menu_info(const game_set& gar, const game* g, int x, int y, int dx, me
 	}
 
 	switch (sort_mode) {
-	case sort_by_group : draw_tag_right("group", xl, xr, y, in_separator, COLOR_MENU_BAR_HIDDEN); break;
 	case sort_by_name : draw_tag_right("name", xl, xr, y, in_separator, COLOR_MENU_BAR_HIDDEN); break;
 	case sort_by_root_name : draw_tag_right("parent", xl, xr, y, in_separator, COLOR_MENU_BAR_HIDDEN); break;
 	case sort_by_time : draw_tag_right("time", xl, xr, y, in_separator, COLOR_MENU_BAR_HIDDEN); break;
@@ -2831,12 +2831,13 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			if (rs.mode_get() == mode_custom) {
 				break;
 			}
+		case EVENT_SETGROUP :
+			if (!rs.current_game) break;
 		case EVENT_HELP :
 		case EVENT_GROUP :
 		case EVENT_TYPE :
 		case EVENT_ATTRIB :
 		case EVENT_SORT :
-		case EVENT_SETGROUP :
 		case EVENT_SETTYPE :
 		case EVENT_COMMAND :
 		case EVENT_MENU :
@@ -3226,10 +3227,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		psc = new pgame_sort_set(sort_by_session_func);
 		category_func = sort_item_session;
 		break;
-	case sort_by_group :
-		psc = new pgame_sort_set(sort_by_group_func);
-		category_func = sort_item_group;
-		break;
 	case sort_by_type :
 		psc = new pgame_sort_set(sort_by_type_func);
 		category_func = sort_item_type;
@@ -3281,22 +3278,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		(*i)->state_set(state);
 	}
 
-	// setup the group state
-	for(pcategory_container::iterator i=rs.group.begin();i!=rs.group.end();++i) {
-		bool state = false;
-		if (rs.include_group_get().size() == 0) {
-			state = true;
-		} else {
-			for(category_container::iterator j=rs.include_group_get().begin();j!=rs.include_group_get().end();++j) {
-				if ((*i)->name_get() == *j) {
-					state = true;
-					break;
-				}
-			}
-		}
-		(*i)->state_set(state);
-	}
-
 	// setup the type state
 	for(pcategory_container::iterator i=rs.type.begin();i!=rs.type.end();++i) {
 		bool state = false;
@@ -3329,20 +3310,31 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 		has_emu = true;
 
-		// group
-		if (!i->group_derived_get()->state_get())
+		// game lists
+		bool state_favorites = false;
+		if (rs.include_favorites_get() == "All Games") {
+			state_favorites = true;
+		} else if (i->gfavorites_get().size()) {
+			for(favorites_container::const_iterator j=i->gfavorites_get().begin();j!=(i)->gfavorites_get().end();++j) {
+				string fi = rs.include_favorites_get();
+				if (*j == fi)
+					state_favorites = true;
+			}
+		}
+
+		if (!state_favorites)
 			continue;
 
 		has_group = true;
 
 		// type
-		if (!i->type_derived_get()->state_get())
+		if (rs.include_favorites_get() == "All Games" && !i->type_derived_get()->state_get())
 			continue;
 
 		has_type = true;
 
 		// filter
-		if (!i->emulator_get()->filter(*i))
+		if (rs.include_favorites_get() == "All Games" && !i->emulator_get()->filter(*i))
 			continue;
 
 		has_filter = true;

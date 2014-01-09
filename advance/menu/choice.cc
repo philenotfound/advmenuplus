@@ -314,6 +314,82 @@ int choice_bag::run(const string& title, int x, int y, int dx, choice_container:
 	return key;
 }
 
+int choice_bag::favorites_run(const string& title, int x, int y, int dx, choice_container::iterator& pos)
+{
+	int key = EVENT_ESC;
+	int done = 0;
+	int border = int_font_dx_get() / 2;
+
+	if (x < 0)
+		x = (int_dx_get() - dx - border * 2) / 2;
+	if (y < 0)
+		y = (int_dy_get() - (size() + 1) * int_font_dy_get() - border * 2) / 2;
+
+	int pos_rel_max = (int_dy_get() - y) / int_font_dy_get();
+	pos_rel_max -= 2;
+	if (pos_rel_max > size())
+		pos_rel_max = size();
+	int pos_base_upper = size() - pos_rel_max;
+	int pos_max = size();
+
+	int pos_base = 0;
+	int pos_rel = 0;
+
+	int dy = (pos_rel_max+1) * int_font_dy_get();
+
+	int_box(x-border, y-border, dx+2*border, dy+border*2, 1, COLOR_CHOICE_NORMAL.foreground);
+	int_clear(x-border+1, y-border+1, dx+2*border-2, dy+border*2-2, COLOR_CHOICE_NORMAL.background);
+
+	unsigned count = 0;
+	for(iterator i=begin();i!=end();++i) {
+		if (i->state_get() == 2 && i->bistate_get()) {
+			++count;
+		}
+	}
+
+	pos_rel = pos - begin();
+	if (pos_rel >= pos_rel_max) {
+		pos_base = pos_rel - pos_rel_max + 1;
+		pos_rel = pos_rel_max - 1;
+	}
+
+	while (!done) {
+		draw(title, x, y, dx, pos_base, pos_rel, pos_rel_max);
+
+		key = int_event_get();
+
+		key = menu_key(key, pos_base, pos_rel, pos_rel_max, pos_base_upper, 1, pos_max);
+
+		switch (key) {
+			case EVENT_DEL :
+				for(iterator i=begin();i!=end();++i) {
+					i->bistate_set(false);
+				}
+			break;
+			case EVENT_INS :
+				for(iterator i=begin();i!=end();++i) {
+					i->bistate_set(true);
+				}
+			break;
+			case EVENT_SPACE :
+				pos = begin() + pos_base + pos_rel;
+				pos->bistate_set(!pos->bistate_get());
+				break;
+			case EVENT_ENTER :
+				done = 1;
+				break;
+			case EVENT_ESC :
+			case EVENT_MENU :
+				done = 1;
+				break;
+		}
+	}
+
+	pos = begin() + pos_base + pos_rel;
+
+	return key;
+}
+
 choice_container::iterator choice_bag::find_by_value(int value)
 {
 	choice_container::iterator i = begin();

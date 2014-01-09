@@ -63,7 +63,6 @@ int run_sort(config_state& rs)
 	ch.insert(ch.end(), choice("Time played", sort_by_time));
 	ch.insert(ch.end(), choice("Play times", sort_by_session));
 	ch.insert(ch.end(), choice("Time per play", sort_by_timepersession));
-	ch.insert(ch.end(), choice("Group", sort_by_group));
 	ch.insert(ch.end(), choice("Type", sort_by_type));
 	ch.insert(ch.end(), choice("Manufacturer", sort_by_manufacturer));
 	ch.insert(ch.end(), choice("Year", sort_by_year));
@@ -308,72 +307,58 @@ int run_preview(config_state& rs)
 }
 
 // ------------------------------------------------------------------------
-// Group menu
+// Favorites menu
 
-#define GROUP_CHOICE_DX 20*int_font_dx_get()
+#define FAVORITES_CHOICE_DX 20*int_font_dx_get()
 
-int run_group(config_state& rs)
+int run_favorites(config_state& rs)
 {
 	choice_bag ch;
 
-	for(pcategory_container::const_iterator j = rs.group.begin();j!=rs.group.end();++j) {
-		bool tag = rs.include_group_get().find((*j)->name_get()) != rs.include_group_get().end();
-		ch.insert(ch.end(), choice((*j)->name_get(), tag, 0));
+	for(favorites_container::const_iterator j = rs.favorites.begin();j!=rs.favorites.end();++j) {
+		ch.insert(ch.end(), choice((*j), 0));
 	}
 
-	choice_bag::iterator i = ch.begin();
+	choice_bag::iterator i = ch.find_by_desc(rs.include_favorites_get());
+	if (i==ch.end())
+		i = ch.begin();
 
-	int key = ch.run(" Include Groups", THIRD_CHOICE_X, THIRD_CHOICE_Y, GROUP_CHOICE_DX, i);
+	int key = ch.run(" Include Game List", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
-		category_container c;
+		string f;
 		for(choice_bag::const_iterator j=ch.begin();j!=ch.end();++j) {
 			if (j->bistate_get())
-				c.insert(j->desc_get());
+				f = j->desc_get();
 		}
-		rs.include_group_set(c);
+		rs.include_favorites_set(f);
 	}
 
 	return key;
 }
 
-void run_group_next(config_state& rs)
+void run_favorites_next(config_state& rs)
 {
-	category* next_select = 0;
-	bool all_select = true;
-
+	string next_select = "";
 	bool pred_in = false;
-	for(pcategory_container::const_iterator j=rs.group.begin();j!=rs.group.end();++j) {
+
+	for(favorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();++j) {
 		if (pred_in)
 			next_select = *j;
 		pred_in = false;
-		for(category_container::const_iterator k = rs.include_group_get().begin();k!=rs.include_group_get().end();++k) {
-			if ((*j)->name_get() == *k) {
-				pred_in = true;
-				break;
-			}
-		}
-		if (!pred_in)
-			all_select = false;
+		if ((*j) == rs.include_favorites_get())
+			pred_in = true;
 	}
+	
+	if (next_select == "" && rs.favorites.begin() != rs.favorites.end())
+		next_select = *rs.favorites.begin();
+	
+	string f;
 
-	category_container c;
-
-	if (!all_select && next_select == 0) {
-		// insert all
-		for(pcategory_container::const_iterator j=rs.group.begin();j!=rs.group.end();++j) {
-			c.insert((*j)->name_get());
-		}
-	} else {
-		if ((all_select || next_select == 0) && rs.group.begin() != rs.group.end())
-			next_select = *rs.group.begin();
-		if (next_select != 0) {
-			// insert the next
-			c.insert(next_select->name_get());
-		}
-	}
-
-	rs.include_group_set(c);
+	if (next_select != "")
+		f = next_select;
+	
+	rs.include_favorites_set(f);
 }
 
 // ------------------------------------------------------------------------
@@ -566,25 +551,37 @@ void run_type_next(config_state& rs)
 // ------------------------------------------------------------------------
 // Move menu
 
-int run_group_move(config_state& rs)
+int run_favorites_move(config_state& rs)
 {
 	choice_bag ch;
 
-	if (!rs.current_game)
-		return EVENT_ENTER;
+	favorites_container gfavoritos = rs.current_game->gfavorites_get();
+	
+	for(favorites_container::const_iterator j = rs.favorites.begin();j!=rs.favorites.end();++j) {
 
-	for(pcategory_container::const_iterator j = rs.group.begin();j!=rs.group.end();++j) {
-		ch.insert(ch.end(), choice((*j)->name_get(), 0));
+		bool tag = false;
+		if ((*j) != "All Games") {
+			for(favorites_container::const_iterator k=gfavoritos.begin();k!=gfavoritos.end();++k) {
+				if(*j==*k)
+					tag = true;
+			}
+			
+			ch.insert(ch.end(), choice((*j), tag, 0));
+		}
 	}
 
-	choice_bag::iterator i = ch.find_by_desc(rs.current_game->group_get()->name_get());
-	if (i==ch.end())
-		i = ch.begin();
+	choice_bag::iterator i = ch.begin();
 
-	int key = ch.run(" Select Game Group", THIRD_CHOICE_X, THIRD_CHOICE_Y, GROUP_CHOICE_DX, i);
+	int key = ch.favorites_run(" Select Game Lists", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
-		rs.current_game->user_group_set(rs.group.insert(i->desc_get()));
+		favorites_container f;
+		for(choice_bag::const_iterator j=ch.begin();j!=ch.end();++j) {
+			if (j->bistate_get()) {
+				f.insert(f.end(), j->desc_get());
+			}
+		}
+		rs.current_game->gfavorites_set(f);
 	}
 
 	return key;
@@ -786,8 +783,8 @@ int run_suballmenu(config_state& rs)
 	choice_bag ch;
 
 	rs.sub_disable(); // force the use of the default config
-	if (rs.group.size() > 1)
-		ch.insert(ch.end(), choice(menu_name(rs, "Game Group...", EVENT_SETGROUP), 7, rs.current_game != 0));
+	if (rs.favorites.size() > 1)
+		ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_SETGROUP), 7, rs.current_game != 0));
 	if (rs.type.size() > 1)
 		ch.insert(ch.end(), choice(menu_name(rs, "Game Type...", EVENT_SETTYPE), 8, rs.current_game != 0));
 	ch.insert(ch.end(), choice("Calibration...", 9));
@@ -820,7 +817,7 @@ int run_suballmenu(config_state& rs)
 				key = run_type(rs);
 				break;
 			case 4 :
-				key = run_group(rs);
+				key = run_favorites(rs);
 				break;
 			case 6 :
 				rs.restore_save();
@@ -829,7 +826,7 @@ int run_suballmenu(config_state& rs)
 				rs.restore_load();
 				break;
 			case 7 :
-				key = run_group_move(rs);
+				key = run_favorites_move(rs);
 				break;
 			case 8 :
 				key = run_type_move(rs);
@@ -864,7 +861,7 @@ int run_subthismenu(config_state& rs)
 	ch.insert(ch.end(), choice(menu_name(rs, "Sort...", EVENT_SORT), 0));
 	ch.insert(ch.end(), choice(menu_name(rs, "Mode...", EVENT_MODE), 1));
 	ch.insert(ch.end(), choice(menu_name(rs, "Preview...", EVENT_PREVIEW), 2));
-	ch.insert(ch.end(), choice(menu_name(rs, "Groups...", EVENT_GROUP), 4));
+	ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_GROUP), 4));
 	ch.insert(ch.end(), choice(menu_name(rs, "Types...", EVENT_TYPE), 3));
 	ch.insert(ch.end(), choice(menu_name(rs, "Filters...", EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
 
@@ -901,7 +898,7 @@ int run_subthismenu(config_state& rs)
 				key = run_type(rs);
 				break;
 			case 4 :
-				key = run_group(rs);
+				key = run_favorites(rs);
 				break;
 			case 5 :
 				rs.sub_get().restore_save();
@@ -919,7 +916,6 @@ int run_subthismenu(config_state& rs)
 				rs.sub_get().include_type_unset();
 				break;
 			case 10 :
-				rs.sub_get().include_group_unset();
 				break;
 			case 11 :
 				emu = run_emu_select(rs);
@@ -1109,9 +1105,9 @@ void run_help(config_state& rs)
 			int_put_alpha(xd, y, "Shutdown", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
-		if (rs.group.size() > 1) {
+		if (rs.favorites.size() > 1) {
 			int_put_alpha(xt, y, event_name(EVENT_GROUP), COLOR_HELP_TAG);
-			int_put_alpha(xd, y, "Next game group", COLOR_HELP_NORMAL);
+			int_put_alpha(xd, y, "Next game list", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
 		if (rs.type.size() > 1) {
@@ -1138,9 +1134,9 @@ void run_help(config_state& rs)
 			int_put_alpha(xd, y, "Commands", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
-		if (rs.group.size() > 1) {
+		if (rs.favorites.size() > 1) {
 			int_put_alpha(xt, y, event_name(EVENT_SETGROUP), COLOR_HELP_TAG);
-			int_put_alpha(xd, y, "Change the current game group", COLOR_HELP_NORMAL);
+			int_put_alpha(xd, y, "Change the current game lists", COLOR_HELP_NORMAL);
 			y += int_font_dy_get();
 		}
 		if (rs.type.size() > 1) {
@@ -1308,10 +1304,6 @@ void run_stat(config_state& rs)
 
 		// emulator
 		if (!i->emulator_get()->state_get())
-			continue;
-
-		// group
-		if (!i->group_derived_get()->state_get())
 			continue;
 
 		// type

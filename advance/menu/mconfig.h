@@ -43,7 +43,6 @@ enum clip_mode_t {
 
 /// Type of sorting.
 enum listsort_t {
-	sort_by_group,
 	sort_by_name,
 	sort_by_root_name,
 	sort_by_time,
@@ -96,11 +95,6 @@ inline bool sort_by_session_func(const game* A, const game* B)
 inline bool sort_by_timepersession_func(const game* A, const game* B)
 {
 	return pgame_combine_less(A, B, pgame_by_timepersession_less, pgame_by_desc_less, pgame_by_name_less);
-}
-
-inline bool sort_by_group_func(const game* A, const game* B)
-{
-	return pgame_combine_less(A, B, pgame_by_group_less, pgame_by_desc_less, pgame_by_name_less);
 }
 
 inline bool sort_by_type_func(const game* A, const game* B)
@@ -214,11 +208,6 @@ class config_emulator_state {
 	bool preview_set_effective; ///< If the preview is set.
 	listpreview_t preview_effective; ///< Preview type selected.
 
-	bool include_group_set_orig; ///< If the group include is set.
-	category_container include_group_orig; ///< Original Included groups.
-	bool include_group_set_effective; ///< If the group include is set.
-	category_container include_group_effective; ///< Included groups.
-
 	bool include_type_set_orig; ///< If the type include is set.
 	category_container include_type_orig; ///< Original Included types.
 	bool include_type_set_effective; ///< If the type include is set.
@@ -241,7 +230,6 @@ public:
 	int menu_rel_get();
 	
 	listpreview_t preview_get();
-	const category_container& include_group_get();
 	const category_container& include_type_get();
 
 	bool sort_has();
@@ -251,7 +239,6 @@ public:
 	bool menu_rel_has();
 
 	bool preview_has();
-	bool include_group_has();
 	bool include_type_has();
 	bool resetgame_has();
 
@@ -262,7 +249,6 @@ public:
 	void menu_rel_unset();
 
 	void preview_unset();
-	void include_group_unset();
 	void include_type_unset();
 
 	void sort_set(listsort_t A);
@@ -272,14 +258,13 @@ public:
 	void menu_rel_set(int A);
 
 	void preview_set(listpreview_t A);
-	void include_group_set(const category_container& A);
 	void include_type_set(const category_container& A);
 
 	bool resetgame_get();
 };
 
 class config_state {
-	bool load_game(const std::string& name, const std::string& group, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
+	bool load_game(const std::string& name,  favorites_container& favorites, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
 	bool load_iterator_game(adv_conf* config_context, const std::string& tag);
 	bool load_iterator_import(adv_conf* config_context, const std::string& tag, void (config_state::*set)(const game&, const std::string&), bool opt_verbose);
 	bool load_iterator_script(adv_conf* config_context, const std::string& tag);
@@ -287,7 +272,6 @@ class config_state {
 	void import_desc(const game& g, const std::string& text);
 	void import_info(const game& g, const std::string& text);
 	void import_type(const game& g, const std::string& text);
-	void import_group(const game& g, const std::string& text);
 
 	emulator* sub_emu; ///< Sub emu selected.
 
@@ -305,8 +289,8 @@ class config_state {
 	listpreview_t default_preview_orig; ///< Original preview type selected.
 	listpreview_t default_preview_effective; ///< Preview type selected.
 
-	category_container default_include_group_orig; ///< Original Included groups.
-	category_container default_include_group_effective; ///< Included groups.
+	std::string default_include_favorites_orig; ///< Original Included favorites list.
+	std::string default_include_favorites_effective; ///< Included favorites list.
 
 	category_container default_include_type_orig; ///< Original Included types.
 	category_container default_include_type_effective; ///< Included types.
@@ -325,7 +309,7 @@ public:
 	int menu_rel_get();
 
 	listpreview_t preview_get();
-	const category_container& include_group_get();
+	const std::string& include_favorites_get() { return default_include_favorites_effective; }
 	const category_container& include_type_get();
 	bool resetgame_get(const game*);
 	bool resetexit_get();
@@ -337,7 +321,7 @@ public:
 	void menu_rel_set(int A);
 
 	void preview_set(listpreview_t A);
-	void include_group_set(const category_container& A);
+	void include_favorites_set(const std::string& A) { default_include_favorites_effective = A; }
 	void include_type_set(const category_container& A);
 
 	void sub_disable();
@@ -353,7 +337,7 @@ public:
 	pemulator_container emu; ///< Supported emulators set.
 	pemulator_container emu_active; ///< Active emulators, a subset of emu.
 
-	pcategory_container group; ///< Group set.
+	favorites_container favorites; ///< Game Lists set.
 	pcategory_container type; ///< Type set.
 
 	bool lock_orig; ///< Original interface locked.

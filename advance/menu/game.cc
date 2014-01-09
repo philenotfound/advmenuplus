@@ -47,7 +47,6 @@ game::game()
 	time = 0;
 	size = 0;
 	type = 0;
-	group = 0;
 	parent = 0;
 	emu = 0;
 	session = 0;
@@ -65,7 +64,6 @@ game::game(const string& Aname) : name(Aname)
 	time = 0;
 	size = 0;
 	type = 0;
-	group = 0;
 	parent = 0;
 	emu = 0;
 	session = 0;
@@ -79,7 +77,7 @@ game::game(const game& A) :
 	manufacturer(A.manufacturer), software_path(A.software_path),
 	sizex(A.sizex), sizey(A.sizey),
 	aspectx(A.aspectx), aspecty(A.aspecty), refresh(A.refresh),
-	group(A.group), type(A.type), time(A.time),
+	type(A.type), time(A.time),
 	session(A.session),
 	size(A.size),
 	rzs(A.rzs),
@@ -190,16 +188,17 @@ string game::name_without_emulator_get() const
 		return name_get().substr(i + 1);
 }
 
-void game::auto_group_set(const category* A) const
+void game::gfavorites_set(const favorites_container& A) const
 {
-	if (!is_user_group_set())
-		group = A;
+	if (A.size() != 0)
+		flag |= flag_user_favorites_set;
+	
+	gfavorites = A;
 }
 
-void game::user_group_set(const category* A) const
+const favorites_container& game::gfavorites_get() const
 {
-	if (!A->undefined_get())
-		flag |= flag_user_group_set; group = A;
+	return	gfavorites;
 }
 
 void game::auto_type_set(const category* A) const
@@ -213,15 +212,6 @@ void game::user_type_set(const category* A) const
 	if (!A->undefined_get())
 		flag |= flag_user_type_set;
 	type = A;
-}
-
-const category* game::group_derived_get() const
-{
-	if (!group_get()->undefined_get())
-		return group_get();
-	if (parent_get())
-		return parent_get()->group_derived_get();
-	return group_get();
 }
 
 const category* game::type_derived_get() const
@@ -750,11 +740,6 @@ string sort_item_session(const game& g)
 {
 	(void)g;
 	return string();
-}
-
-string sort_item_group(const game& g)
-{
-	return g.group_get()->name_get();
 }
 
 string sort_item_type(const game& g)

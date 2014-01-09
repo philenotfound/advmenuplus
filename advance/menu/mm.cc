@@ -77,7 +77,7 @@ int run_sub(config_state& rs, bool silent)
 				case EVENT_GROUP :
 					// replay the sound and clip
 					silent = false;
-					run_group_next(rs);
+					run_favorites_next(rs);
 					break;
 				case EVENT_EMU_NEXT :
 					// replay the sound and clip
@@ -112,7 +112,7 @@ int run_sub(config_state& rs, bool silent)
 				case EVENT_SETGROUP :
 					// replay the sound and clip
 					silent = false;
-					run_group_move(rs);
+					run_favorites_move(rs);
 					break;
 				case EVENT_SETTYPE :
 					// replay the sound and clip
@@ -468,7 +468,6 @@ static adv_conf_conv STANDARD[] = {
 #ifdef __MSDOS__
 { "", "allegro_*", "*", "%s", "%s", "%s", ADV_CONF_CONV_AUTOREG_MULTI }, /* auto registration of the Allegro options */
 #endif
-{ "*", "group_inport", "*", "%s", "group_import", "%s", 0 }, /* 1.16.0 */
 { "*", "type_inport", "*", "%s", "type_import", "%s", 0 }, /* 1.16.0 */
 { "*", "preview_aspect", "fit", "%s", "preview_expand", "3.0", 0 }, /* 1.17.4 */
 { "*", "preview_aspect", "correct", "%s", "preview_expand", "1.15", 0 }, /* 1.17.4 */
@@ -484,7 +483,6 @@ static adv_conf_conv STANDARD[] = {
 { "*", "select_vector", "*", "", "", "", 0 }, /* remove */
 { "*", "select_vertical", "*", "", "", "", 0 }, /* remove */
 { "*", "type_import", "none", "", "", "", 0 }, /* remove */
-{ "*", "group_import", "none", "", "", "", 0 }, /* remove */
 { "*", "desc_import", "none", "", "", "", 0 }, /* remove */
 { "*", "device_joystick", "standard", "%s", "%s", "allegro/%s", 0 }, /* rename */
 { "*", "device_joystick", "dual", "%s", "%s", "allegro/%s", 0 }, /* rename */

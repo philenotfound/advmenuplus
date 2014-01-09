@@ -33,7 +33,6 @@ using namespace std;
 // Configuration init
 
 static adv_conf_enum_int OPTION_SORT[] = {
-{ "group", sort_by_group },
 { "name", sort_by_name },
 { "parent", sort_by_root_name },
 { "time", sort_by_time },
@@ -346,10 +345,9 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_multi(config_context, "emulator_font_color_select");
 	conf_string_register_multi(config_context, "group");
 	conf_string_register_multi(config_context, "type");
-	conf_string_register_multi(config_context, "group_include");
+	conf_string_register_default(config_context, "group_include", "All Games");
 	conf_string_register_multi(config_context, "type_include");
 	conf_string_register_multi(config_context, "type_import");
-	conf_string_register_multi(config_context, "group_import");
 	conf_string_register_multi(config_context, "desc_import");
 	conf_string_register_multi(config_context, "info_import");
 	conf_string_register_multi(config_context, "game");
@@ -487,13 +485,13 @@ static bool config_load_background_list(const string& list, path_container& c)
 	return almost_one;
 }
 
-bool config_state::load_game(const string& name, const string& group_name, const string& type_name, const string& time, const string& session, const string& desc)
+bool config_state::load_game(const string& name, favorites_container& favorites, const string& type_name, const string& time, const string& session, const string& desc)
 {
 	game_set::const_iterator i = gar.find(game(name));
 	if (i==gar.end())
 		return false;
 
-	i->user_group_set(group.insert(group_name));
+	i->gfavorites_set(favorites);
 	i->user_type_set(type.insert(type_name));
 
 	if (desc.length()!=0)
@@ -703,6 +701,23 @@ static bool config_load_iterator_emu(adv_conf* config_context, const string& tag
 	return true;
 }
 
+static bool config_load_iterator_favorites(adv_conf* config_context, const string& tag, favorites_container& fav)
+{
+	fav.insert(fav.end(), "All Games");
+	adv_conf_iterator i;
+	conf_iterator_begin(&i, config_context, tag.c_str());
+	while (!conf_iterator_is_end(&i)) {
+		string a0;
+		string s = conf_iterator_string_get(&i);
+		if (!config_split(s, a0))
+			return false;
+		if (a0 != "All Games")
+			fav.insert(fav.end(), a0);
+		conf_iterator_next(&i);
+	}
+	return true;
+}
+
 static bool config_load_iterator_pcategory(adv_conf* config_context, const string& tag, pcategory_container& cat)
 {
 	adv_conf_iterator i;
@@ -811,10 +826,19 @@ bool config_state::load_iterator_game(adv_conf* config_context, const string& ta
 	adv_conf_iterator i;
 	conf_iterator_begin(&i, config_context, tag.c_str());
 	while (!conf_iterator_is_end(&i)) {
+		favorites_container f;
 		string s = conf_iterator_string_get(&i);
 		int j = 0;
 		string game = arg_get(s, j);
-		string group = arg_get(s, j);
+		
+		string sfavorites = arg_get(s, j);
+		int k = 0;
+		while (k<sfavorites.length()) {
+			string list = token_get(sfavorites, k, "/");
+			token_skip(sfavorites, k, "/");
+			f.insert(f.end(), list);
+		}
+		
 		string type = arg_get(s, j);
 		string time = arg_get(s, j);
 		string session = arg_get(s, j);
@@ -830,7 +854,7 @@ bool config_state::load_iterator_game(adv_conf* config_context, const string& ta
 			return false;
 		}
 
-		if (!load_game(game, group, type, time, session, desc)) {
+		if (!load_game(game, f, type, time, session, desc)) {
 			++ignored_count;
 			if (ignored_count < 10)
 				target_err("Ignoring info for game '%s'.\n", game.c_str());
@@ -1283,22 +1307,21 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	}
 
 	if (opt_verbose)
-		target_nfo("log: load group and types\n");
+		target_nfo("log: load game lists and types\n");
 
 	// load the group/type informations
-	if (!config_load_iterator_pcategory(config_context, "group", group))
+	if (!config_load_iterator_favorites(config_context, "group", favorites))
 		return false;
 	if (!config_load_iterator_pcategory(config_context, "type", type))
 		return false;
 
-	if (!config_load_iterator_category(config_context, "group_include", default_include_group_orig))
-		return false;
+	default_include_favorites_orig = borrar_comillas(conf_string_get_default(config_context, "group_include"));
+
 	if (!config_load_iterator_category(config_context, "type_include", default_include_type_orig))
 		return false;
 
-	if (default_include_group_orig.size() == 0) {
-		for(pcategory_container::iterator i=group.begin();i!=group.end();++i)
-			default_include_group_orig.insert((*i)->name_get());
+	if (default_include_favorites_orig == "") {
+		default_include_favorites_orig = "All Games";
 	}
 	if (default_include_type_orig.size() == 0) {
 		for(pcategory_container::iterator i=type.begin();i!=type.end();++i)
@@ -1311,9 +1334,8 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	if (!load_iterator_game(config_context, "game"))
 		return false;
 
-	// set the group and type of all the remainig games
+	// set the type of all the remainig games
 	for(game_set::const_iterator i=gar.begin();i!=gar.end();++i) {
-		i->auto_group_set(group.undefined_get());
 		i->auto_type_set(type.undefined_get());
 	}
 
@@ -1343,8 +1365,6 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	if (!load_iterator_import(config_context, "type_import", &config_state::import_type, opt_verbose))
 		return false;
-	if (!load_iterator_import(config_context, "group_import", &config_state::import_group, opt_verbose))
-		return false;
 
 	if (opt_verbose)
 		target_nfo("log: load background music list\n");
@@ -1370,11 +1390,6 @@ void config_state::import_info(const game& g, const string& text)
 void config_state::import_type(const game& g, const string& text)
 {
 	g.auto_type_set(type.insert(text));
-}
-
-void config_state::import_group(const game& g, const string& text)
-{
-	g.auto_group_set(group.insert(text));
 }
 
 void config_state::conf_default(adv_conf* config_context)
@@ -1461,7 +1476,6 @@ void config_state::conf_default(adv_conf* config_context)
 		conf_set(config_context, "", "group", "\"Very Good\"");
 		conf_set(config_context, "", "group", "\"Good\"");
 		conf_set(config_context, "", "group", "\"Bad\"");
-		conf_set(config_context, "", "group", "\"<undefined>\"");
 	}
 
 	conf_iterator_begin(&i, config_context, "type");
@@ -1505,11 +1519,9 @@ bool config_state::save(adv_conf* config_context) const
 	conf_int_set(config_context, "", "menu_rel", default_menu_rel_orig);
 	conf_int_set(config_context, "", "sort", default_sort_orig);
 	conf_int_set(config_context, "", "preview", default_preview_orig);
-	conf_remove(config_context, "", "group_include");
 
-	for(category_container::const_iterator i=default_include_group_orig.begin();i!=default_include_group_orig.end();++i) {
-		conf_string_set(config_context, "", "group_include", config_out(*i).c_str());
-	}
+	conf_remove(config_context, "", "group_include");
+	conf_string_set(config_context, "", "group_include", config_out(default_include_favorites_orig).c_str());
 
 	conf_remove(config_context, "", "type_include");
 	for(category_container::const_iterator i=default_include_type_orig.begin();i!=default_include_type_orig.end();++i) {
@@ -1530,8 +1542,9 @@ bool config_state::save(adv_conf* config_context) const
 	}
 
 	conf_remove(config_context, "", "group");
-	for(pcategory_container::const_iterator i=group.begin();i!=group.end();++i) {
-		conf_string_set(config_context, "", "group", config_out((*i)->name_get()).c_str());
+	for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+		if (*i != "All Games")
+			conf_string_set(config_context, "", "group", config_out(*i).c_str());
 	}
 
 	conf_remove(config_context, "", "type");
@@ -1563,7 +1576,7 @@ bool config_state::save(adv_conf* config_context) const
 	conf_remove(config_context, "", "game");
 	for(game_set::const_iterator i=gar.begin();i!=gar.end();++i) {
 		if (0
-			|| i->is_user_group_set()
+			|| i->is_user_favorites_set()
 			|| i->is_user_type_set()
 			|| i->is_time_set()
 			|| i->is_session_set()
@@ -1573,8 +1586,15 @@ bool config_state::save(adv_conf* config_context) const
 			f << "\"" << i->name_get() << "\"";
 
 			f << " \"";
-			if (i->is_user_group_set())
-				f << i->group_get()->name_get();
+			if (i->is_user_favorites_set()) {
+				favorites_container favorites = i->gfavorites_get();
+				string sfavorites = "";
+				for(favorites_container::const_iterator j=favorites.begin();j!=favorites.end();++j) {
+					sfavorites += (*j) + "/";
+				}
+				if(sfavorites != "")
+					f << sfavorites.erase(sfavorites.length() - 1);
+			}
 			f << "\"";
 
 			f << " \"";
@@ -1616,7 +1636,7 @@ void config_state::restore_load()
 	default_menu_base_effective = default_menu_base_orig;
 	default_menu_rel_effective = default_menu_rel_orig;
 	default_preview_effective = default_preview_orig;
-	default_include_group_effective = default_include_group_orig;
+	default_include_favorites_effective = default_include_favorites_orig;
 	default_include_type_effective = default_include_type_orig;
 	difficulty_effective = difficulty_orig;
 	include_emu_set(include_emu_orig);
@@ -1637,7 +1657,7 @@ void config_state::restore_save_default()
 	default_menu_base_orig = default_menu_base_effective;
 	default_menu_rel_orig = default_menu_rel_effective;
 	default_preview_orig = default_preview_effective;
-	default_include_group_orig = default_include_group_effective;
+	default_include_favorites_orig = default_include_favorites_effective;
 	default_include_type_orig = default_include_type_effective;
 	difficulty_orig = difficulty_effective;
 	include_emu_orig = include_emu_effective;
@@ -1671,10 +1691,6 @@ config_state::~config_state()
 {
 	// delete the emulators
 	for(pemulator_container::iterator i=emu.begin();i!=emu.end();++i) {
-		delete *i;
-	}
-	// delete the groups
-	for(pcategory_container::iterator i=group.begin();i!=group.end();++i) {
 		delete *i;
 	}
 	// delete the types
@@ -1757,14 +1773,6 @@ listpreview_t config_state::preview_get()
 		return default_preview_effective;
 }
 
-const category_container& config_state::include_group_get()
-{
-	if (sub_has() && sub_get().include_group_has())
-		return sub_get().include_group_get();
-	else
-		return default_include_group_effective;
-}
-
 const category_container& config_state::include_type_get()
 {
 	if (sub_has() && sub_get().include_type_has())
@@ -1829,14 +1837,6 @@ void config_state::preview_set(listpreview_t A)
 		sub_get().preview_set(A);
 	else
 		default_preview_effective = A;
-}
-
-void config_state::include_group_set(const category_container& A)
-{
-	if (sub_has())
-		sub_get().include_group_set(A);
-	else
-		default_include_group_effective = A;
 }
 
 void config_state::include_type_set(const category_container& A)
@@ -2002,14 +2002,6 @@ bool config_emulator_state::load(adv_conf* config_context, const string& section
 		preview_set_orig = false;
 	}
 
-	if (!config_load_iterator_category_section(config_context, section, "group_include", include_group_orig))
-		return false;
-	if (include_group_orig.size() != 0) {
-		include_group_set_orig = true;
-	} else {
-		include_group_set_orig = false;
-	}
-
 	if (!config_load_iterator_category_section(config_context, section, "type_include", include_type_orig))
 		return false;
 	if (include_type_orig.size() != 0) {
@@ -2060,13 +2052,6 @@ void config_emulator_state::save(adv_conf* config_context, const string& section
 		conf_remove(config_context, section.c_str(), "preview");
 	}
 
-	conf_remove(config_context, section.c_str(), "group_include");
-	if (include_group_set_orig) {
-		for(category_container::const_iterator i=include_group_orig.begin();i!=include_group_orig.end();++i) {
-			conf_string_set(config_context, section.c_str(), "group_include", config_out(*i).c_str());
-		}
-	}
-
 	conf_remove(config_context, section.c_str(), "type_include");
 	if (include_type_set_orig) {
 		for(category_container::const_iterator i=include_type_orig.begin();i!=include_type_orig.end();++i) {
@@ -2084,7 +2069,6 @@ void config_emulator_state::restore_load()
 	menu_rel_effective = menu_rel_orig;
 	
 	preview_effective = preview_orig;
-	include_group_effective = include_group_orig;
 	include_type_effective = include_type_orig;
 	sort_set_effective = sort_set_orig;
 	mode_set_effective = mode_set_orig;
@@ -2093,7 +2077,6 @@ void config_emulator_state::restore_load()
 	menu_rel_set_effective = menu_rel_set_orig;
 	
 	preview_set_effective = preview_set_orig;
-	include_group_set_effective = include_group_set_orig;
 	include_type_set_effective = include_type_set_orig;
 }
 
@@ -2106,7 +2089,6 @@ void config_emulator_state::restore_save()
 	menu_rel_orig = menu_rel_effective;
 	
 	preview_orig = preview_effective;
-	include_group_orig = include_group_effective;
 	include_type_orig = include_type_effective;
 	sort_set_orig = sort_set_effective;
 	mode_set_orig = mode_set_effective;
@@ -2115,7 +2097,6 @@ void config_emulator_state::restore_save()
 	menu_rel_set_orig = menu_rel_set_effective;
 	
 	preview_set_orig = preview_set_effective;
-	include_group_set_orig = include_group_set_effective;
 	include_type_set_orig = include_type_set_effective;
 }
 
@@ -2142,11 +2123,6 @@ bool config_emulator_state::menu_rel_has()
 bool config_emulator_state::preview_has()
 {
 	return preview_set_effective;
-}
-
-bool config_emulator_state::include_group_has()
-{
-	return include_group_set_effective;
 }
 
 bool config_emulator_state::include_type_has()
@@ -2182,11 +2158,6 @@ int config_emulator_state::menu_rel_get()
 listpreview_t config_emulator_state::preview_get()
 {
 	return preview_effective;
-}
-
-const category_container& config_emulator_state::include_group_get()
-{
-	return include_group_effective;
 }
 
 const category_container& config_emulator_state::include_type_get()
@@ -2229,12 +2200,6 @@ void config_emulator_state::preview_set(listpreview_t A)
 	preview_effective = A;
 }
 
-void config_emulator_state::include_group_set(const category_container& A)
-{
-	include_group_set_effective = true;
-	include_group_effective = A;
-}
-
 void config_emulator_state::include_type_set(const category_container& A)
 {
 	include_type_set_effective = true;
@@ -2264,11 +2229,6 @@ void config_emulator_state::menu_rel_unset()
 void config_emulator_state::preview_unset()
 {
 	preview_set_effective = false;
-}
-
-void config_emulator_state::include_group_unset()
-{
-	include_group_set_effective = false;
 }
 
 void config_emulator_state::include_type_unset()

@@ -55,11 +55,13 @@
 #define EVENT_OFF (28 << 16)
 #define EVENT_MENU (29 << 16)
 #define EVENT_EMU_NEXT (30 << 16)
-#define EVENT_EMU_PRE (36 << 16)
+#define EVENT_EMU_PRE (38 << 16)
 #define EVENT_ROTATE (31 << 16)
 #define EVENT_LOCK (32 << 16)
 #define EVENT_PREVIEW (34 << 16)
 #define EVENT_MUTE (35 << 16)
+#define EVENT_OFF_FORCE (36 << 16)
+#define EVENT_ESC_FORCE (37 << 16)
 
 bool event_in(const std::string& s);
 void event_out(adv_conf* config_context, const char* tag);

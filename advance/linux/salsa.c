@@ -60,6 +60,7 @@ struct soundb_alsa_context {
 	unsigned sample_length; /**< Sample (for all channels) length in bytes. */
 	snd_pcm_t* handle; /**< Alsa handle. */
 	int volume; /**< Volume adjustement. ALSA_VOLUME_BASE == full volume. */
+	snd_pcm_uframes_t buffer_size; /**< ALSA buffe size. */
 };
 
 static struct soundb_alsa_context alsa_state;
@@ -76,24 +77,15 @@ static void alsa_log(snd_pcm_hw_params_t* hw_params, snd_pcm_sw_params_t* sw_par
 	unsigned period_count;
 	unsigned buffer_time;
 	snd_pcm_uframes_t buffer_size;
-	unsigned tick_time;
-
-	snd_pcm_uframes_t xfer_align;
 
 	snd_pcm_hw_params_get_period_time(hw_params, &period_time, 0);
 	snd_pcm_hw_params_get_period_size(hw_params, &period_size, 0);
 	snd_pcm_hw_params_get_periods(hw_params, &period_count, 0);
 	snd_pcm_hw_params_get_buffer_time(hw_params, &buffer_time, 0);
 	snd_pcm_hw_params_get_buffer_size(hw_params, &buffer_size);
-	snd_pcm_hw_params_get_tick_time(hw_params, &tick_time, 0);
 
-	log_std(("sound:alsa: hw period_time %g [us], period_size %d, periods %d, buffer_time %g [us], buffer_size %d, tick_time %g [us]\n",
-		(double)(period_time / 1000000.0), (unsigned)period_size, (unsigned)period_count, (double)(buffer_time / 1000000.0), (unsigned)buffer_size, (double)(tick_time / 1000000.0)
-	));
-
-	snd_pcm_sw_params_get_xfer_align(sw_params, &xfer_align);
-	log_std(("sound:alsa: sw xfer_align %d\n",
-		(unsigned)xfer_align
+	log_std(("sound:alsa: hw period_time %g [us], period_size %d, periods %d, buffer_time %g [us], buffer_size %d\n",
+		(double)(period_time / 1000000.0), (unsigned)period_size, (unsigned)period_count, (double)(buffer_time / 1000000.0), (unsigned)buffer_size
 	));
 }
 
@@ -185,6 +177,9 @@ adv_error soundb_alsa_init(int sound_id, unsigned* rate, adv_bool stereo_flag, d
 		log_std(("ERROR:sound:alsa: audio buffer TOO SMALL\n"));
 	}
 
+	/* store the buffer size for later use */
+	alsa_state.buffer_size = buffer_size;
+
 	r = snd_pcm_hw_params(alsa_state.handle, hw_params);
 	if (r < 0) {
 		log_std(("ERROR:sound:alsa: Couldn't set hw audio parameters: %s\n", snd_strerror(r)));
@@ -197,15 +192,15 @@ adv_error soundb_alsa_init(int sound_id, unsigned* rate, adv_bool stereo_flag, d
 		goto err_close;
 	}
 
-	r = snd_pcm_sw_params_set_xfer_align(alsa_state.handle, sw_params, 1);
-	if (r < 0) {
-		log_std(("ERROR:sound:alsa: Couldn't set xfer_align: %s\n", snd_strerror(r)));
-		goto err_close;
-	}
-
 	r = snd_pcm_sw_params(alsa_state.handle, sw_params);
 	if (r < 0) {
 		log_std(("ERROR:sound:alsa: Couldn't set sw audio parameters: %s\n", snd_strerror(r)));
+		goto err_close;
+	}
+
+	r = snd_pcm_prepare(alsa_state.handle);
+	if (r < 0) {
+		log_std(("ERROR:sound:alsa: Couldn't prepare audio handle: %s\n", snd_strerror(r)));
 		goto err_close;
 	}
 
@@ -237,22 +232,26 @@ void soundb_alsa_stop(void)
 
 unsigned soundb_alsa_buffered(void)
 {
-	snd_pcm_sframes_t buffered;
 	int r;
+	snd_pcm_sframes_t avail;
 
-	r = snd_pcm_delay(alsa_state.handle, &buffered);
+	r = snd_pcm_avail(alsa_state.handle);
 	if (r < 0) {
 		if (r == -EPIPE) {
-			log_std(("ERROR:sound:alsa: snd_pcm_delay() failed: %s. Increase the latency with -sound_latency.\n", snd_strerror(r)));
+			log_std(("ERROR:sound:alsa: snd_pcm_avail() failed: %s. Increase the latency with -sound_latency.\n", snd_strerror(r)));
 		} else {
-			log_std(("ERROR:sound:alsa: snd_pcm_delay() failed: %s\n", snd_strerror(r)));
+			log_std(("ERROR:sound:alsa: snd_pcm_avail() failed: %s\n", snd_strerror(r)));
 		}
-		buffered = 0;
+		return 0;
 	}
 
-	log_debug(("sound:alsa: snd_pcm_delay() = %d\n", (unsigned)buffered));
+	avail = r;
 
-	return buffered;
+	log_debug(("sound:alsa: buffer_size = %d, snd_pcm_avail() = %d\n", (unsigned)alsa_state.buffer_size, (unsigned)avail));
+
+	if (avail > alsa_state.buffer_size)
+		return 0;
+	return alsa_state.buffer_size - avail;
 }
 
 static void alsa_volume_channel(double volume)
@@ -394,6 +393,8 @@ void soundb_alsa_play(const adv_sample* sample_map, unsigned sample_count)
 
 			r = snd_pcm_writei(alsa_state.handle, buf_map, run / alsa_state.channel);
 		}
+
+		log_debug(("sound:alsa: snd_pcm_writei() -> %d\n", r));
 
 		if (r < 0) {
 			if (r == -EAGAIN) {

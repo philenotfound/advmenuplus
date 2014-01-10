@@ -30,7 +30,7 @@
 #include <list>
 
 #define ADV_COPY \
-	"AdvMenuPLUS - Copyright (C) 2009-2012 by daesdae\nAdvanceMENU - Copyright (C) 1999-2008 by Andrea Mazzoleni\n"
+	"AdvMenuPLUS - Copyright (C) 2009-2013 by daesdae\nAdvanceMENU - Copyright (C) 1999-2008 by Andrea Mazzoleni\n"
 
 enum clip_mode_t {
 	clip_none,
@@ -473,7 +473,8 @@ class config_import {
 	std::string file;
 	std::string section;
 
-	void import_ini(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
+	void import_catver(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
+	void import_catlist(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
 	void import_mac(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
 	void import_nms(game_set& gar, config_state& config, void (config_state::*set)(const game&, const std::string& text));
 public:

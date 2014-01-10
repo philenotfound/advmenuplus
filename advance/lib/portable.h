@@ -54,7 +54,7 @@
 #define restrict __restrict
 #endif
 
-/* Customize for Windows Mingw/Cygwin */
+/* Customize for Windows MINGW */
 #ifdef __WIN32__
 #define TIME_WITH_SYS_TIME 1
 #define HAVE_SYS_TIME_H 1
@@ -211,6 +211,21 @@ static inline int rpl_lrint(double x)
 }
 #endif
 #define lrint rpl_lrint
+
+/* 64 bit IO */
+#ifdef __WIN32__
+#define off_t off64_t /* This must be after including stdio.h */
+off64_t rpl_ftello(FILE* f);
+int rpl_fseeko(FILE* f, off64_t offset, int origin);
+#define fseeko rpl_fseeko
+#define ftello rpl_ftello
+#endif
+
+#ifdef __MSDOS__
+/* No support for 64 bit fseek/ftell in MSDOS */
+#define fseeko fseek
+#define ftello ftell
+#endif
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ advmenu [\(hydefault] [\(hyremove] [\(hycfg FILE]
 .PD
 .SH DESCRIPTION 
 AdvanceMENU is a front\(hyend to run the AdvanceMAME, AdvanceMESS,
-MAME, MESS, xmame, Raine and other emulators.
+MAME, MESS, Raine and other emulators.
 .PP
 Simply run it in the same directory of the emulator and press
 \(oqf1\(cq to get the help screen or \(oq~\(cq for the main menu.
@@ -85,7 +85,7 @@ In Linux and Mac OS X you can also use \(oq\(hy\(hy\(cq before options instead o
 In DOS and Windows you can also use \(oq/\(cq.
 .SH EMULATORS 
 The program supports many type of emulators. The emulators
-AdvanceMAME, AdvanceMESS, MAME, SDLMAME, xmame, DMAME,
+AdvanceMAME, AdvanceMESS, MAME, SDLMAME, DMAME,
 DMESS and DRAINE are directly supported and the only thing
 you should do is to run the AdvanceMENU program in the same
 directory of the emulator.
@@ -233,22 +233,12 @@ The directories specified in the \(oqrompath\(cq option in the
 file in Windows are used to detect the list of the available roms.
 .PP
 Please note that in Linux and Mac OS X the \(cqmame.ini\(cq file doesn\(cqt
-support relative paths for roms and other files. Always absolute
-paths configuring SDL MAME.
+support relative paths for roms and other files. Always use absolute
+paths configuring SDL MAME. You can use the \(a"$HOME\(a" variable to
+refers at the Linux/Mac OS X user home directory.
 .PP
 The directory specified in \(oqsnapshot_directory\(cq is used to detect the
 list of available snapshots files.
-.SS xmame \(hy xmame 
-For the \(oqxmame\(cq emulator the roms informations are gathered
-from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs
-created automatically with emulator \(oq\(hylistxml\(cq command.
-.PP
-The directories specified in the \(oqrompath\(cq option in the
-\(oqHOME/.xmame/mamerc\(cq file are used to detect the list of the
-available roms.
-.PP
-The directory specified in \(oqscreenshotdir\(cq is
-used to detect the list of available snapshots files.
 .SS dmame \(hy DOS MAME 
 For the \(oqdmame\(cq emulator the roms informations are gathered
 from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs
@@ -2383,26 +2373,26 @@ Selects the automatic import of the groups, types, descriptions
 and extra information from an external file. The extra info are
 additional information displayed for every game.
 .PP
-The file formats supported are CATINI, MacMAME and NMS.
+The file formats supported are CATVER, CATLIST/CAT32, MacMAME and NMS.
 The files are read in the current directory in DOS and Windows
 and in the $home directory in Linux and Mac OS X.
 .PP
 WARNING! These options DON\(cqT OVERRIDE any user explicit
 choices made with the \(oqgame\(cq option.
 .PP
-desc_import (ini | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+desc_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
 .PD 0
 .PP
 .PD
-info_import (ini | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+info_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
 .PD 0
 .PP
 .PD
-group_import (ini | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+group_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
 .PD 0
 .PP
 .PD
-type_import (ini | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+type_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
 .PD 0
 .PP
 .PD
@@ -2433,8 +2423,12 @@ Options:
 .I none
 Don\(cqt import.
 .HP 4
-.I ini
-Import in CATLIST format.
+.I catver
+Import in the CATVER format. In this format you must
+also specify the section to load.
+.HP 4
+.I catlist
+Import in the CATLIST/CAT32 format.
 .HP 4
 .I mac
 Import in the MacMAME format.
@@ -2457,7 +2451,15 @@ The section name (only for the \(oqini\(cq format).
 Examples:
 .PP
 .RS 4
-group_import ini \(a"advmame\(a" \(a"catver.ini\(a" \(a"Category\(a"
+group_import catver \(a"advmame\(a" \(a"catver.ini\(a" \(a"Category\(a"
+.PD 0
+.PP
+.PD
+info_import catver \(a"advmame\(a" \(a"catver.ini\(a" \(a"VerAdded\(a"
+.PD 0
+.PP
+.PD
+group_import catlist \(a"advmame\(a" \(a"catlist.ini\(a"
 .PD 0
 .PP
 .PD
@@ -2469,16 +2471,12 @@ desc_import nms \(a"raine\(a" \(a"raine.nms\(a"
 .PD 0
 .PP
 .PD
-info_import ini \(a"advmame\(a" \(a"catver.ini\(a" \(a"VerAdded\(a"
-.PD 0
-.PP
-.PD
 .RE
 .PP
-The CATLIST files can be downloaded at:
+The CATVER/CATLIST files can be downloaded at:
 .PP
 .RS 4
-http://www.mameworld.net/catlist/
+http://www.progettoemma.net/?catlist
 .PD 0
 .PP
 .PD
@@ -2599,4 +2597,4 @@ Restart the program.
 .PD
 .RE
 .SH COPYRIGHT 
-This file is Copyright (C) 2003, 2004, 2005 Andrea Mazzoleni, Randy Schnedler.
+This file is Copyright (C) 2003, 2004, 2005, 2012 Andrea Mazzoleni, Randy Schnedler.

@@ -202,14 +202,6 @@ static void fb_log(struct fb_fix_screeninfo* fix, struct fb_var_screeninfo* var)
 		if (var->vmode & FB_VMODE_DOUBLE)
 			log_std((" doublescan"));
 		log_std(("\n"));
-		log_std(("video:fb: reserved %xh:%xh:%xh:%xh:%xh:%xh\n",
-			(unsigned)var->reserved[0],
-			(unsigned)var->reserved[1],
-			(unsigned)var->reserved[2],
-			(unsigned)var->reserved[3],
-			(unsigned)var->reserved[4],
-			(unsigned)var->reserved[5]
-		));
 	}
 }
 
@@ -536,7 +528,7 @@ adv_error fb_init(int device_id, adv_output output, unsigned overlay_size, adv_c
 		return -1;
 
 	if (os_internal_wm_active()) {
-		error_set("Unsupported in X.\n");
+		error_set("Unsupported in X. Try with the SDL library.\n");
 		return -1;
 	}
 
@@ -591,7 +583,7 @@ adv_error fb_init(int device_id, adv_output output, unsigned overlay_size, adv_c
 	fb_log(&fb_state.fixinfo, &fb_state.varinfo);
 
 	if (strcmp(id_buffer, "VESA VGA")==0) {
-		error_set("The 'vesafb' FrameBuffer driver doesn't allow the creation of new video modes.");
+		error_set("The 'vesafb' FrameBuffer driver doesn't allow the creation of new video modes.\n");
 		goto err_close;
 	}
 
@@ -604,7 +596,7 @@ adv_error fb_init(int device_id, adv_output output, unsigned overlay_size, adv_c
 	}
 
 	if ((fb_state.flags & (VIDEO_DRIVER_FLAGS_MODE_PALETTE8 | VIDEO_DRIVER_FLAGS_MODE_BGR15 | VIDEO_DRIVER_FLAGS_MODE_BGR16 | VIDEO_DRIVER_FLAGS_MODE_BGR24 | VIDEO_DRIVER_FLAGS_MODE_BGR32)) == 0) {
-		error_set("This '%s' FrameBuffer driver doesn't seem to allow the creation of new video modes.", id_buffer);
+		error_set("This '%s' FrameBuffer driver doesn't seem to allow the creation of new video modes.\n", id_buffer);
 		goto err_close;
 	}
 

@@ -151,8 +151,10 @@ if test $ac_auto_cflags = yes; then
 		AC_CHECK_CC_OPT([-march=native], [CFLAGS="$CFLAGS -march=native"], [])
 		AC_CHECK_CC_OPT([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS -O"])
 		AC_CHECK_CC_OPT([-fomit-frame-pointer], [CFLAGS="$CFLAGS -fomit-frame-pointer"], [])
-		# -fno-merge-constants is required to speedup the link time. ld spends a lot of time trying to merge partial strings.
-		AC_CHECK_CC_OPT([-fno-merge-constants], [CFLAGS="$CFLAGS -fno-merge-constants"], [])
+		# Code is not ready for strict-aliasing. It seems working, but who know...
+		AC_CHECK_CC_OPT([-fno-strict-aliasing], [CFLAGS="$CFLAGS -fno-strict-aliasing"], [])
+		# We are not interested in stack protection
+		AC_CHECK_CC_OPT([-fno-stack-protector], [CFLAGS="$CFLAGS -fno-stack-protector"], [])
 		AC_CHECK_CC_OPT([-Wall], [CFLAGS="$CFLAGS -Wall"], [])
 		AC_CHECK_CC_OPT([-Wno-sign-compare], [CFLAGS="$CFLAGS -Wno-sign-compare"], [])
 		AC_CHECK_CC_OPT([-Wno-unused], [CFLAGS="$CFLAGS -Wno-unused"], [])
@@ -328,7 +330,7 @@ if test $ac_system = unix ; then
 	AC_FUNC_VPRINTF
 	AC_CHECK_FUNCS([strcasecmp strerror])
 	AC_CHECK_FUNCS([uname sysconf backtrace backtrace_symbols])
-	AC_CHECK_FUNCS([flockfile funlockfile fread_unlocked fwrite_unlocked fgetc_unlocked feof_unlocked])
+	AC_CHECK_FUNCS([flockfile funlockfile fread_unlocked fwrite_unlocked fgetc_unlocked feof_unlocked fseeko ftello])
 	AC_CHECK_FUNCS([iopl mprotect])
 	AC_MSG_CHECKING([for port in/out])
 	AC_TRY_LINK([
@@ -1124,6 +1126,8 @@ AC_SUBST([CONF_LIB_JEVENT],[$ac_lib_jevent])
 
 # Final
 AC_SUBST([CONF_LIB_DIRECT],[$ac_lib_direct_flag])
+AC_SUBST([mandir],['${prefix}/man'])
+AC_SUBST([docdir],['${prefix}/doc'])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
@@ -1166,6 +1170,10 @@ echo "Misc :" $ac_lib_other
 if test $ac_enable_debug = no ; then
 	if test $ac_lib_video_flag = no; then
 		AC_MSG_ERROR([no video library found. If you have the SDL library installed somewhere try using the --with-sdl-prefix option.])
+	else
+		if test $ac_lib_sdl = no; then
+			AC_MSG_WARN([the SDL library was not found. You will not able to use this program in a window manager environment! If you have the SDL library installed somewhere try using the --with-sdl-prefix option.])
+		fi
 	fi
 	if test $ac_lib_sound_flag = no; then
 		AC_MSG_ERROR([no sound library found])

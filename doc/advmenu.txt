@@ -14,7 +14,7 @@ advmenu [-default] [-remove] [-cfg FILE]
 =============
 
 AdvanceMENU is a front-end to run the AdvanceMAME, AdvanceMESS,
-MAME, MESS, xmame, Raine and other emulators.
+MAME, MESS, Raine and other emulators.
 
 Simply run it in the same directory of the emulator and press
 `f1' to get the help screen or `~' for the main menu.
@@ -82,7 +82,7 @@ In DOS and Windows you can also use `/'.
 ===========
 
 The program supports many type of emulators. The emulators
-AdvanceMAME, AdvanceMESS, MAME, SDLMAME, xmame, DMAME,
+AdvanceMAME, AdvanceMESS, MAME, SDLMAME, DMAME,
 DMESS and DRAINE are directly supported and the only thing
 you should do is to run the AdvanceMENU program in the same
 directory of the emulator.
@@ -222,27 +222,14 @@ The directories specified in the `rompath' option in the
 file in Windows are used to detect the list of the available roms.
 
 Please note that in Linux and Mac OS X the 'mame.ini' file doesn't
-support relative paths for roms and other files. Always absolute
-paths configuring SDL MAME.
+support relative paths for roms and other files. Always use absolute
+paths configuring SDL MAME. You can use the "$HOME" variable to
+refers at the Linux/Mac OS X user home directory.
 
 The directory specified in `snapshot_directory' is used to detect the
 list of available snapshots files.
 
-4.6 xmame - xmame
------------------
-
-For the `xmame' emulator the roms informations are gathered
-from the file `EMUNAME.xml'. If this file doesn't exist, it's
-created automatically with emulator `-listxml' command.
-
-The directories specified in the `rompath' option in the
-`HOME/.xmame/mamerc' file are used to detect the list of the
-available roms.
-
-The directory specified in `screenshotdir' is
-used to detect the list of available snapshots files.
-
-4.7 dmame - DOS MAME
+4.6 dmame - DOS MAME
 --------------------
 
 For the `dmame' emulator the roms informations are gathered
@@ -256,7 +243,7 @@ roms.
 The directory specified in `snap' is used to
 detect the list of available snapshots.
 
-4.8 dmess - DOS MESS
+4.7 dmess - DOS MESS
 --------------------
 
 For the `dmess' emulator the roms informations are gathered
@@ -305,7 +292,7 @@ file `snap\ti99_4a.png' is created. When you return to
 AdvanceMENU the file is moved automatically to
 `snap\ti99_4a\alpiner.png'.
 
-4.9 draine - DOS Raine
+4.8 draine - DOS Raine
 ----------------------
 
 For the `draine' emulator the roms informations are gathered
@@ -1367,17 +1354,17 @@ Selects the automatic import of the groups, types, descriptions
 and extra information from an external file. The extra info are
 additional information displayed for every game.
 
-The file formats supported are CATINI, MacMAME and NMS.
+The file formats supported are CATVER, CATLIST/CAT32, MacMAME and NMS.
 The files are read in the current directory in DOS and Windows
 and in the $home directory in Linux and Mac OS X.
 
 WARNING! These options DON'T OVERRIDE any user explicit
 choices made with the `game' option.
 
-desc_import (ini | mac | nms) "EMULATOR" "FILE" ["SECTION"]
-info_import (ini | mac | nms) "EMULATOR" "FILE" ["SECTION"]
-group_import (ini | mac | nms) "EMULATOR" "FILE" ["SECTION"]
-type_import (ini | mac | nms) "EMULATOR" "FILE" ["SECTION"]
+desc_import (catver | mac | nms) "EMULATOR" "FILE" ["SECTION"]
+info_import (catver | mac | nms) "EMULATOR" "FILE" ["SECTION"]
+group_import (catver | mac | nms) "EMULATOR" "FILE" ["SECTION"]
+type_import (catver | mac | nms) "EMULATOR" "FILE" ["SECTION"]
 
 Commands:
     desc_import - Imports the game names shown in the menu.
@@ -1388,7 +1375,9 @@ Commands:
 
 Options:
     none - Don't import.
-    ini - Import in CATLIST format.
+    catver - Import in the CATVER format. In this format you must
+        also specify the section to load.
+    catlist - Import in the CATLIST/CAT32 format.
     mac - Import in the MacMAME format.
     nms - Import in the NMS format.
     EMULATOR - The emulator tag name as specified in
@@ -1397,14 +1386,15 @@ Options:
     SECTION - The section name (only for the `ini' format).
 
 Examples:
-    group_import ini "advmame" "catver.ini" "Category"
+    group_import catver "advmame" "catver.ini" "Category"
+    info_import catver "advmame" "catver.ini" "VerAdded"
+    group_import catlist "advmame" "catlist.ini"
     type_import mac "advmame" "Genre 37b14.txt"
     desc_import nms "raine" "raine.nms"
-    info_import ini "advmame" "catver.ini" "VerAdded"
 
-The CATLIST files can be downloaded at:
+The CATVER/CATLIST files can be downloaded at:
 
-    http://www.mameworld.net/catlist/
+    http://www.progettoemma.net/?catlist
 
 ---- 5.7.6 misc_exit ----
 Selects the exit mode.
@@ -1466,4 +1456,4 @@ The program intercepts the following signals:
 8 COPYRIGHT
 ===========
 
-This file is Copyright (C) 2003, 2004, 2005 Andrea Mazzoleni, Randy Schnedler.
+This file is Copyright (C) 2003, 2004, 2005, 2012 Andrea Mazzoleni, Randy Schnedler.

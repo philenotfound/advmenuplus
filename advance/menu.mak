@@ -83,7 +83,6 @@ MENUOBJS += \
 	$(MENUOBJ)/blit/clear.o \
 	$(MENUOBJ)/blit/blit.o \
 	$(MENUOBJ)/blit/slice.o \
-	$(MENUOBJ)/blit/segment.o \
 	$(MENUOBJ)/mpglib/interfac.o \
 	$(MENUOBJ)/mpglib/internal.o \
 	$(MENUOBJ)/mpglib/decode.o \
@@ -515,7 +514,7 @@ $(sort $(MENUOBJDIRS)):
 
 $(MENUOBJ)/advmenup$(EXE) : $(sort $(MENUOBJDIRS)) $(MENUOBJS)
 	$(ECHO) $@ $(MSG)
-	$(LDXX) $(MENUOBJS) $(MENULIBS) $(MENULDFLAGS) $(LDFLAGS) -o $@
+	$(LDXX) $(MENUOBJS) $(MENULDFLAGS) $(LDFLAGS) $(MENULIBS) -o $@
 ifeq ($(CONF_DEBUG),yes)
 	$(RM) advmenud$(EXE)
 	$(LN_S) $@ advmenud$(EXE)
@@ -665,9 +664,6 @@ ifeq ($(CONF_SYSTEM),windows)
 MENU_ROOT_BIN += \
 	$(srcdir)/advance/svgalib/svgawin/driver/svgawin.sys \
 	$(srcdir)/advance/svgalib/svgawin/install/svgawin.exe \
-	$(srcdir)/support/sdl.dll \
-	$(srcdir)/support/zlib.dll \
-	$(srcdir)/support/libexpat.dll \
 	$(srcdir)/support/advmenuv.bat \
 	$(srcdir)/support/advmenuc.bat
 endif

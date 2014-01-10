@@ -1407,9 +1407,12 @@ bool sdlmame::load_cfg(const game_set& gar, bool quiet)
 {
 	const char* s;
 	adv_conf* context;
+	string home_dir;
 
 #ifdef __WIN32__
 	string ref_dir = exe_dir_get();
+
+	home_dir = ref_dir;
 
 	string config_file = slash_add(ref_dir) + "mame.ini";
 #else
@@ -1418,6 +1421,8 @@ bool sdlmame::load_cfg(const game_set& gar, bool quiet)
 		target_err("Environment variable HOME not set.\n");
 		return false;
 	}
+
+	home_dir = home;
 
 	string ref_dir = slash_add(home) + ".mame";
 
@@ -1442,7 +1447,8 @@ bool sdlmame::load_cfg(const game_set& gar, bool quiet)
 	// Uses list_import_from_dos_forced because also Linux SDL MAME uses ';' as separator dir !
 
 	if (conf_string_section_get(context, "", "rompath", &s)==0) {
-		emu_rom_path = list_abs(list_import_from_dos_forced(list_import(s)), ref_dir);
+		string replace = subs(s, "$HOME", home_dir);
+		emu_rom_path = list_abs(list_import_from_dos_forced(list_import(replace)), ref_dir);
 	} else {
 		emu_rom_path = list_abs(list_import_from_dos_forced(list_import("roms")), ref_dir);
 	}
@@ -1450,7 +1456,8 @@ bool sdlmame::load_cfg(const game_set& gar, bool quiet)
 	emu_software_path = "";
 
 	if (conf_string_section_get(context, "", "snapshot_directory", &s)==0) {
-		emu_snap_path = list_abs(list_import_from_dos_forced(list_import(s)), ref_dir);
+		string replace = subs(s, "$HOME", home_dir);
+		emu_snap_path = list_abs(list_import_from_dos_forced(list_import(replace)), ref_dir);
 	} else {
 		emu_snap_path = list_abs(list_import_from_dos_forced(list_import("snap")), ref_dir);
 	}
@@ -1468,99 +1475,6 @@ bool sdlmame::load_cfg(const game_set& gar, bool quiet)
 	config_cabinet_path = list_abs(list_import(user_cabinet_path), ref_dir);
 	config_marquee_path = list_abs(list_import(user_marquee_path), ref_dir);
 	config_title_path = list_abs(list_import(user_title_path), ref_dir);
-
-	log_std(("%s: rom_path %s\n", user_name_get().c_str(), cpath_export(config_rom_path)));
-	log_std(("%s: alts_path %s\n", user_name_get().c_str(), cpath_export(config_alts_path)));
-	log_std(("%s: icon_path %s\n", user_name_get().c_str(), cpath_export(config_icon_path)));
-	log_std(("%s: flyer_path %s\n", user_name_get().c_str(), cpath_export(config_flyer_path)));
-	log_std(("%s: cabinet_path %s\n", user_name_get().c_str(), cpath_export(config_cabinet_path)));
-	log_std(("%s: marquee_path %s\n", user_name_get().c_str(), cpath_export(config_marquee_path)));
-	log_std(("%s: title_path %s\n", user_name_get().c_str(), cpath_export(config_title_path)));
-
-	scan_dirlist(gar, config_rom_path_get(), quiet);
-
-	return true;
-}
-
-//---------------------------------------------------------------------------
-// xmame
-
-xmame::xmame(const string& Aname, const string& Aexe_path, const string& Acmd_arg)
-	: mame_mame(Aname, Aexe_path, Acmd_arg, false, false)
-{
-}
-
-string xmame::type_get() const
-{
-	return "xmame";
-}
-
-string list_importxmame(const string& list, const string& home_dir, const string& ref_dir)
-{
-	return list_abs(list_import(subs(list, "$HOME", home_dir)), path_import(ref_dir));
-}
-
-bool xmame::load_cfg(const game_set& gar, bool quiet)
-{
-	const char* s;
-	adv_conf* context;
-
-	char* home = getenv("HOME");
-	if (!home || !*home) {
-		target_err("Environment variable HOME not set.\n");
-		return false;
-	}
-
-	// assume to be in unix, so slash_add/remove can be
-	// used also for os paths
-	string home_dir_os = slash_remove(home);
-
-	string ref_dir_os = slash_add(home) + ".xmame";
-
-	string config_file = path_import(slash_add(ref_dir_os) + "xmamerc");
-
-	if (!validate_config_file(config_file)) {
-		return false;
-	}
-
-	context = conf_init();
-
-	conf_string_register(context, "rompath");
-	conf_string_register(context, "screenshotdir");
-
-	if (conf_input_file_load_adv(context, 0, cpath_export(config_file), 0, 1, 1, 0, 0, 0, 0) != 0) {
-		target_err("Error loading the configuration file %s.\n", cpath_export(config_file));
-		conf_done(context);
-		return false;
-	}
-
-	if (conf_string_section_get(context, "", "rompath", &s)==0) {
-		emu_rom_path = list_importxmame(s, home_dir_os, ref_dir_os);
-	} else {
-		emu_rom_path = list_importxmame("roms", home_dir_os, ref_dir_os);
-	}
-
-	emu_software_path = "";
-
-	if (conf_string_section_get(context, "", "screenshotdir", &s)==0) {
-		emu_snap_path = list_importxmame(s, home_dir_os, ref_dir_os);
-	} else {
-		emu_snap_path = list_importxmame("snap", home_dir_os, ref_dir_os);
-	}
-
-	conf_done(context);
-
-	log_std(("%s: emu_rom_path %s\n", user_name_get().c_str(), cpath_export(emu_rom_path)));
-	log_std(("%s: emu_software_path %s\n", user_name_get().c_str(), cpath_export(emu_software_path)));
-	log_std(("%s: emu_snap_path %s\n", user_name_get().c_str(), cpath_export(emu_snap_path)));
-
-	config_rom_path = dir_cat(emu_rom_path, list_importxmame(user_rom_path, home_dir_os, ref_dir_os));
-	config_alts_path = dir_cat(emu_snap_path, list_importxmame(user_alts_path, home_dir_os, ref_dir_os));
-	config_icon_path = list_importxmame(user_icon_path, home_dir_os, ref_dir_os);
-	config_flyer_path = list_importxmame(user_flyer_path, home_dir_os, ref_dir_os);
-	config_cabinet_path = list_importxmame(user_cabinet_path, home_dir_os, ref_dir_os);
-	config_marquee_path = list_importxmame(user_marquee_path, home_dir_os, ref_dir_os);
-	config_title_path = list_importxmame(user_title_path, home_dir_os, ref_dir_os);
 
 	log_std(("%s: rom_path %s\n", user_name_get().c_str(), cpath_export(config_rom_path)));
 	log_std(("%s: alts_path %s\n", user_name_get().c_str(), cpath_export(config_alts_path)));

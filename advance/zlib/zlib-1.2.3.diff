@@ -28,7 +28,7 @@ diff -u zlib-1.2.3.ori/zconf.h zlib/zconf.h
 - * For conditions of distribution and use, see copyright notice in zlib.h
 - */
 -
--/* @(#) $Id: zlib-1.2.3.diff,v 1.1 2005/11/01 10:02:09 amadvance Exp $ */
+-/* @(#) $Id$ */
 -
  #ifndef ZCONF_H
  #define ZCONF_H
@@ -373,7 +373,7 @@ diff -u zlib-1.2.3.ori/zutil.c zlib/zutil.c
 - * For conditions of distribution and use, see copyright notice in zlib.h
 - */
 -
--/* @(#) $Id: zlib-1.2.3.diff,v 1.1 2005/11/01 10:02:09 amadvance Exp $ */
+-/* @(#) $Id$ */
 -
  #include "zutil.h"
  
@@ -676,7 +676,7 @@ diff -u zlib-1.2.3.ori/zutil.h zlib/zutil.h
 -   subject to change. Applications should only use zlib.h.
 - */
 -
--/* @(#) $Id: zlib-1.2.3.diff,v 1.1 2005/11/01 10:02:09 amadvance Exp $ */
+-/* @(#) $Id$ */
 -
  #ifndef ZUTIL_H
  #define ZUTIL_H

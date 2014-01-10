@@ -1323,7 +1323,7 @@ int event_open(const char* file, unsigned char* evtype_bitmask, unsigned evtype_
 {
 	int f;
 
-	f = open(file, O_RDWR | O_NONBLOCK);
+	f = open(file, O_RDONLY | O_NONBLOCK);
 	if (f == -1) {
 		if (errno != ENODEV) {
 			log_std(("event: error opening device %s, errno %d (%s)\n", file, errno, strerror(errno)));
@@ -1591,7 +1591,7 @@ adv_error event_read(int f, int* type, int* code, int* value)
 		return -1;
 	}
 
-	log_debug(("event: read %ld.%06ld, type %d, code %d, value %d\n", e.time.tv_sec, e.time.tv_usec, e.type, e.code, e.value));
+	log_debug(("event: read time %ld.%06ld, type %d, code %d, value %d\n", e.time.tv_sec, e.time.tv_usec, e.type, e.code, e.value));
 
 	*type = e.type;
 	*code = e.code;
@@ -1642,7 +1642,7 @@ int event_compare(const void* void_a, const void* void_b)
 	return 0;
 }
 
-unsigned event_locate(struct event_location* event_map, unsigned event_max, adv_bool* eacces)
+unsigned event_locate(struct event_location* event_map, unsigned event_max, const char* prefix, adv_bool* eacces)
 {
 	unsigned event_mac;
 	unsigned i;
@@ -1653,7 +1653,7 @@ unsigned event_locate(struct event_location* event_map, unsigned event_max, adv_
 		unsigned char evtype_bitmask[EV_MAX/8 + 1];
 		int f;
 
-		snprintf(event_map[event_mac].file, sizeof(event_map[event_mac].file), "/dev/input/event%d", i);
+		snprintf(event_map[event_mac].file, sizeof(event_map[event_mac].file), "/dev/input/%s%d", prefix, i);
 
 		f = event_open(event_map[event_mac].file, evtype_bitmask, sizeof(evtype_bitmask));
 		if (f == -1) {

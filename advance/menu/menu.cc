@@ -484,12 +484,16 @@ string tag_info_get(const game* g, int gs, int ga, const string favorites, const
 				info_tag.erase(info_tag.length() - 1);
 		} else if (tag_info == "clone") {
 			if (g->parent_get())
-				info_tag = "Clone of " + g->parent_get()->name_get();
+				info_tag = "Clone of " + g->parent_get()->name_without_emulator_get();
 			else if (g->clone_get()) {
 				ostringstream os;
-				os << g->clone_get() << " clones";
+				if (g->clone_get() == 1)
+					os << g->clone_get() << " Clone";
+				else
+					os << g->clone_get() << " Clones";
 				info_tag = os.str();
-			}
+			} else
+				info_tag = "No Clones";
 		}
 	}
 	return info_tag;

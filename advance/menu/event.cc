@@ -91,6 +91,25 @@ static struct event_item EVENT_TAB[] = {
 { 0, 0, { 0 } }
 };
 
+static int JOY_EVENT[16] = {
+	EVENT_ENTER,
+	EVENT_ESC,
+	EVENT_MENU,
+	EVENT_PREVIEW,
+	EVENT_MODE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_UP,
+	EVENT_DOWN,
+	EVENT_LEFT,
+	EVENT_RIGHT
+};
+
 static int seq_pressed(const unsigned* code)
 {
 	int j;
@@ -220,6 +239,11 @@ static void event_insert(unsigned event, unsigned* seq)
 	}
 }
 
+static void joy_event_insert(unsigned joy, unsigned event)
+{
+	JOY_EVENT[joy] = event;
+}
+
 static unsigned string2event(const string& s)
 {
 	unsigned i;
@@ -281,6 +305,23 @@ bool event_in(const string& s)
 		return false;
 
 	event_insert(event, seq);
+
+	return true;
+}
+
+bool joy_event_in(const string& s)
+{
+	int pos = 0;
+
+	string sjoy = arg_get(s, pos);
+	unsigned joy = joy_code(sjoy.c_str());
+	if (joy == JOYB_MAX)
+		return false;
+
+	string sevent = arg_get(s, pos);
+	unsigned event = string2event(sevent);
+
+	joy_event_insert(joy-1, event);
 
 	return true;
 }
@@ -454,6 +495,12 @@ void event_push(int event)
 	if (!i->name) {
 		log_std(("ERROR:event: unknown event %d\n", event));
 	}
+}
+
+void joy_event_push(unsigned joy) {
+	unsigned event = JOY_EVENT[joy];
+	if(event != EVENT_NONE)
+		event_push(event);
 }
 
 int event_pop()

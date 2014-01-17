@@ -22,6 +22,43 @@
 
 #include "key.h"
 
+/*
+ * --------------------------------
+ * JOYSTICK
+ * -------------------------------
+ */
+
+struct joy_entry {
+	const char* name;
+	unsigned code;
+};
+
+static struct joy_entry JOY[] = {
+{ "1_joy", JOYB_1},
+{ "2_joy", JOYB_2 },
+{ "3_joy", JOYB_3 },
+{ "4_joy", JOYB_4 },
+{ "5_joy", JOYB_5 },
+{ "6_joy", JOYB_6 },
+{ "7_joy", JOYB_7 },
+{ "8_joy", JOYB_8 },
+{ "9_joy", JOYB_9 },
+{ "10_joy", JOYB_10 },
+{ "11_joy", JOYB_11 },
+{ "12_joy", JOYB_12 },
+{ "up_joy", JOYB_UP },
+{ "down_joy", JOYB_DOWN },
+{ "right_joy", JOYB_RIGHT },
+{ "left_joy", JOYB_LEFT },
+{ 0, 0 }
+};
+
+/*
+ * --------------------------------
+ * KEYBOARD
+ * -------------------------------
+ */
+
 struct key_entry {
 	const char* name;
 	unsigned code;

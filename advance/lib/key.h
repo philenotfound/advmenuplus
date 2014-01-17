@@ -268,12 +268,33 @@ extern "C" {
 /* hole */
 
 #define KEYB_MAX 256
+
+/* hole */
+#define JOYB_1 1
+#define JOYB_2 2
+#define JOYB_3 3
+#define JOYB_4 4
+#define JOYB_5 5
+#define JOYB_6 6
+#define JOYB_7 7
+#define JOYB_8 8
+#define JOYB_9 9
+#define JOYB_10 10
+#define JOYB_11 11
+#define JOYB_12 12
+#define JOYB_UP 13
+#define JOYB_DOWN 14
+#define JOYB_LEFT 15
+#define JOYB_RIGHT 16
+#define JOYB_MAX 256
 /*@}*/
 
 const char* key_name(unsigned code);
 unsigned key_code(const char* name);
 adv_bool key_is_defined(unsigned code);
 
+unsigned joy_code(const char* name);
+	
 #ifdef __cplusplus
 };
 #endif

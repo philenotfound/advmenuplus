@@ -53,6 +53,17 @@ static struct joy_entry JOY[] = {
 { 0, 0 }
 };
 
+unsigned joy_code(const char* name)
+{
+	struct joy_entry* i;
+
+	for(i=JOY;i->name;++i)
+		if (strcmp(name, i->name)==0)
+			return i->code;
+
+	return JOYB_MAX;
+}
+
 /*
  * --------------------------------
  * KEYBOARD

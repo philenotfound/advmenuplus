@@ -210,7 +210,7 @@ static void int_joystick_button_raw_poll()
 {
 	for(int i=0;i<joystickb_count_get();++i) {
 		for(int j=0;j<joystickb_button_count_get(i);++j) {
-			if (j < 12 && joystickb_button_get(i, j)) {
+			if (j < 16 && joystickb_button_get(i, j)) {
 				joy_event_push(j);
 			}
 		}

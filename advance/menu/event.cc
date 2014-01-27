@@ -91,12 +91,16 @@ static struct event_item EVENT_TAB[] = {
 { 0, 0, { 0 } }
 };
 
-static int JOY_EVENT[16] = {
+static int JOY_EVENT[20] = {
 	EVENT_ENTER,
 	EVENT_ESC,
 	EVENT_MENU,
 	EVENT_PREVIEW,
 	EVENT_MODE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
 	EVENT_NONE,
 	EVENT_NONE,
 	EVENT_NONE,

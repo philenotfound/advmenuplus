@@ -282,10 +282,14 @@ extern "C" {
 #define JOYB_10 10
 #define JOYB_11 11
 #define JOYB_12 12
-#define JOYB_UP 13
-#define JOYB_DOWN 14
-#define JOYB_LEFT 15
-#define JOYB_RIGHT 16
+#define JOYB_13 13
+#define JOYB_14 14
+#define JOYB_15 15
+#define JOYB_16 16
+#define JOYB_UP 17
+#define JOYB_DOWN 18
+#define JOYB_LEFT 19
+#define JOYB_RIGHT 20
 #define JOYB_MAX 256
 /*@}*/
 

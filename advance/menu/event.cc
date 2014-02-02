@@ -91,7 +91,7 @@ static struct event_item EVENT_TAB[] = {
 { 0, 0, { 0 } }
 };
 
-static int JOY_EVENT[20] = {
+static int JOY_EVENT[80] = {
 	EVENT_ENTER,
 	EVENT_ESC,
 	EVENT_MENU,
@@ -111,7 +111,67 @@ static int JOY_EVENT[20] = {
 	EVENT_UP,
 	EVENT_DOWN,
 	EVENT_LEFT,
-	EVENT_RIGHT
+	EVENT_RIGHT,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE,
+	EVENT_NONE
 };
 
 static int seq_pressed(const unsigned* code)
@@ -501,8 +561,9 @@ void event_push(int event)
 	}
 }
 
-void joy_event_push(unsigned joy) {
-	unsigned event = JOY_EVENT[joy];
+void joy_event_push(unsigned njoy, unsigned nbutton) {
+	unsigned nevent = 20*njoy+nbutton;
+	unsigned event = JOY_EVENT[nevent];
 	if(event != EVENT_NONE)
 		event_push(event);
 }

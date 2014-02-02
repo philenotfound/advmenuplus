@@ -76,7 +76,7 @@ int event_peek();
 void event_setup(const std::string& press_sound, double delay_repeat_ms, double delay_repeat_next_ms, bool alpha_mode);
 
 bool joy_event_in(const std::string& s);
-void joy_event_push(unsigned joy);
+void joy_event_push(unsigned njoy, unsigned nbutton);
 
 #endif
 

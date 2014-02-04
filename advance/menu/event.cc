@@ -27,6 +27,7 @@
 
 #include "target.h"
 #include "keydrv.h"
+#include "joydrv.h"
 
 #include <deque>
 
@@ -57,12 +58,12 @@ struct event_item {
 #define OP_NOT (KEYB_MAX + 2)
 
 static struct event_item EVENT_TAB[] = {
-{"up", EVENT_UP, { KEYB_UP, OP_OR, KEYB_8_PAD, KEYB_MAX } },
-{"down", EVENT_DOWN, { KEYB_DOWN, OP_OR, KEYB_2_PAD, KEYB_MAX } },
-{"left", EVENT_LEFT, { KEYB_LEFT, OP_OR, KEYB_4_PAD, KEYB_MAX } },
-{"right", EVENT_RIGHT, { KEYB_RIGHT, OP_OR, KEYB_6_PAD, KEYB_MAX } },
-{"enter", EVENT_ENTER, { KEYB_ENTER, OP_OR, KEYB_ENTER_PAD, KEYB_MAX } },
-{"esc", EVENT_ESC, { KEYB_ESC, KEYB_MAX } },
+{"up", EVENT_UP, { KEYB_UP, OP_OR, KEYB_8_PAD, OP_OR, JOYB_1_UP, KEYB_MAX } },
+{"down", EVENT_DOWN, { KEYB_DOWN, OP_OR, KEYB_2_PAD, OP_OR, JOYB_1_DOWN, KEYB_MAX } },
+{"left", EVENT_LEFT, { KEYB_LEFT, OP_OR, KEYB_4_PAD, OP_OR, JOYB_1_LEFT, KEYB_MAX } },
+{"right", EVENT_RIGHT, { KEYB_RIGHT, OP_OR, KEYB_6_PAD, OP_OR, JOYB_1_RIGHT, KEYB_MAX } },
+{"enter", EVENT_ENTER, { KEYB_ENTER, OP_OR, KEYB_ENTER_PAD, OP_OR, JOYB_1_1, KEYB_MAX } },
+{"esc", EVENT_ESC, { KEYB_ESC, OP_OR, JOYB_1_2, KEYB_MAX } },
 {"space", EVENT_SPACE, { KEYB_SPACE, KEYB_MAX } },
 {"home", EVENT_HOME, { KEYB_HOME, KEYB_MAX } },
 {"end", EVENT_END, { KEYB_END, KEYB_MAX } },
@@ -71,7 +72,7 @@ static struct event_item EVENT_TAB[] = {
 {"del", EVENT_DEL, { KEYB_DEL, KEYB_MAX } },
 {"ins", EVENT_INS, { KEYB_INSERT, KEYB_MAX } },
 {"shutdown", EVENT_OFF, { KEYB_LCONTROL, KEYB_ESC, KEYB_MAX } },
-{"mode", EVENT_MODE, { KEYB_TAB, KEYB_MAX } },
+{"mode", EVENT_MODE, { KEYB_TAB, OP_OR, JOYB_1_5, KEYB_MAX } },
 {"help", EVENT_HELP, { KEYB_F1, KEYB_MAX } },
 {"favorites_next", EVENT_FAVORITES_NEXT, { KEYB_F2, KEYB_MAX } },
 {"type", EVENT_TYPE, { KEYB_F3, KEYB_MAX } },
@@ -81,98 +82,52 @@ static struct event_item EVENT_TAB[] = {
 {"settype", EVENT_SETTYPE, { KEYB_F10, KEYB_MAX } },
 {"runclone", EVENT_CLONE, { KEYB_F12, KEYB_MAX } },
 {"command", EVENT_COMMAND, { KEYB_F8, KEYB_MAX } },
-{"menu", EVENT_MENU, { KEYB_BACKQUOTE, OP_OR, KEYB_BACKSLASH, KEYB_MAX } },
+{"menu", EVENT_MENU, { KEYB_BACKQUOTE, OP_OR, KEYB_BACKSLASH, OP_OR, JOYB_1_3, KEYB_MAX } },
 {"emulator_next", EVENT_EMU_NEXT, { KEYB_F7, KEYB_MAX } },
 {"emulator_pre", EVENT_EMU_PRE, { KEYB_F6, KEYB_MAX } },
 {"rotate", EVENT_ROTATE, { KEYB_0_PAD, KEYB_MAX } },
 {"lock", EVENT_LOCK, { KEYB_SCRLOCK, KEYB_MAX } },
-{"preview", EVENT_PREVIEW, { KEYB_SPACE, KEYB_MAX } },
+{"preview", EVENT_PREVIEW, { KEYB_SPACE, OP_OR, JOYB_1_4, KEYB_MAX } },
 {"mute", EVENT_MUTE, { KEYB_PERIOD_PAD, KEYB_MAX } },
 { 0, 0, { 0 } }
 };
 
-static int JOY_EVENT[80] = {
-	EVENT_ENTER,
-	EVENT_ESC,
-	EVENT_MENU,
-	EVENT_PREVIEW,
-	EVENT_MODE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_UP,
-	EVENT_DOWN,
-	EVENT_LEFT,
-	EVENT_RIGHT,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE,
-	EVENT_NONE
-};
+unsigned joy_get(unsigned code)
+{
+	unsigned joystick = (code - JOYB_MIN - 1)/20;		//joystick number
+	unsigned button = (code - JOYB_MIN - 1)%20;	//button number
+
+	if (joystickb_count_get()>joystick) {
+
+		/* buttons */
+		if (button<16 && joystickb_button_count_get(joystick)>button)
+			return joystickb_button_get(joystick, button);
+		
+		/* axes */
+		if (button >= 16 && joystickb_stick_count_get(joystick) > 0) {
+			switch (button) {
+				case 16:	//up
+					if (joystickb_stick_axe_count_get(joystick, 0) > 1)
+						return joystickb_stick_axe_digital_get(joystick, 0, 1, 1);
+					break;
+				case 17:	//down
+					if(joystickb_stick_axe_count_get(joystick, 0) > 1)
+						return joystickb_stick_axe_digital_get(joystick, 0, 1, 0);
+					break;
+				case 18:	//left
+					if(joystickb_stick_axe_count_get(joystick, 0) > 0)
+						return joystickb_stick_axe_digital_get(joystick, 0, 0, 1);
+					break;
+				case 19:	//right
+					if(joystickb_stick_axe_count_get(joystick, 0) > 0)
+						return joystickb_stick_axe_digital_get(joystick, 0, 0, 0);
+					break;
+			}
+		}
+	}
+		
+	return 0;
+}
 
 static int seq_pressed(const unsigned* code)
 {
@@ -197,8 +152,12 @@ static int seq_pressed(const unsigned* code)
 			default:
 				if (res) {
 					adv_bool pressed = 0;
-					for(unsigned k=0;k<keyb_count_get();++k)
-						pressed = pressed || (keyb_get(k, code[j]) != 0);
+					if (code[j] > JOYB_MIN && code[j] < JOYB_MAX) {
+						pressed = pressed || (joy_get(code[j]) != 0);
+					} else {
+						for(unsigned k=0;k<keyb_count_get();++k)
+							pressed = pressed || (keyb_get(k, code[j]) != 0);
+					}
 					if ((pressed != 0) == invert)
 						res = 0;
 				}
@@ -303,11 +262,6 @@ static void event_insert(unsigned event, unsigned* seq)
 	}
 }
 
-static void joy_event_insert(unsigned joy, unsigned event)
-{
-	JOY_EVENT[joy] = event;
-}
-
 static unsigned string2event(const string& s)
 {
 	unsigned i;
@@ -369,23 +323,6 @@ bool event_in(const string& s)
 		return false;
 
 	event_insert(event, seq);
-
-	return true;
-}
-
-bool joy_event_in(const string& s)
-{
-	int pos = 0;
-
-	string sjoy = arg_get(s, pos);
-	unsigned joy = joy_code(sjoy.c_str());
-	if (joy == JOYB_MAX)
-		return false;
-
-	string sevent = arg_get(s, pos);
-	unsigned event = string2event(sevent);
-
-	joy_event_insert(joy-1, event);
 
 	return true;
 }
@@ -559,13 +496,6 @@ void event_push(int event)
 	if (!i->name) {
 		log_std(("ERROR:event: unknown event %d\n", event));
 	}
-}
-
-void joy_event_push(unsigned njoy, unsigned nbutton) {
-	unsigned nevent = 20*njoy+nbutton;
-	unsigned event = JOY_EVENT[nevent];
-	if(event != EVENT_NONE)
-		event_push(event);
 }
 
 int event_pop()

@@ -54,7 +54,6 @@ MENUOBJS += \
 	$(MENUOBJ)/lib/rgb.o \
 	$(MENUOBJ)/lib/conf.o \
 	$(MENUOBJ)/lib/key.o \
-	$(MENUOBJ)/lib/joy.o \
 	$(MENUOBJ)/lib/incstr.o \
 	$(MENUOBJ)/lib/videoio.o \
 	$(MENUOBJ)/lib/update.o \

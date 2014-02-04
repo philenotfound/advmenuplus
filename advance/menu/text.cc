@@ -206,37 +206,6 @@ static void int_joystick_done()
 	joystickb_done();
 }
 
-static void int_joystick_button_raw_poll()
-{
-	for(int i=0;i<joystickb_count_get();++i) {
-		for(int j=0;j<joystickb_button_count_get(i);++j) {
-			if (i<4 && j < 16 && joystickb_button_get(i, j)) {
-				joy_event_push(i, j);
-			}
-		}
-	}
-}
-
-static void int_joystick_move_raw_poll()
-{
-	for(int i=0;i<joystickb_count_get();++i) {
-		for(int j=0;j<joystickb_stick_count_get(i);++j) {
-			if (joystickb_stick_axe_count_get(i, j) > 0) {
-				if (i<4 && joystickb_stick_axe_digital_get(i, j, 0, 0))
-					joy_event_push(i, 19); //right
-				if (i<4 && joystickb_stick_axe_digital_get(i, j, 0, 1))
-					joy_event_push(i, 18); //left
-			}
-			if (joystickb_stick_axe_count_get(i, j) > 1) {
-				if (i<4 && joystickb_stick_axe_digital_get(i, j, 1, 0))
-					joy_event_push(i, 17); //down
-				if (i<4 && joystickb_stick_axe_digital_get(i, j, 1, 1))
-					joy_event_push(i, 16); //up
-			}
-		}
-	}
-}
-
 // -----------------------------------------------------------------------
 // Key
 
@@ -2903,8 +2872,6 @@ static void key_poll()
 		event_push(EVENT_ESC);
 	}
 
-	int_joystick_button_raw_poll();
-	int_joystick_move_raw_poll();
 	int_mouse_button_raw_poll();
 	int_mouse_move_raw_poll();
 	event_poll();

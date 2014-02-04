@@ -38,7 +38,6 @@
 #include "device.h"
 #include "conf.h"
 #include "key.h"
-#include "joy.h"
 
 #ifdef __cplusplus
 extern "C" {

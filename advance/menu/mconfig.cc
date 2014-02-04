@@ -360,7 +360,6 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_bool_register_default(config_context, "ui_console", 0);
 	conf_bool_register_default(config_context, "ui_menukey", 1);
 	conf_string_register_multi(config_context, "event_assign");
-	conf_string_register_multi(config_context, "joystick_assign");
 	conf_string_register_multi(config_context, "ui_color");
 	conf_string_register_default(config_context, "idle_start", "0 0");
 	conf_string_register_default(config_context, "idle_screensaver", "60 10");
@@ -1087,8 +1086,6 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	console_mode = conf_bool_get_default(config_context, "ui_console");
 	menu_key = conf_bool_get_default(config_context, "ui_menukey");
 	if (!config_load_iterator(config_context, "event_assign", event_in))
-		return false;
-	if (!config_load_iterator(config_context, "joystick_assign", joy_event_in))
 		return false;
 	if (!config_load_iterator(config_context, "ui_color", color_in))
 		return false;

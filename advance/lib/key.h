@@ -267,8 +267,97 @@ extern "C" {
 
 /* hole */
 
-#define KEYB_MAX 256
+#define JOYB_MIN 260
+/* joystick 1 */
+#define JOYB_1_1 261
+#define JOYB_1_2 262
+#define JOYB_1_3 263
+#define JOYB_1_4 264
+#define JOYB_1_5 265
+#define JOYB_1_6 266
+#define JOYB_1_7 267
+#define JOYB_1_8 268
+#define JOYB_1_9 269
+#define JOYB_1_10 270
+#define JOYB_1_11 271
+#define JOYB_1_12 272
+#define JOYB_1_13 273
+#define JOYB_1_14 274
+#define JOYB_1_15 275
+#define JOYB_1_16 276
+#define JOYB_1_UP 277
+#define JOYB_1_DOWN 278
+#define JOYB_1_LEFT 279
+#define JOYB_1_RIGHT 280
+/* joystick 2 */
+#define JOYB_2_1 281
+#define JOYB_2_2 282
+#define JOYB_2_3 283
+#define JOYB_2_4 284
+#define JOYB_2_5 285
+#define JOYB_2_6 286
+#define JOYB_2_7 287
+#define JOYB_2_8 288
+#define JOYB_2_9 289
+#define JOYB_2_10 290
+#define JOYB_2_11 291
+#define JOYB_2_12 292
+#define JOYB_2_13 293
+#define JOYB_2_14 294
+#define JOYB_2_15 295
+#define JOYB_2_16 296
+#define JOYB_2_UP 297
+#define JOYB_2_DOWN 298
+#define JOYB_2_LEFT 299
+#define JOYB_2_RIGHT 300
+/* joystick 3 */
+#define JOYB_3_1 301
+#define JOYB_3_2 302
+#define JOYB_3_3 303
+#define JOYB_3_4 304
+#define JOYB_3_5 305
+#define JOYB_3_6 306
+#define JOYB_3_7 307
+#define JOYB_3_8 308
+#define JOYB_3_9 309
+#define JOYB_3_10 310
+#define JOYB_3_11 311
+#define JOYB_3_12 312
+#define JOYB_3_13 313
+#define JOYB_3_14 314
+#define JOYB_3_15 315
+#define JOYB_3_16 316
+#define JOYB_3_UP 317
+#define JOYB_3_DOWN 318
+#define JOYB_3_LEFT 319
+#define JOYB_3_RIGHT 320
+/* joystick 4 */
+#define JOYB_4_1 321
+#define JOYB_4_2 322
+#define JOYB_4_3 323
+#define JOYB_4_4 324
+#define JOYB_4_5 325
+#define JOYB_4_6 326
+#define JOYB_4_7 327
+#define JOYB_4_8 328
+#define JOYB_4_9 329
+#define JOYB_4_10 330
+#define JOYB_4_11 331
+#define JOYB_4_12 332
+#define JOYB_4_13 333
+#define JOYB_4_14 334
+#define JOYB_4_15 335
+#define JOYB_4_16 336
+#define JOYB_4_UP 337
+#define JOYB_4_DOWN 338
+#define JOYB_4_LEFT 339
+#define JOYB_4_RIGHT 340
 
+#define JOYB_MAX 341
+
+/* hole */
+
+#define KEYB_MAX 352
 /*@}*/
 
 const char* key_name(unsigned code);

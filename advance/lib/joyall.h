@@ -63,6 +63,9 @@ extern "C" {
 #ifdef USE_JOYSTICK_SDL
 #include "jsdl.h"
 #endif
+#ifdef USE_JOYSTICK_IPP
+#include "jipp.h"
+#endif
 #ifdef USE_JOYSTICK_NONE
 #include "jnone.h"
 #endif

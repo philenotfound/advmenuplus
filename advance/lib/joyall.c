@@ -43,6 +43,7 @@
  *  - USE_JOYSTICK_SDL
  *  - USE_JOYSTICK_ALLEGRO
  *  - USE_JOYSTICK_LGALLEGRO
+ *  - USE_JOYSTICK_IPP
  *  - USE_JOYSTICK_NONE
  */
 void joystickb_reg_driver_all(adv_conf* context)
@@ -68,6 +69,9 @@ void joystickb_reg_driver_all(adv_conf* context)
 #endif
 #ifdef USE_JOYSTICK_LGALLEGRO
 	joystickb_reg_driver(context, &joystickb_lgallegro_driver);
+#endif
+#ifdef USE_JOYSTICK_IPP
+	joystickb_reg_driver(context, &joystickb_ipp_driver);
 #endif
 #ifdef USE_JOYSTICK_NONE
 	joystickb_reg_driver(context, &joystickb_none_driver);
@@ -103,6 +107,9 @@ void joystickb_report_driver_all(char* s, unsigned size)
 #endif
 #ifdef USE_JOYSTICK_LGALLEGRO
 	sncat(s, size, " lgallegro");
+#endif
+#ifdef USE_JOYSTICK_IPP
+	sncat(s, size, " ipp");
 #endif
 #ifdef USE_JOYSTICK_NONE
 	sncat(s, size, " none");

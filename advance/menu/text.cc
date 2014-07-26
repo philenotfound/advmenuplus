@@ -206,53 +206,6 @@ static void int_joystick_done()
 	joystickb_done();
 }
 
-static void int_joystick_button_raw_poll()
-{
-	for(int i=0;i<joystickb_count_get();++i) {
-		for(int j=0;j<joystickb_button_count_get(i);++j) {
-			if (joystickb_button_get(i, j)) {
-				switch (j) {
-				case 0 :
-					event_push(EVENT_ENTER);
-					break;
-				case 1 :
-					event_push(EVENT_ESC);
-					break;
-				case 2 :
-					event_push(EVENT_MENU);
-					break;
-				case 3 :
-					event_push(EVENT_PREVIEW);
-					break;
-				case 4 :
-					event_push(EVENT_MODE);
-					break;
-				}
-			}
-		}
-	}
-}
-
-static void int_joystick_move_raw_poll()
-{
-	for(int i=0;i<joystickb_count_get();++i) {
-		for(int j=0;j<joystickb_stick_count_get(i);++j) {
-			if (joystickb_stick_axe_count_get(i, j) > 0) {
-				if (joystickb_stick_axe_digital_get(i, j, 0, 0))
-					event_push(EVENT_RIGHT);
-				if (joystickb_stick_axe_digital_get(i, j, 0, 1))
-					event_push(EVENT_LEFT);
-			}
-			if (joystickb_stick_axe_count_get(i, j) > 1) {
-				if (joystickb_stick_axe_digital_get(i, j, 1, 0))
-					event_push(EVENT_DOWN);
-				if (joystickb_stick_axe_digital_get(i, j, 1, 1))
-					event_push(EVENT_UP);
-			}
-		}
-	}
-}
-
 // -----------------------------------------------------------------------
 // Key
 
@@ -2919,8 +2872,6 @@ static void key_poll()
 		event_push(EVENT_ESC);
 	}
 
-	int_joystick_button_raw_poll();
-	int_joystick_move_raw_poll();
 	int_mouse_button_raw_poll();
 	int_mouse_move_raw_poll();
 	event_poll();

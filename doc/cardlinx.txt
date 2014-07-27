@@ -1339,21 +1339,21 @@ Radeon 8500/8500LE (R200) [514c]
     OEM PC Partner Ltd {174b} : Radeon R200 QL [Sapphire Radeon 8500 LE]
     OEM PowerColor (C.P. Technology Co Ltd) {148c} : Radeon 8500 Evil Master II Multi-display Edition
 Radeon 9000 (RV250) - Secondary [496f]
-    +Radeon 9000 (RV250) - Secondary
+    Radeon 9000 (RV250) - Secondary
 Radeon 9000 (RV250) [4967]
     Radeon 9000 (RV250)
 Radeon 9000 Series (RV250) - Secondary [496e]
-    +Radeon 9000 - Secondary
-    +Radeon 9000 Pro - Secondary
-    +Radeon 9000 Series (RV250) - Secondary
-    +OEM Connect Components Ltd {17ee} : 3D Radeon 9000 Pro - Secondary
-    +OEM First International Computer Inc {1509} : AT009 Radeon 9000 Pro - Secondary
-    +OEM Giga-Byte Technology {1458} : Maya Radeon 9000 Pro - Secondary
-    +OEM Hightech Information Systems Ltd {17af} : Excalibur Radeon 9000 - Secondary
-    +OEM Hightech Information Systems Ltd {17af} : Excalibur Radeon 9000 Pro - Secondary
-    +OEM PC Partner Ltd {174b} : Radeon 9000 Atlantis Pro - Secondary
-    +OEM PowerColor (C.P. Technology Co Ltd) {148c} : Radeon 9000 Pro Evil Commando - Secondary
-    +OEM Wistron Corporation {17c0} : S-Media Radeon 9000 - Secondary
+    Radeon 9000 - Secondary
+    Radeon 9000 Pro - Secondary
+    Radeon 9000 Series (RV250) - Secondary
+    OEM Connect Components Ltd {17ee} : 3D Radeon 9000 Pro - Secondary
+    OEM First International Computer Inc {1509} : AT009 Radeon 9000 Pro - Secondary
+    OEM Giga-Byte Technology {1458} : Maya Radeon 9000 Pro - Secondary
+    OEM Hightech Information Systems Ltd {17af} : Excalibur Radeon 9000 - Secondary
+    OEM Hightech Information Systems Ltd {17af} : Excalibur Radeon 9000 Pro - Secondary
+    OEM PC Partner Ltd {174b} : Radeon 9000 Atlantis Pro - Secondary
+    OEM PowerColor (C.P. Technology Co Ltd) {148c} : Radeon 9000 Pro Evil Commando - Secondary
+    OEM Wistron Corporation {17c0} : S-Media Radeon 9000 - Secondary
 Radeon 9000 Series (RV250) [4966]
     Radeon 9000 Series (RV250)
     OEM Connect Components Ltd {17ee} : 3D Radeon 9000 Pro
@@ -1505,14 +1505,14 @@ Radeon RV250 Id [Radeon 9000] [4964]
 Radeon RV250 Ie [Radeon 9000] [4965]
 Radeon VE QZ [515a]
 Radeon X300 Series - Secondary [5b70]
-    +Radeon X300 Series - Secondary
+    Radeon X300 Series - Secondary
 Radeon X300 Series [5b60]
     Radeon X300 Series
     OEM ASUSTeK Computer Inc {1043} : EAX300SE
 Radeon X600 Series - Secondary [5b72]
 Radeon X600 Series Secondary [3e70]
-    +OEM ASUSTeK Computer Inc {1043} : EAX600 PRO/TD - Secondary
-    +OEM PC Partner Ltd {174b} : Sapphire Radeon X600XT - Secondary
+    OEM ASUSTeK Computer Inc {1043} : EAX600 PRO/TD - Secondary
+    OEM PC Partner Ltd {174b} : Sapphire Radeon X600XT - Secondary
 Radeon X600 Series [3e50]
     OEM ASUSTeK Computer Inc {1043} : EAX600 PRO/TD
     OEM PC Partner Ltd {174b} : Sapphire Radeon X600XT

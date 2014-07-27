@@ -1,26 +1,26 @@
 .TH "AdvanceMENU Frontend" 1
 .SH NAME
-advmenu \(hy AdvanceMENU Frontend
+advmenu \- AdvanceMENU Frontend
 .SH SYNOPSIS 
-advmenu [\(hydefault] [\(hyremove] [\(hycfg FILE]
+advmenu [\-default] [\-remove] [\-cfg FILE]
 .PD 0
 .PP
 .PD
-	[\(hylog] [\(hyversion] [\(hyhelp]
+	[\-log] [\-version] [\-help]
 .PD 0
 .PP
 .PD
 .SH DESCRIPTION 
-AdvanceMENU is a front\(hyend to run the AdvanceMAME, AdvanceMESS,
+AdvanceMENU is a front\-end to run the AdvanceMAME, AdvanceMESS,
 MAME, MESS, Raine and other emulators.
 .PP
 Simply run it in the same directory of the emulator and press
-\(oqf1\(cq to get the help screen or \(oq~\(cq for the main menu.
+\`f1\' to get the help screen or \`~\' for the main menu.
 .PP
-Press \(oqtab\(cq to change the display mode. Press \(oqspace\(cq to change
+Press \`tab\' to change the display mode. Press \`space\' to change
 the preview mode.
 .PP
-To run a game press \(oqenter\(cq. Press \(oqesc\(cq to exit.
+To run a game press \`enter\'. Press \`esc\' to exit.
 .PP
 The major features are:
 .PD 0
@@ -31,7 +31,7 @@ Auto update of the rom info.
 .IP \(bu
 Vertical and horizontal orientation.
 .IP \(bu
-Support for any TV/Arcade Monitor like AdvanceMAME but it\(cqs
+Support for any TV/Arcade Monitor like AdvanceMAME but it\'s
 good also for a normal PC monitor.
 .IP \(bu
 Static and Animated image and clip preview (PNG/PCX/ICO/MNG).
@@ -48,41 +48,41 @@ start, program exit...
 .IP \(bu
 Support for zipped images and sounds archives.
 .IP \(bu
-Screen\(hysaver. A slide show of the game images.
+Screen\-saver. A slide show of the game images.
 .IP \(bu
 Selectable background and help images with translucency.
 .PD
 .SH OPTIONS 
 .TP
-.B \(hydefault
+.B \-default
 Add to the configuration file all the missing options
 with default values.
 .TP
-.B \(hyremove
+.B \-remove
 Remove from the configuration file all the options
 with default values.
 .TP
-.B \(hycfg FILE
+.B \-cfg FILE
 Select an alternate configuration file. In Linux and Mac
-OS X the you can prefix the file name with \(a"./\(a" to
+OS X the you can prefix the file name with \[dq]./\[dq] to
 load it from the current directory.
 .TP
-.B \(hylog
-Create the file \(oqadvmenu.log\(cq with a lot of internal
+.B \-log
+Create the file \`advmenu.log\' with a lot of internal
 information. Very useful for bug report.
 .TP
-.B \(hyverbose
+.B \-verbose
 Print some startup information.
 .TP
-.B \(hyversion
-Print the version number, the low\(hylevel device drivers
+.B \-version
+Print the version number, the low\-level device drivers
 supported and the configuration directories.
 .TP
-.B \(hyhelp
+.B \-help
 Print a short command line help.
 .PP
-In Linux and Mac OS X you can also use \(oq\(hy\(hy\(cq before options instead of \(oq\(hy\(cq.
-In DOS and Windows you can also use \(oq/\(cq.
+In Linux and Mac OS X you can also use \`\-\-\' before options instead of \`\-\'.
+In DOS and Windows you can also use \`/\'.
 .SH EMULATORS 
 The program supports many type of emulators. The emulators
 AdvanceMAME, AdvanceMESS, MAME, SDLMAME, DMAME,
@@ -91,195 +91,195 @@ you should do is to run the AdvanceMENU program in the same
 directory of the emulator.
 .PP
 All the other emulators are supported with the emulator
-type \(oqgeneric\(cq.
-.SS generic \(hy Generic emulator 
-For the \(oqgeneric\(cq emulator no additional rom information is
+type \`generic\'.
+.SS generic \- Generic emulator 
+For the \`generic\' emulator no additional rom information is
 needed. Only the name and the size of the rom files are used.
 .PP
 You should specify all emulator information and directories
-with the \(oqemulator\(cq and \(oqemulator_*\(cq options in the
-\(oqadvmenu.rc\(cq file.
+with the \`emulator\' and \`emulator_*\' options in the
+\`advmenu.rc\' file.
 .PP
-You need to use at least the \(oqemulator\(cq and \(oqemulator_roms\(cq
+You need to use at least the \`emulator\' and \`emulator_roms\'
 options to inform AdvanceMENU how to run the emulator and where
 to find the roms.
 .PP
 For example:
 .PP
 .RS 4
-emulator \(a"snes9x\(a" generic \(a"c:\(rsgame\(rssnes9x\(rssnes9x.exe\(a" \(a"%f\(a"
+emulator \[dq]snes9x\[dq] generic \[dq]c:\\game\\snes9x\\snes9x.exe\[dq] \[dq]%f\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms \(a"snes9x\(a" \(a"c:\(rsgame\(rssnes9x\(rsroms\(a"
+emulator_roms \[dq]snes9x\[dq] \[dq]c:\\game\\snes9x\\roms\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms_filter \(a"snes9x\(a" \(a"*.smc;*.sfc;*.fig;*.1\(a"
+emulator_roms_filter \[dq]snes9x\[dq] \[dq]*.smc;*.sfc;*.fig;*.1\[dq]
 .PD 0
 .PP
 .PD
 .RE
 .PP
 .RS 4
-emulator \(a"zsnes\(a" generic \(a"c:\(rsgame\(rszsnes\(rszsnes.exe\(a" \(a"\(hye \(hym roms\(rs%f\(a"
+emulator \[dq]zsnes\[dq] generic \[dq]c:\\game\\zsnes\\zsnes.exe\[dq] \[dq]\-e \-m roms\\%f\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms \(a"zsnes\(a" \(a"c:\(rsgame\(rszsnes\(rsroms\(a"
+emulator_roms \[dq]zsnes\[dq] \[dq]c:\\game\\zsnes\\roms\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms_filter \(a"zsnes\(a" \(a"*.smc;*.sfc;*.fig;*.1\(a"
+emulator_roms_filter \[dq]zsnes\[dq] \[dq]*.smc;*.sfc;*.fig;*.1\[dq]
 .PD 0
 .PP
 .PD
 .RE
 .PP
-The various %s, %f, %p, ... macros are explained in the \(oqemulator\(cq
+The various %s, %f, %p, ... macros are explained in the \`emulator\'
 option description.
 .PP
 The roms are searched in the path specified with the
-\(oqemulator_roms\(cq option in the \(oqadvmenu.rc\(cq file. For every file
+\`emulator_roms\' option in the \`advmenu.rc\' file. For every file
 found (with any extension) a game is added in the menu.
-You can filter the files with the \(oqemulator_roms_filter\(cq option.
+You can filter the files with the \`emulator_roms_filter\' option.
 .PP
 All the snapshots are searched in the directories specified with
-the \(oqemulator_*\(cq options using the same name of the rom file.
+the \`emulator_*\' options using the same name of the rom file.
 .PP
 If you want, you can manually write a MAME like information file
-and name it as \(oqENUNAME.lst\(cq. This file has the same format
-of the output of the \(oq\(hylistinfo\(cq MAME command.
-Actually only the information \(oqgame\(cq, \(oqname\(cq, \(oqdescription\(cq, \(oqyear\(cq,
-\(oqmanufacturer\(cq, \(oqcloneof\(cq are used.
+and name it as \`ENUNAME.lst\'. This file has the same format
+of the output of the \`\-listinfo\' MAME command.
+Actually only the information \`game\', \`name\', \`description\', \`year\',
+\`manufacturer\', \`cloneof\' are used.
 Please note that this file is used only to add information at the
 existing games. The games present in this file are not automatically
 added at the game list.
-.SS advmame \(hy AdvanceMAME 
-For the \(oqadvmame\(cq emulator type the roms informations are
-gathered from the file \(oqENUNAME.xml\(cq. If this file doesn\(cqt
-exist, it\(cqs created automatically with emulator \(oq\(hylistxml\(cq
+.SS advmame \- AdvanceMAME 
+For the \`advmame\' emulator type the roms informations are
+gathered from the file \`ENUNAME.xml\'. If this file doesn\'t
+exist, it\'s created automatically with emulator \`\-listxml\'
 command.
 .PP
-The directories specified in the \(oqdir_rom\(cq option in the
-\(oqadvmame.rc\(cq file are used to detect the list of the
+The directories specified in the \`dir_rom\' option in the
+\`advmame.rc\' file are used to detect the list of the
 available roms. In the DOS and Windows versions of the
-program the \(oqadvmenu.rc\(cq file is searched in the same directory
-of the emulator. In the Unix version it\(cqs searched in the
-\(oqHOME/.advance\(cq directory.
+program the \`advmenu.rc\' file is searched in the same directory
+of the emulator. In the Unix version it\'s searched in the
+\`HOME/.advance\' directory.
 .PP
-The directory specified in \(oqdir_snap\(cq is used to
+The directory specified in \`dir_snap\' is used to
 detect the list of available snapshots.
-.SS advmess \(hy AdvanceMESS 
-For the \(oqadvmess\(cq emulator the rom information is gathered
-from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist,
-it\(cqs created automatically with emulator \(oq\(hylistxml\(cq command.
+.SS advmess \- AdvanceMESS 
+For the \`advmess\' emulator the rom information is gathered
+from the file \`EMUNAME.xml\'. If this file doesn\'t exist,
+it\'s created automatically with emulator \`\-listxml\' command.
 .PP
-The directories specified in the \(oqdir_rom\(cq option in the
-\(oqadvmess.rc\(cq file are used to detect the list of the
+The directories specified in the \`dir_rom\' option in the
+\`advmess.rc\' file are used to detect the list of the
 available bioses.
 .PP
-All the directories listed in the option \(oqdir_image\(cq are
-read and all the files found in the \(oqmachine\(cq directories
+All the directories listed in the option \`dir_image\' are
+read and all the files found in the \`machine\' directories
 are inserted as software if the extension is recognized as a
-valid device extension for the current \(oqmachine\(cq or if it\(cqs a
-\(oqzip\(cq file.
-For example if the \(oqdir_image\(cq options is \(oqc:\(rssoftware\(cq,
-AdvanceMENU scans the directories \(oqc:\(rssoftware\(rsti99_4a\(cq,
-\(oqc:\(rssoftware\(rssms\(cq, \(oqc:\(rssoftware\(rsgameboy\(cq...
-Files in the main directory \(oqc:\(rssoftware\(cq are NOT checked.
+valid device extension for the current \`machine\' or if it\'s a
+\`zip\' file.
+For example if the \`dir_image\' options is \`c:\\software\',
+AdvanceMENU scans the directories \`c:\\software\\ti99_4a\',
+\`c:\\software\\sms\', \`c:\\software\\gameboy\'...
+Files in the main directory \`c:\\software\' are NOT checked.
 .PP
 When you select to run a zip file, the zip file is opened and
 all the files in the zip with a valid name and with a recognized
 device extension are added at the AdvanceMESS command line.
 A file is considered to have a valid name if has the same name
 of the zip of if it has the name of the zip with an additional
-char. For example in the file \(oqalpiner.zip\(cq the files
-\(oqalpiner.bin\(cq, \(oqalpinerc.bin\(cq and \(oqalpinerg.bin\(cq have a valid
+char. For example in the file \`alpiner.zip\' the files
+\`alpiner.bin\', \`alpinerc.bin\' and \`alpinerg.bin\' have a valid
 name. This feature can be used to group all the required roms
 to play a software in a single zip file.
 .PP
 The file extension is also used to correctly select the device
 type when calling AdvanceMESS.
 .PP
-The directory specified in \(oqdir_snap\(cq is used to detect the
+The directory specified in \`dir_snap\' is used to detect the
 list of available snapshots.
 At any exit of AdvanceMESS if a new snapshot is created, this
-file is moved to the correct \(oqsnap\(rssystem\(cq directory renaming
+file is moved to the correct \`snap\\system\' directory renaming
 it as the software started.
-For example, suppose that you run the \(oqti99_4a\(cq system with the
-software \(oqalpiner\(cq. If you press F12 during the emulation, the
-file \(oqsnap\(rsti99_4a.png\(cq is created. When you return to
+For example, suppose that you run the \`ti99_4a\' system with the
+software \`alpiner\'. If you press F12 during the emulation, the
+file \`snap\\ti99_4a.png\' is created. When you return to
 AdvanceMENU the file is moved automatically to
-\(oqsnap\(rsti99_4a\(rsalpiner.png\(cq.
-.SS mame \(hy Windows MAME 
-For the \(oqmame\(cq emulator the roms information is gathered from
-the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs created
-automatically with emulator \(oq\(hylistxml\(cq command.
+\`snap\\ti99_4a\\alpiner.png\'.
+.SS mame \- Windows MAME 
+For the \`mame\' emulator the roms information is gathered from
+the file \`EMUNAME.xml\'. If this file doesn\'t exist, it\'s created
+automatically with emulator \`\-listxml\' command.
 .PP
-The directories specified in the \(oqrompath\(cq option in the
-\(oqmame.ini\(cq file are used to detect the list of the available
+The directories specified in the \`rompath\' option in the
+\`mame.ini\' file are used to detect the list of the available
 roms.
 .PP
-The directory specified in \(oqsnapshot_directory\(cq is
+The directory specified in \`snapshot_directory\' is
 used to detect the list of available snapshots.
-.SS sdlmame \(hy SDL MAME 
-For the \(oqsdlmame\(cq emulator the roms informations are gathered
-from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs
-created automatically with emulator \(oq\(hylistxml\(cq command.
+.SS sdlmame \- SDL MAME 
+For the \`sdlmame\' emulator the roms informations are gathered
+from the file \`EMUNAME.xml\'. If this file doesn\'t exist, it\'s
+created automatically with emulator \`\-listxml\' command.
 .PP
-The directories specified in the \(oqrompath\(cq option in the
-\(oqHOME/.mame/mame.ini\(cq file in Linux and Mac OS X and in the \(cqmame.ini\(cq
+The directories specified in the \`rompath\' option in the
+\`HOME/.mame/mame.ini\' file in Linux and Mac OS X and in the \'mame.ini\'
 file in Windows are used to detect the list of the available roms.
 .PP
-Please note that in Linux and Mac OS X the \(cqmame.ini\(cq file doesn\(cqt
+Please note that in Linux and Mac OS X the \'mame.ini\' file doesn\'t
 support relative paths for roms and other files. Always use absolute
-paths configuring SDL MAME. You can use the \(a"$HOME\(a" variable to
+paths configuring SDL MAME. You can use the \[dq]$HOME\[dq] variable to
 refers at the Linux/Mac OS X user home directory.
 .PP
-The directory specified in \(oqsnapshot_directory\(cq is used to detect the
+The directory specified in \`snapshot_directory\' is used to detect the
 list of available snapshots files.
-.SS dmame \(hy DOS MAME 
-For the \(oqdmame\(cq emulator the roms informations are gathered
-from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs
-created automatically with emulator \(oq\(hylistxml\(cq command.
+.SS dmame \- DOS MAME 
+For the \`dmame\' emulator the roms informations are gathered
+from the file \`EMUNAME.xml\'. If this file doesn\'t exist, it\'s
+created automatically with emulator \`\-listxml\' command.
 .PP
-The directories specified in the \(oqrompath\(cq option in the
-\(oqmame.cfg\(cq file are used to detect the list of the available
+The directories specified in the \`rompath\' option in the
+\`mame.cfg\' file are used to detect the list of the available
 roms.
 .PP
-The directory specified in \(oqsnap\(cq is used to
+The directory specified in \`snap\' is used to
 detect the list of available snapshots.
-.SS dmess \(hy DOS MESS 
-For the \(oqdmess\(cq emulator the roms informations are gathered
-from the file \(oqEMUNAME.xml\(cq. If this file doesn\(cqt exist, it\(cqs
-created automatically with emulator \(oq\(hylistxml\(cq command.
+.SS dmess \- DOS MESS 
+For the \`dmess\' emulator the roms informations are gathered
+from the file \`EMUNAME.xml\'. If this file doesn\'t exist, it\'s
+created automatically with emulator \`\-listxml\' command.
 .PP
-The directories specified in the \(oqbiospath\(cq option in the
-\(oqmess.cfg\(cq file are used to detect the list of the available
+The directories specified in the \`biospath\' option in the
+\`mess.cfg\' file are used to detect the list of the available
 bioses.
 .PP
-All the directories listed in the option \(oqsoftwarepath\(cq are
-read and all the \(oqzip\(cq files found in the \(oqsubsystem\(cq
+All the directories listed in the option \`softwarepath\' are
+read and all the \`zip\' files found in the \`subsystem\'
 directories are inserted as software.
-For example if the \(oqsoftwarepath\(cq options is \(oqc:\(rssoftware\(cq,
-AdvanceMENU scans the directories \(oqc:\(rssoftware\(rsti99_4a\(cq,
-\(oqc:\(rssoftware\(rssms\(cq, \(oqc:\(rssoftware\(rsgameboy\(cq...
-Zips in the main directory \(oqc:\(rssoftware\(cq are NOT checked.
+For example if the \`softwarepath\' options is \`c:\\software\',
+AdvanceMENU scans the directories \`c:\\software\\ti99_4a\',
+\`c:\\software\\sms\', \`c:\\software\\gameboy\'...
+Zips in the main directory \`c:\\software\' are NOT checked.
 .PP
 When you select one of these entries the zip is opened and is
 searched the first file with the same name of the zip but
 different extension. This file is used as the argument of the
-\(oq\(hycart\(cq option when running \(oqmess\(cq.
-AdvanceMENU is NOT able to use other supports like \(oq\(hyflop\(cq.
+\`\-cart\' option when running \`mess\'.
+AdvanceMENU is NOT able to use other supports like \`\-flop\'.
 .PP
-All the aliases present if the \(oqmess.cfg\(cq are inserted as
+All the aliases present if the \`mess.cfg\' are inserted as
 software entries. When you select one of these entries the
-\(oqmess\(cq option \(oq\(hyalias\(cq is used to start the game.
+\`mess\' option \`\-alias\' is used to start the game.
 .PP
 You can set an arbitrary description on an alias specification
 adding it on the same line of the alias after the comment char
-\(cq#\(cq using this format:
+\'#\' using this format:
 .PP
 .RS 4
 ALIAS = ALIAS_DEF # Description | YEAR | MANUFACTURER
@@ -295,7 +295,7 @@ For example:
 .PD 0
 .PP
 .PD
-ti\(hyinva = \(hycart ti\(hyinvac.bin \(hycart ti\(hyinvag.bin \(rs
+ti\-inva = \-cart ti\-invac.bin \-cart ti\-invag.bin \\
 .PD 0
 .PP
 .PD
@@ -306,44 +306,44 @@ ti\(hyinva = \(hycart ti\(hyinvac.bin \(hycart ti\(hyinvag.bin \(rs
 .RE
 .PP
 At any exit of the emulator if a new snapshot is created, this file
-is moved to the correct \(oqsnap\(rssystem\(cq directory renaming it as
+is moved to the correct \`snap\\system\' directory renaming it as
 the software started.
-For example, suppose that you run the \(oqti99_4a\(cq system with the
-software \(oqalpiner\(cq. If you press F12 during the emulation, the
-file \(oqsnap\(rsti99_4a.png\(cq is created. When you return to
+For example, suppose that you run the \`ti99_4a\' system with the
+software \`alpiner\'. If you press F12 during the emulation, the
+file \`snap\\ti99_4a.png\' is created. When you return to
 AdvanceMENU the file is moved automatically to
-\(oqsnap\(rsti99_4a\(rsalpiner.png\(cq.
-.SS draine \(hy DOS Raine 
-For the \(oqdraine\(cq emulator the roms informations are gathered
-from the file \(oqEMUNAME.lst\(cq. If this file doesn\(cqt exist, it\(cqs
-created automatically with emulator \(oq\(hygameinfo\(cq command.
+\`snap\\ti99_4a\\alpiner.png\'.
+.SS draine \- DOS Raine 
+For the \`draine\' emulator the roms informations are gathered
+from the file \`EMUNAME.lst\'. If this file doesn\'t exist, it\'s
+created automatically with emulator \`\-gameinfo\' command.
 .PP
-All the directories specified in the \(oqrom_dir_*\(cq options are
+All the directories specified in the \`rom_dir_*\' options are
 used to detect the list of the available roms.
 .PP
-The directory specified in \(oqscreenshots\(cq is used to detect the
+The directory specified in \`screenshots\' is used to detect the
 list of available snapshots.
 .SH CONFIGURATION 
-The file \(oqadvmenu.rc\(cq is used to save the current state of the
-front\(hyend. It\(cqs read at startup and saved at exit. You can
-prevent the automatic save at the exit with the \(oqconfig\(cq option.
+The file \`advmenu.rc\' is used to save the current state of the
+front\-end. It\'s read at startup and saved at exit. You can
+prevent the automatic save at the exit with the \`config\' option.
 .PP
 In DOS and Windows the configuration options are read from the
-file \(oqadvmenu.rc\(cq in the current directory.
+file \`advmenu.rc\' in the current directory.
 .PP
 In Linux and Mac OS X the configuration options are read from the
-files \(oqadvmame.rc\(cq and \(oqadvmess.rc\(cq in the $host, $data and
+files \`advmame.rc\' and \`advmess.rc\' in the $host, $data and
 the $home directory.
-The $host directory is \(oq$SYSCONFDIR\(cq, where $SYSCONFDIR is the
-\(oqsysconfdir\(cq directory configured with the \(oqconfigure\(cq script.
-The default is \(oq/usr/local/etc\(cq.
-The $data directory is \(oq$DATADIR/advance\(cq, where $DATADIR is the
-\(oqdatadir\(cq directory configured with the \(oqconfigure\(cq script.
-The default is \(oq/usr/local/share\(cq.
-The $home directory is \(oq$ADVANCE\(cq, where $ADVANCE is the value of the
+The $host directory is \`$SYSCONFDIR\', where $SYSCONFDIR is the
+\`sysconfdir\' directory configured with the \`configure\' script.
+The default is \`/usr/local/etc\'.
+The $data directory is \`$DATADIR/advance\', where $DATADIR is the
+\`datadir\' directory configured with the \`configure\' script.
+The default is \`/usr/local/share\'.
+The $home directory is \`$ADVANCE\', where $ADVANCE is the value of the
 ADVANCE environment variable when the program is run.
 If the ADVANCE environment variable is missing the $home directory
-is \(oq$HOME/.advance\(cq where $HOME is the value of the HOME environment
+is \`$HOME/.advance\' where $HOME is the value of the HOME environment
 variable.
 If both the ADVANCE and HOME environment variables are missing the
 $data directory became also the $home directory.
@@ -353,20 +353,20 @@ The priority of the options is in the order: $host, $home and $data.
 The $home directory is also used to write all the information
 by the program. The files in the $host and $data directory are only read.
 .PP
-You can include an additional configuration files with the \(oqinclude\(cq
+You can include an additional configuration files with the \`include\'
 option. In DOS and Windows the files are searched in the current directory.
 In Linux and Mac OS X the files are searched in the $home directory if
 they are expressed as a relative path. You can force the search in the
-current directory prefixing the file with \(oq./\(cq.
-To include more than one file you must divide the names with \(oq;\(cq in
-DOS and Windows, and with \(oq:\(cq in Linux and Mac OS X.
+current directory prefixing the file with \`./\'.
+To include more than one file you must divide the names with \`;\' in
+DOS and Windows, and with \`:\' in Linux and Mac OS X.
 .PP
 You can force the creation of a default configuration file with the
-command line option \(oq\(hydefault\(cq.
+command line option \`\-default\'.
 .PP
-In DOS and Windows the directory name separator is \(oq\(rs\(cq and the
-multi\(hydirectory separator is \(oq;\(cq. In Linux and Mac OS X the directory
-name separator is \(oq/\(cq and the multi\(hydirectory separator is \(oq:\(cq.
+In DOS and Windows the directory name separator is \`\\\' and the
+multi\-directory separator is \`;\'. In Linux and Mac OS X the directory
+name separator is \`/\' and the multi\-directory separator is \`:\'.
 .SS Global Configuration Options 
 This section describes the global options used to
 customize the the program.
@@ -377,8 +377,8 @@ different emulators. Please note that these specific emulator
 configurations are not activated if you select to show
 more than one emulator at time.
 In this case only the default configuration is used.
-Specifically these special options are \(oqmode\(cq, \(oqsort\(cq,
-\(oqpreview\(cq, \(oqgroup_include\(cq and \(oqtype_include\(cq.
+Specifically these special options are \`mode\', \`sort\',
+\`preview\', \`group_include\' and \`type_include\'.
 .SS config 
 Selects if and when the configuration modified by the user at
 runtime should be saved.
@@ -397,12 +397,12 @@ Save any changes before exiting
 (default).
 .HP 4
 .I restore_at_exit
-Don\(cqt save the changes. At the next
+Don\'t save the changes. At the next
 run, restore the previous configuration.
 .HP 4
 .I restore_at_idle
 Restore the previous configuration
-after the \(oqidle\(cq time.
+after the \`idle\' time.
 .PD
 .RE
 .PP
@@ -413,15 +413,15 @@ Selects the emulators to list in the menu. You can specify more than
 one emulator.
 .PP
 WARNING! Before playing with this option, you should do a
-backup copy of your current \(oqadvmenu.rc\(cq because when you remove
+backup copy of your current \`advmenu.rc\' because when you remove
 an emulator, the game information for that emulator (like
 the time played) is lost.
 .PP
-emulator \(a"EMULATOR\(a" (generic | advmame | advmess | mame | dmame
+emulator \[dq]EMULATOR\[dq] (generic | advmame | advmess | mame | dmame
 .PD 0
 .PP
 .PD
-	| dmess | draine) \(a"[\(hy]EXECUTABLE\(a" \(a"ARGUMENTS\(a"
+	| dmess | draine) \[dq][\-]EXECUTABLE\[dq] \[dq]ARGUMENTS\[dq]
 .PD 0
 .PP
 .PD
@@ -435,37 +435,37 @@ The name for the emulator. It must be
 different for every emulator defined.
 .HP 4
 .I generic
-It\(cqs a generic emulator.
+It\'s a generic emulator.
 .HP 4
 .I advmame
-It\(cqs the AdvanceMAME emulator.
+It\'s the AdvanceMAME emulator.
 .HP 4
 .I advmess
-It\(cqs the AdvanceMESS emulator.
+It\'s the AdvanceMESS emulator.
 .HP 4
 .I mame
-It\(cqs the Window MAME emulator.
+It\'s the Window MAME emulator.
 .HP 4
 .I dmame
-It\(cqs the DOS MAME emulator.
+It\'s the DOS MAME emulator.
 .HP 4
 .I dmess
-It\(cqs the DOS MESS emulator.
+It\'s the DOS MESS emulator.
 .HP 4
 .I draine
-It\(cqs the DOS Raine emulator.
+It\'s the DOS Raine emulator.
 .HP 4
-.I [\(hy]EXECUTABLE
+.I [\-]EXECUTABLE
 The executable path of the emulator.
 In DOS and Windows you can also use a batch (.bat)
 file, but this prevent the automatic generation of
 the listing file which must be generated manually.
-You can put a \(oq\(hy\(cq in front of the file path
+You can put a \`\-\' in front of the file path
 to ignore any error returned by the executable.
 .HP 4
 .I ARGUMENTS
 The arguments to be passed to the emulator.
-The arguments are required only for the \(oqgeneric\(cq
+The arguments are required only for the \`generic\'
 emulator. For the others, AdvanceMENU automatically
 adds the required arguments to run a
 game. However, you may wish to add extra
@@ -479,61 +479,61 @@ with some special values:
 .PD 0
 .HP 4
 .I %s
-Expanded as the game name. For example \(a"pacman\(a".
+Expanded as the game name. For example \[dq]pacman\[dq].
 .HP 4
 .I %p
 Expanded as the complete path of the rom. For
-example \(a"c:\(rsemu\(rsroms\(rspacman.zip\(a".
+example \[dq]c:\\emu\\roms\\pacman.zip\[dq].
 .HP 4
 .I %f
 Expanded as the rom name with the extension. For
-example \(a"pacman.zip\(a".
+example \[dq]pacman.zip\[dq].
 .HP 4
 .I %o[R0,R90,R180,R270]
 Expanded as one of the R* string,
 depending on the current menu orientation.
 Note that you cannot use space in the R* string.
-For example \(a"%o[,\(hyror,\(hyflipx,\(hyrol] %o[,,\(hyflipy,]\(a"
+For example \[dq]%o[,\-ror,\-flipx,\-rol] %o[,,\-flipy,]\[dq]
 correctly rotate the AdvanceMAME emulator.
 .PD
 .RE
 .PP
-For the \(oqgeneric\(cq emulator type you need use the % macros
+For the \`generic\' emulator type you need use the % macros
 to tell at the emulator which game run. For all the other emulator
 types this information is automatically added by AdvanceMENU.
 .PP
 Examples for DOS and Windows:
 .PP
 .RS 4
-emulator \(a"AdvanceMAME\(a" advmame \(a"advmame\(rsadvmame.exe\(a" \(rs
+emulator \[dq]AdvanceMAME\[dq] advmame \[dq]advmame\\advmame.exe\[dq] \\
 .PD 0
 .PP
 .PD
-	\(a"%o[,\(hyror,\(hyflipx,\(hyrol] %o[,,\(hyflipy,]\(a"
+	\[dq]%o[,\-ror,\-flipx,\-rol] %o[,,\-flipy,]\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"MAME\(a" mame \(a"mame\(rsmame.exe\(a" \(a"\(hynohws\(a"
+emulator \[dq]MAME\[dq] mame \[dq]mame\\mame.exe\[dq] \[dq]\-nohws\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"MESS\(a" dmess \(a"mess\(rsmess.exe\(a" \(a"\(a"
+emulator \[dq]MESS\[dq] dmess \[dq]mess\\mess.exe\[dq] \[dq]\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"Raine\(a" draine \(a"raine\(rsraine.exe\(a" \(a"\(a"
+emulator \[dq]Raine\[dq] draine \[dq]raine\\raine.exe\[dq] \[dq]\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"Custom Raine\(a" draine \(a"raine\(rsraine2.bat\(a" \(a"\(a"
+emulator \[dq]Custom Raine\[dq] draine \[dq]raine\\raine2.bat\[dq] \[dq]\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"SNes9x\(a" generic \(a"c:\(rsgame\(rssnes9x\(rssnes9x.exe\(a" \(a"%f\(a"
+emulator \[dq]SNes9x\[dq] generic \[dq]c:\\game\\snes9x\\snes9x.exe\[dq] \[dq]%f\[dq]
 .PD 0
 .PP
 .PD
-emulator \(a"ZSNes\(a" generic \(a"c:\(rsgame\(rszsnes\(rszsnes.exe\(a" \(a"\(hye \(hym roms\(rs%f\(a"
+emulator \[dq]ZSNes\[dq] generic \[dq]c:\\game\\zsnes\\zsnes.exe\[dq] \[dq]\-e \-m roms\\%f\[dq]
 .PD 0
 .PP
 .PD
@@ -542,11 +542,11 @@ emulator \(a"ZSNes\(a" generic \(a"c:\(rsgame\(rszsnes\(rszsnes.exe\(a" \(a"\(hy
 Examples for Linux and Mac OS X:
 .PP
 .RS 4
-emulator \(a"AdvanceMAME\(a" advmame \(a"advmame\(a" \(rs
+emulator \[dq]AdvanceMAME\[dq] advmame \[dq]advmame\[dq] \\
 .PD 0
 .PP
 .PD
-	\(a"%o[,\(hyror,\(hyflipx,\(hyrol] %o[,,\(hyflipy,]\(a"
+	\[dq]%o[,\-ror,\-flipx,\-rol] %o[,,\-flipy,]\[dq]
 .PD 0
 .PP
 .PD
@@ -555,38 +555,38 @@ emulator \(a"AdvanceMAME\(a" advmame \(a"advmame\(a" \(rs
 Selects additional directories for the emulators. These
 directories are used in addition to any other directory
 defined in the emulator config file. The preview images and
-sounds files are also searched also in any \(oq.zip\(cq file present
+sounds files are also searched also in any \`.zip\' file present
 in these directories.
 .PP
-emulator_roms \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_roms \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms_filter \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_roms_filter \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_altss \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_altss \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_flyers \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_flyers \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_cabinets \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_cabinets \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_marquees \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_marquees \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_icons \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_icons \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
-emulator_titles \(a"EMULATOR\(a" \(a"LIST\(a"
+emulator_titles \[dq]EMULATOR\[dq] \[dq]LIST\[dq]
 .PD 0
 .PP
 .PD
@@ -597,9 +597,9 @@ Commands:
 .HP 4
 .I roms
 List of directories used for the roms. This
-option is used only for the \(oqgeneric\(cq emulator
+option is used only for the \`generic\' emulator
 type. All the other emulators use the
-emulator\(hyspecific config file to set the rom
+emulator\-specific config file to set the rom
 path.
 .HP 4
 .I roms_filter
@@ -639,39 +639,39 @@ name of a defined emulator
 .HP 4
 .I LIST
 List of directories or patterns. In DOS and Windows
-use the \(oq;\(cq char as separator. In Linux and
-Mac OS X use the \(oq:\(cq char.
+use the \`;\' char as separator. In Linux and
+Mac OS X use the \`:\' char.
 .PD
 .RE
 .PP
 Examples for DOS and Windows:
 .PP
 .RS 4
-emulator_roms \(a"SNes9x\(a" \(a"c:\(rsgame\(rssnes9x\(rsroms;c:\(rsgame\(rszsnes\(rsroms2\(a"
+emulator_roms \[dq]SNes9x\[dq] \[dq]c:\\game\\snes9x\\roms;c:\\game\\zsnes\\roms2\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms_filter \(a"SNes9x\(a" \(a"*.smc;*.sfc;*.fig;*.1\(a"
+emulator_roms_filter \[dq]SNes9x\[dq] \[dq]*.smc;*.sfc;*.fig;*.1\[dq]
 .PD 0
 .PP
 .PD
-emulator_flyers \(a"SNes9x\(a" \(a"c:\(rsgame\(rszsnes\(rsfly\(a"
+emulator_flyers \[dq]SNes9x\[dq] \[dq]c:\\game\\zsnes\\fly\[dq]
 .PD 0
 .PP
 .PD
-emulator_cabinets \(a"SNes9x\(a" \(a"c:\(rsgame\(rszsnes\(rscab\(a"
+emulator_cabinets \[dq]SNes9x\[dq] \[dq]c:\\game\\zsnes\\cab\[dq]
 .PD 0
 .PP
 .PD
-emulator_marquees \(a"SNes9x\(a" \(a"c:\(rsgame\(rszsnes\(rsmar\(a"
+emulator_marquees \[dq]SNes9x\[dq] \[dq]c:\\game\\zsnes\\mar\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms \(a"ZSNes\(a" \(a"c:\(rsgame\(rszsnes\(rsroms\(a"
+emulator_roms \[dq]ZSNes\[dq] \[dq]c:\\game\\zsnes\\roms\[dq]
 .PD 0
 .PP
 .PD
-emulator_roms_filter \(a"ZSNes\(a" \(a"*.smc;*.sfc;*.fig;*.1\(a"
+emulator_roms_filter \[dq]ZSNes\[dq] \[dq]*.smc;*.sfc;*.fig;*.1\[dq]
 .PD 0
 .PP
 .PD
@@ -738,7 +738,7 @@ Special mode for marquee preview.
 .PD
 .RE
 .SS mode_skip 
-Disables some menu modes when you press \(oqtab\(cq.
+Disables some menu modes when you press \`tab\'.
 .PP
 mode_skip (full | full_mixed | text | list | list_mixed
 .PD 0
@@ -837,7 +837,7 @@ Resolution of the game display.
 .HP 4
 .I info
 External information imported with the
-\(oqinfo_import\(cq option.
+\`info_import\' option.
 .PD
 .RE
 .SS preview 
@@ -857,21 +857,21 @@ Nothing for the default value, or an emulator
 name for a specific emulator option.
 .HP 4
 .I snap
-Files in the \(oqsnap\(cq and \(oqaltss\(cq dir.
+Files in the \`snap\' and \`altss\' dir.
 .HP 4
 .I flyers
-Files in the \(oqflyers\(cq dir.
+Files in the \`flyers\' dir.
 .HP 4
 .I cabinets
-Files in the \(oqcabinets\(cq dir.
+Files in the \`cabinets\' dir.
 .HP 4
 .I titles
-Files in the \(oqtitles\(cq dir.
+Files in the \`titles\' dir.
 .PD
 .RE
 .PP
-The \(oqicons\(cq and \(oqmarquees\(cq images can be selected with the
-special \(oqmode\(cq options \(oqtile_icon\(cq and \(oqtile_marquee\(cq.
+The \`icons\' and \`marquees\' images can be selected with the
+special \`mode\' options \`tile_icon\' and \`tile_marquee\'.
 .SS preview_expand 
 Enlarges the screen area used by the vertical games on horizontal
 tile (and horizontal games in vertical tile).
@@ -903,31 +903,31 @@ preview_expand 1.15
 Selects the default images. When an image for the selected game
 is not found, a default image can be displayed.
 .PP
-preview_default \(a"FILE\(a"
+preview_default \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_snap \(a"FILE\(a"
+preview_default_snap \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_flyer \(a"FILE\(a"
+preview_default_flyer \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_cabinet \(a"FILE\(a"
+preview_default_cabinet \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_icon \(a"FILE\(a"
+preview_default_icon \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_marquee \(a"FILE\(a"
+preview_default_marquee \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
-preview_default_title \(a"FILE\(a"
+preview_default_title \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
@@ -958,22 +958,22 @@ The complete PATH of the image.
 Examples:
 .PP
 .RS 4
-preview_default \(a"C:\(rsMAME\(rsDEFAULT.PNG\(a"
+preview_default \[dq]C:\\MAME\\DEFAULT.PNG\[dq]
 .PD 0
 .PP
 .PD
-preview_default_marquee \(a"C:\(rsMAME\(rsDEFMAR.PNG\(a"
+preview_default_marquee \[dq]C:\\MAME\\DEFMAR.PNG\[dq]
 .PD 0
 .PP
 .PD
-preview_default_icon \(a"C:\(rsMAME\(rsDEFICO.ICO\(a"
+preview_default_icon \[dq]C:\\MAME\\DEFICO.ICO\[dq]
 .PD 0
 .PP
 .PD
 .RE
 .SS icon_space 
-Selects the space size between icons. The \(oqicon\(cq mode is
-available only if you set the option \(oqemulator_icons\(cq in the
+Selects the space size between icons. The \`icon\' mode is
+available only if you set the option \`emulator_icons\' in the
 emulator config file.
 .PP
 icon_space SPACE
@@ -993,7 +993,7 @@ The number of pixel between icons (default 43).
 In the icon display the game title is displayed in multiple rows
 if there is enough space.
 .SS merge 
-Selects the expected format of your romset. It\(cqs used to test
+Selects the expected format of your romset. It\'s used to test
 the existence of the correct zips needed to run the games.
 .PP
 merge none | differential | parent | any | disable
@@ -1025,11 +1025,11 @@ Check disabled.
 .RE
 .SS game 
 Contains various information of the know games.
-A \(oqgame\(cq option is added automatically at the configuration
-files for any rom found. It\(cqs used to keep some game
+A \`game\' option is added automatically at the configuration
+files for any rom found. It\'s used to keep some game
 information like the play time.
 .PP
-game \(a"EMULATOR/GAME\(a" \(a"GROUP\(a" \(a"TYPE\(a" TIME PLAY \(a"DESC\(a"
+game \[dq]EMULATOR/GAME\[dq] \[dq]GROUP\[dq] \[dq]TYPE\[dq] TIME PLAY \[dq]DESC\[dq]
 .PD 0
 .PP
 .PD
@@ -1046,10 +1046,10 @@ Short name of the game, generally the
 rom name without the extension.
 .HP 4
 .I GROUP
-Name of the group of the game or empty \(a"\(a".
+Name of the group of the game or empty \[dq]\[dq].
 .HP 4
 .I TYPE
-Name of the type of the game or empty \(a"\(a".
+Name of the type of the game or empty \[dq]\[dq].
 .HP 4
 .I TIME
 Time played in seconds.
@@ -1058,27 +1058,27 @@ Time played in seconds.
 Number of play.
 .HP 4
 .I DESC
-User description or empty \(a"\(a".
+User description or empty \[dq]\[dq].
 .PD
 .RE
 .PP
 The GROUP, TYPE and DESC argument overwrite any
-other value imported with the \(oqgroup_import\(cq, \(oqtype_import\(cq,
-and \(oqdesc_import\(cq options. The imported values take effect
+other value imported with the \`group_import\', \`type_import\',
+and \`desc_import\' options. The imported values take effect
 only if the user GROUP, TYPE and DESC are empty.
 .PP
 Examples:
 .PP
 .RS 4
-game \(a"advmame/puckman\(a" \(a"Very Good\(a" \(a"Arcade\(a" \(rs
+game \[dq]advmame/puckman\[dq] \[dq]Very Good\[dq] \[dq]Arcade\[dq] \\
 .PD 0
 .PP
 .PD
-	1231 21 \(a"Pac\(hyMan Japanese\(a"
+	1231 21 \[dq]Pac\-Man Japanese\[dq]
 .PD 0
 .PP
 .PD
-game \(a"advmame/1943\(a" \(a"\(a" \(a"\(a" 121 4 \(a"1943 !!\(a"
+game \[dq]advmame/1943\[dq] \[dq]\[dq] \[dq]\[dq] 121 4 \[dq]1943 !!\[dq]
 .PD 0
 .PP
 .PD
@@ -1088,13 +1088,13 @@ This section describes the options used to customize the display.
 .SS device_video_* 
 These options are used to customize the video drivers.
 .PP
-All the \(oqdevice_video_*\(cq options defined in the \(oqadvdev.txt\(cq file can
+All the \`device_video_*\' options defined in the \`advdev.txt\' file can
 be used.
 .PP
-If you use a \(oqSystem\(cq video driver, you don\(cqt need to set these
+If you use a \`System\' video driver, you don\'t need to set these
 options. They are mostly ignored.
 .PP
-With a \(oqGenerate\(cq video drivers these options are used to select
+With a \`Generate\' video drivers these options are used to select
 and create the correct video mode. If missing the settings for a
 standard Multisync SVGA monitor are used.
 .SS display_size 
@@ -1243,7 +1243,7 @@ This section describes the options used to customize the sound.
 .SS device_sound_* 
 These options are used to customize the audio drivers.
 .PP
-All the \(oqdevice_sound_*\(cq options defined in the \(oqadvdev.txt\(cq file can
+All the \`device_sound_*\' options defined in the \`advdev.txt\' file can
 be used.
 .SS sound_volume 
 Sets the global sound volume.
@@ -1258,15 +1258,15 @@ Options:
 .PD 0
 .HP 4
 .I VOLUME
-The volume attenuation in dB (default \(hy3).
-The attenuation is a negative value from \(hy40 to 0.
+The volume attenuation in dB (default \-3).
+The attenuation is a negative value from \-40 to 0.
 .PD
 .RE
 .PP
 Examples:
 .PP
 .RS 4
-sound_volume \(hy5
+sound_volume \-5
 .PD 0
 .PP
 .PD
@@ -1433,15 +1433,15 @@ Selects the background music directory to search for MP3 and WAV
 files. Music tracks will be played in random order.
 .PP
 Multiple directories may be specified by separating each with a
-semicolon \(oq;\(cq in DOS and Windows, with a double\(hycolon \(oq:\(cq in Linux
+semicolon \`;\' in DOS and Windows, with a double\-colon \`:\' in Linux
 and Mac OS X.
 .PP
 Note that this directory must be used only for your music.
 The emulated game recordings, played when the cursor is moved on
 the game, are stored in the snap directory defined in the emulator
-configuration file or with the \(oqemulator_altss\(cq option.
+configuration file or with the \`emulator_altss\' option.
 .PP
-sound_background_loop_dir \(a"DIR\(a"
+sound_background_loop_dir \[dq]DIR\[dq]
 .PD 0
 .PP
 .PD
@@ -1458,7 +1458,7 @@ Directory for .mp3 and .wav files.
 Examples:
 .PP
 .RS 4
-sound_background_loop_dir C:\(rsMP3\(rsPOP;C:\(rsMP3\(rsROCK
+sound_background_loop_dir C:\\MP3\\POP;C:\\MP3\\ROCK
 .PD 0
 .PP
 .PD
@@ -1469,8 +1469,8 @@ input.
 .SS device_keyboard/joystick/mouse 
 These options are used to customize the input drivers.
 .PP
-All the \(oqdevice_keyboard/joystick/mouse_*\(cq options defined in
-the \(oqadvdev.txt\(cq file can be used.
+All the \`device_keyboard/joystick/mouse_*\' options defined in
+the \`advdev.txt\' file can be used.
 .PP
 As default the mouse and the joystick support is disabled.
 To enable it you must add the options:
@@ -1510,9 +1510,9 @@ interface.
 .SS ui_font 
 Selects a font file. The formats TrueType (TTF), GRX, PSF and
 RAW are supported. You can find a collection of fonts in the
-\(oqcontrib\(cq directory.
+\`contrib\' directory.
 .PP
-ui_font auto | \(a"FILE\(a"
+ui_font auto | \[dq]FILE\[dq]
 .PD 0
 .PP
 .PD
@@ -1522,7 +1522,7 @@ Options:
 .PD 0
 .HP 4
 .I auto
-Use the built\(hyin font (default).
+Use the built\-in font (default).
 .HP 4
 .I FILE
 Font file path.
@@ -1628,10 +1628,10 @@ File in .PNG or .MNG format to load.
 .RE
 .SS ui_gamemsg 
 One line message displayed when a game is chosen. The
-message is displayed only if the option \(oqdisplay_restoreatgame\(cq is
-set to \(oqno\(cq.
+message is displayed only if the option \`display_restoreatgame\' is
+set to \`no\'.
 .PP
-ui_gamemsg \(a"MESSAGE\(a"
+ui_gamemsg \[dq]MESSAGE\[dq]
 .PD 0
 .PP
 .PD
@@ -1641,24 +1641,24 @@ Options:
 .PD 0
 .HP 4
 .I MESSAGE
-Message to display (default \(a"Run Game\(a").
+Message to display (default \[dq]Run Game\[dq]).
 To prevent the display of the message use the
-empty string \(a"\(a".
+empty string \[dq]\[dq].
 .PD
 .RE
 .PP
 Examples:
 .PP
 .RS 4
-ui_gamemsg \(a"Avvio il gioco...\(a"
+ui_gamemsg \[dq]Avvio il gioco...\[dq]
 .PD 0
 .PP
 .PD
 .RE
 .SS ui_game 
 Selects the preview type to display when a game is run. The
-preview is displayed only if the option \(oqdisplay_restoreatgame\(cq is
-set to \(oqno\(cq.
+preview is displayed only if the option \`display_restoreatgame\' is
+set to \`no\'.
 .PP
 ui_game none | snap | flyers | cabinets | titles
 .PD 0
@@ -1670,7 +1670,7 @@ Options:
 .PD 0
 .HP 4
 .I none
-Don\(cqt display any preview.
+Don\'t display any preview.
 .HP 4
 .I snap, flyers, cabinets, titles
 Display the
@@ -1679,8 +1679,8 @@ specified preview. (default snap).
 .RE
 .SS ui_skiptop/bottom/left/right 
 Defines the border area of the screen not used by the menu.
-Generally it\(cqs the part of the screen used by the background image.
-If a \(oqui_background\(cq image is specified these values refer at image
+Generally it\'s the part of the screen used by the background image.
+If a \`ui_background\' image is specified these values refer at image
 size before stretching, otherwise they refer at the current video
 mode size.
 .PP
@@ -1845,7 +1845,7 @@ Defines the user commands. These commands are executed as
 shell scripts. The video mode is not changed, so they must be
 silent.
 .PP
-ui_command \(a"MENU\(a" SCRIPT
+ui_command \[dq]MENU\[dq] SCRIPT
 .PP
 Options:
 .RS 4
@@ -1856,7 +1856,7 @@ Name of the menu entry.
 .HP 4
 .I SCRIPT
 Commands to execute. If you need to insert more
-command rows you can end the line with the \(rs char.
+command rows you can end the line with the \\ char.
 .PD
 .RE
 .PP
@@ -1866,26 +1866,26 @@ the selected game:
 .PD 0
 .HP 4
 .I %s
-The game name. For example \(a"pacman\(a".
+The game name. For example \[dq]pacman\[dq].
 .HP 4
 .I %p
 The complete path of the rom. For
-example \(a"c:\(rsemu\(rsroms\(rspacman.zip\(a".
+example \[dq]c:\\emu\\roms\\pacman.zip\[dq].
 .HP 4
 .I %f
 The rom name with the extension. For
-example \(a"pacman.zip\(a".
+example \[dq]pacman.zip\[dq].
 .PD
 .RE
 .PP
-If no game is selected the macros aren\(cqt substituted.
+If no game is selected the macros aren\'t substituted.
 .PP
 If the script exits with an error code, a message is displayed.
 .PP
 Examples:
 .PP
 .RS 4
-ui_command \(a"Delete Hiscore\(a" \(rs
+ui_command \[dq]Delete Hiscore\[dq] \\
 .PD 0
 .PP
 .PD
@@ -1893,15 +1893,15 @@ ui_command \(a"Delete Hiscore\(a" \(rs
 .PD 0
 .PP
 .PD
-ui_command \(a"Enable GamePad\(a" \(rs
+ui_command \[dq]Enable GamePad\[dq] \\
 .PD 0
 .PP
 .PD
-	rmmod analog \(rs
+	rmmod analog \\
 .PD 0
 .PP
 .PD
-	sleep 1 \(rs
+	sleep 1 \\
 .PD 0
 .PP
 .PD
@@ -1920,7 +1920,7 @@ Options:
 .PD 0
 .HP 4
 .I MENU
-Name of the menu entry (default \(a"Command\(a").
+Name of the menu entry (default \[dq]Command\[dq]).
 .PD
 .RE
 .SS ui_command_error 
@@ -1933,7 +1933,7 @@ Options:
 .PD 0
 .HP 4
 .I MSG
-Message to display (default \(a"Error running the command\(a").
+Message to display (default \[dq]Error running the command\[dq]).
 .PD
 .RE
 .SS ui_menukey 
@@ -1955,8 +1955,8 @@ input.
 .SS device_keyboard/joystick/mouse_* 
 These options are used to customize the input drivers.
 .PP
-All the \(oqdevice_keyboard/joystick/mouse_*\(cq options defined in
-the \(oqadvdev.txt\(cq file can be used.
+All the \`device_keyboard/joystick/mouse_*\' options defined in
+the \`advdev.txt\' file can be used.
 .SS input_hotkey 
 Enables or disables the recognition of the special OS keyboard
 sequences.
@@ -2006,7 +2006,7 @@ Change virtual console.
 .RE
 .SS lock 
 Locks or unlocks the user interface. When locked, the user can
-only browse and run games. Options can\(cqt be changed and the user
+only browse and run games. Options can\'t be changed and the user
 cannot exit.
 .PP
 lock yes | no
@@ -2118,10 +2118,10 @@ Options:
 .HP 4
 .I EXPRESSION
 Definition of the key expression that
-generates the event. It\(cqs a combination of
-the key names or scan\(hycode, and of the operators
-\(oqnot\(cq, \(oqor\(cq. The \(oqand\(cq operator is implicit
-between consecutive scan\(hycodes.
+generates the event. It\'s a combination of
+the key names or scan\-code, and of the operators
+\`not\', \`or\'. The \`and\' operator is implicit
+between consecutive scan\-codes.
 .HP 4
 .I KEY
 The available key names are:
@@ -2157,7 +2157,7 @@ event_assign emulator 91 23 or not 21 33
 .PD
 .RE
 .PP
-You can use the utility \(oqadvk\(cq to get the key scancodes and
+You can use the utility \`advk\' to get the key scancodes and
 names.
 .SS event_repeat 
 Selects the repeat rate of the various events.
@@ -2203,7 +2203,7 @@ is interrupted (default).
 .SS event_alpha 
 Disables the alphanumeric keys for fast moving.
 If you have a keyboard encoder or a keyboard hack with some
-buttons remapped to alphanumeric keys, it\(cqs useful to disable
+buttons remapped to alphanumeric keys, it\'s useful to disable
 them.
 .PP
 event_alpha yes | no
@@ -2225,8 +2225,8 @@ Disable.
 .SS Other Configuration Options 
 .SS idle_start 
 Automatically starts a random game after some time of inactivity.
-You can also configure the AdvanceMAME option \(oqinput_idleexit\(cq
-in the file \(oqadvmame.rc\(cq to create a continuous demo mode.
+You can also configure the AdvanceMAME option \`input_idleexit\'
+in the file \`advmame.rc\' to create a continuous demo mode.
 .PP
 idle_start START_TIMEOUT REPEAT_TIMEOUT
 .PD 0
@@ -2324,22 +2324,22 @@ snapshots are ignored.
 .PD
 .RE
 .SS group/type 
-Selects the available \(oqgroup\(cq and \(oqtype\(cq category names and
+Selects the available \`group\' and \`type\' category names and
 which of them to show.
 .PP
-group \(a"STRING\(a"
+group \[dq]STRING\[dq]
 .PD 0
 .PP
 .PD
-type \(a"STRING\(a"
+type \[dq]STRING\[dq]
 .PD 0
 .PP
 .PD
-[EMULATOR/]group_include \(a"STRING\(a"
+[EMULATOR/]group_include \[dq]STRING\[dq]
 .PD 0
 .PP
 .PD
-[EMULATOR/]type_include \(a"STRING\(a"
+[EMULATOR/]type_include \[dq]STRING\[dq]
 .PD 0
 .PP
 .PD
@@ -2377,22 +2377,22 @@ The file formats supported are CATVER, CATLIST/CAT32, MacMAME and NMS.
 The files are read in the current directory in DOS and Windows
 and in the $home directory in Linux and Mac OS X.
 .PP
-WARNING! These options DON\(cqT OVERRIDE any user explicit
-choices made with the \(oqgame\(cq option.
+WARNING! These options DON\'T OVERRIDE any user explicit
+choices made with the \`game\' option.
 .PP
-desc_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+desc_import (catver | mac | nms) \[dq]EMULATOR\[dq] \[dq]FILE\[dq] [\[dq]SECTION\[dq]]
 .PD 0
 .PP
 .PD
-info_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+info_import (catver | mac | nms) \[dq]EMULATOR\[dq] \[dq]FILE\[dq] [\[dq]SECTION\[dq]]
 .PD 0
 .PP
 .PD
-group_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+group_import (catver | mac | nms) \[dq]EMULATOR\[dq] \[dq]FILE\[dq] [\[dq]SECTION\[dq]]
 .PD 0
 .PP
 .PD
-type_import (catver | mac | nms) \(a"EMULATOR\(a" \(a"FILE\(a" [\(a"SECTION\(a"]
+type_import (catver | mac | nms) \[dq]EMULATOR\[dq] \[dq]FILE\[dq] [\[dq]SECTION\[dq]]
 .PD 0
 .PP
 .PD
@@ -2421,7 +2421,7 @@ Options:
 .PD 0
 .HP 4
 .I none
-Don\(cqt import.
+Don\'t import.
 .HP 4
 .I catver
 Import in the CATVER format. In this format you must
@@ -2438,36 +2438,36 @@ Import in the NMS format.
 .HP 4
 .I EMULATOR
 The emulator tag name as specified in
-the \(oqemulator\(cq option.
+the \`emulator\' option.
 .HP 4
 .I FILE
 The file name.
 .HP 4
 .I SECTION
-The section name (only for the \(oqini\(cq format).
+The section name (only for the \`ini\' format).
 .PD
 .RE
 .PP
 Examples:
 .PP
 .RS 4
-group_import catver \(a"advmame\(a" \(a"catver.ini\(a" \(a"Category\(a"
+group_import catver \[dq]advmame\[dq] \[dq]catver.ini\[dq] \[dq]Category\[dq]
 .PD 0
 .PP
 .PD
-info_import catver \(a"advmame\(a" \(a"catver.ini\(a" \(a"VerAdded\(a"
+info_import catver \[dq]advmame\[dq] \[dq]catver.ini\[dq] \[dq]VerAdded\[dq]
 .PD 0
 .PP
 .PD
-group_import catlist \(a"advmame\(a" \(a"catlist.ini\(a"
+group_import catlist \[dq]advmame\[dq] \[dq]catlist.ini\[dq]
 .PD 0
 .PP
 .PD
-type_import mac \(a"advmame\(a" \(a"Genre 37b14.txt\(a"
+type_import mac \[dq]advmame\[dq] \[dq]Genre 37b14.txt\[dq]
 .PD 0
 .PP
 .PD
-desc_import nms \(a"raine\(a" \(a"raine.nms\(a"
+desc_import nms \[dq]raine\[dq] \[dq]raine.nms\[dq]
 .PD 0
 .PP
 .PD
@@ -2500,7 +2500,7 @@ Exit is disabled.
 Exit is possible pressing ESC.
 .HP 4
 .I shutdown
-Exit is possible pressing CTRL\(hyESC.
+Exit is possible pressing CTRL\-ESC.
 .HP 4
 .I all
 All the exit modes are possible.
@@ -2536,10 +2536,10 @@ Clips:
 .PD 0
 .HP 4
 .I MNG
-The MNG\(hyVLC (Very Low Complexity) sub format
+The MNG\-VLC (Very Low Complexity) sub format
 without transparency and alpha channel.
-Or the sub\(hyformats generated by AdvanceMAME or
-by the \(oqadvmng\(cq compression utility.
+Or the sub\-formats generated by AdvanceMAME or
+by the \`advmng\' compression utility.
 .PD
 .RE
 .PP

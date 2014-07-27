@@ -1,6 +1,6 @@
 .TH "AdvanceMAME Device Drivers" 1
 .SH NAME
-device drivers \(hy AdvanceMAME Device Drivers
+device drivers \- AdvanceMAME Device Drivers
 .PP
 This file describes the video, sound, joystick, mouse
 and keyboard drivers used by the Advance programs.
@@ -18,31 +18,31 @@ This set of drivers is able to program directly the video board
 to always generate a perfect video mode with the correct size
 and frequency.
 .PP
-They always work in \(oqfullscreen\(cq output mode and generally
+They always work in \`fullscreen\' output mode and generally
 support only a subset of video boards.
 .PP
 To function correctly these drivers require a correct
-configuration of the \(oqdevice_video_*\(cq options.
+configuration of the \`device_video_*\' options.
 .PP
-The \(oqGenerate\(cq drivers are always the preferred choice.
+The \`Generate\' drivers are always the preferred choice.
 .SS System drivers 
 This set of drivers is able to use only the video modes
 available on the operating system.
 .PP
-They can work in \(oqfullscreen\(cq mode, \(oqwindow\(cq mode and \(oqzoom\(cq
+They can work in \`fullscreen\' mode, \`window\' mode and \`zoom\'
 output mode using the video board hardware acceleration to
-stretch the image. The default output mode is \(oqwindow\(cq if you
+stretch the image. The default output mode is \`window\' if you
 run the program in a window manager, otherwise the output
-mode \(oqfullscreen\(cq is chosen.
+mode \`fullscreen\' is chosen.
 .PP
 Please note that these drivers generally need to stretch the
 image losing a lot in image quality and speed.
 .PP
-These drivers don\(cqt require any \(oqdevice_video_*\(cq options
+These drivers don\'t require any \`device_video_*\' options
 because they cannot control how the video modes are generated.
 .SS Available Generate Drivers 
 The following is the list of all the video drivers supported.
-.SS fb \(hy Generate Frame Buffer video (Linux) 
+.SS fb \- Generate Frame Buffer video (Linux) 
 This driver works in Linux and is able to create video modes
 using the Linux Kernel Frame Buffer interface.
 .PP
@@ -50,7 +50,7 @@ All clocks, all RGB bit depths are available.
 .PP
 This driver is able to use the Linux fb API to synchronize
 with the vertical sync of the video mode, but generally
-it isn\(cqt possible because the low\(hyend drivers don\(cqt support
+it isn\'t possible because the low\-end drivers don\'t support
 this feature. Anyway, if you run the program as root it can
 use the standard VGA registers to detect the vsync.
 This is the major limitation compared with the svgalib driver.
@@ -76,13 +76,13 @@ support in your Linux kernel.
 This driver is not available in X (when the environment DISPLAY
 variable is defined).
 .PP
-The Frame Buffer device opened is \(oq/dev/fb0\(cq and \(oq/dev/fb/0\(cq, you
+The Frame Buffer device opened is \`/dev/fb0\' and \`/dev/fb/0\', you
 can change it setting the FRAMEBUFFER environment variable.
 .PP
-The generic Frame Buffer \(oqvesafb\(cq driver cannot be used because
-it doesn\(cqt allow the creation of new video modes. If it\(cqs your
+The generic Frame Buffer \`vesafb\' driver cannot be used because
+it doesn\'t allow the creation of new video modes. If it\'s your
 only option you can use it through the SDL library.
-.SS svgalib \(hy Generate SVGA video (Linux) [OBSOLETE] 
+.SS svgalib \- Generate SVGA video (Linux) [OBSOLETE] 
 This driver works in Linux and is able to use video modes obtained
 tweaking the hardware registers of the recognized SVGA boards using
 the SVGALIB library.
@@ -92,7 +92,7 @@ This driver is generally able to synchronize with the vertical sync
 of the video mode.
 .PP
 To use these modes your video board must be supported
-by a \(oqsvgalib\(cq driver listed in the \(oqcardlinx.txt\(cq file.
+by a \`svgalib\' driver listed in the \`cardlinx.txt\' file.
 To use this driver you need to install the SVGALIB library
 version 1.9.x.
 .PP
@@ -100,26 +100,26 @@ To use this driver you need to correctly configure the
 SVGALIB HorizSync and VertRefresh options in the
 file /etc/vga/libvga.config file.
 You must use a range equal or a bit larger than the range
-specified with the AdvanceMAME \(oqdevice_video_clock\(cq option.
+specified with the AdvanceMAME \`device_video_clock\' option.
 .PP
 This driver is not available in X (when the environment DISPLAY
 variable is defined).
 .PP
-In the \(oqcontrib/svgalib\(cq directory there are various
+In the \`contrib/svgalib\' directory there are various
 SVGALIB patches to fix some problems with recent video
 boards, and to work with systems with kernel 2.6 and udev.
-.SS svgaline \(hy Generate SVGA video (DOS) [OBSOLETE] 
+.SS svgaline \- Generate SVGA video (DOS) [OBSOLETE] 
 This driver works in DOS and is able to use video modes obtained
 tweaking the hardware registers of the recognized SVGA boards.
 .PP
 All clocks, all RGB bit depths are available.
 .PP
 To use these modes your video board must be supported
-by a \(oqsvgaline\(cq driver listed in the \(oqcarddos.txt\(cq file.
+by a \`svgaline\' driver listed in the \`carddos.txt\' file.
 .PP
 This driver is completely independent of the VGA/VBE BIOS
 of your board.
-.SS vbeline \(hy Generate VBE video (DOS) [OBSOLETE] 
+.SS vbeline \- Generate VBE video (DOS) [OBSOLETE] 
 This driver works in DOS and is able to use video modes obtained
 tweaking the standard VBE (VESA) BIOS mode changing the hardware
 registers of the SVGA.
@@ -127,15 +127,15 @@ registers of the SVGA.
 All clocks, all RGB bit depths are available.
 .PP
 To use these modes your video board must be supported
-by a \(oqvbeline\(cq driver listed in the \(oqcarddos.txt\(cq file.
+by a \`vbeline\' driver listed in the \`carddos.txt\' file.
 .PP
 These drivers work setting a video mode using the
 default VBE2 services and tweak some hardware SVGA
 registers to modify the obtained video mode.
-The driver \(oqvbe3\(cq is an exception. It requires the
+The driver \`vbe3\' is an exception. It requires the
 presence of a VBE3 BIOS to change the frequency of the
 desired video mode. Unfortunately the standard
-VBE3 services don\(cqt support a resolution size change.
+VBE3 services don\'t support a resolution size change.
 .PP
 The resolution is changed modifying only the standard
 VGA registers. This hack may or not may works.
@@ -143,10 +143,10 @@ Also the interlaced modes are only rarely supported
 by the various VBE3 BIOS because they are very rarely
 used in the standard PC monitors.
 .PP
-If your video board isn\(cqt supported by any drivers and
-you don\(cqt have a VBE3 BIOS you can try installing a
+If your video board isn\'t supported by any drivers and
+you don\'t have a VBE3 BIOS you can try installing a
 software VESA BIOS like the SciTech Display Doctor.
-.SS vgaline \(hy Generate VGA video (DOS) [OBSOLETE] 
+.SS vgaline \- Generate VGA video (DOS) [OBSOLETE] 
 This driver works in DOS and is able to use video modes obtained
 tweaking the hardware registers of the standard VGA.
 .PP
@@ -159,7 +159,7 @@ This driver supports also text modes with pixel clocks
 .PP
 This driver is completely independent of the VGA BIOS
 of your board.
-.SS svgawin \(hy Generate SVGA video (Windows) [OBSOLETE] 
+.SS svgawin \- Generate SVGA video (Windows) [OBSOLETE] 
 This driver works in Windows NT/2000/XP and is able to use video
 modes obtained tweaking the hardware registers of the recognized
 SVGA boards.
@@ -167,17 +167,17 @@ SVGA boards.
 All clocks, all RGB bit depths are available.
 .PP
 To use these modes your video board must be supported
-by a \(oqsvgawin\(cq driver listed in the \(oqcardwin.txt\(cq file.
+by a \`svgawin\' driver listed in the \`cardwin.txt\' file.
 .PP
 To use this driver you need to install the included SVGAWIN
-driver. Please read the \(oqsvgawin.txt\(cq file carefully.
+driver. Please read the \`svgawin.txt\' file carefully.
 .PP
-This driver is experimental. At present it\(cqs only tested on
+This driver is experimental. At present it\'s only tested on
 Windows 2000 with a GeForce 2 board. It may not work will
 all the other boards.
 .SS Available System Drivers 
 The following is the list of all the System video drivers supported.
-.SS sdl \(hy System SDL video (Linux, Windows and Mac OS X) 
+.SS sdl \- System SDL video (Linux, Windows and Mac OS X) 
 This driver works in Linux, Windows and Mac OS X and is able to
 use video modes reported by the SDL graphics library.
 .PP
@@ -185,40 +185,40 @@ It supports all RGB bit depths available and the YUV mode.
 .PP
 The output in the YUV mode is generally accelerated, and can
 be used to scale the video output to an arbitrary size.
-You can enable this feature with the \(oq\(hydevice_video_output overlay\(cq
+You can enable this feature with the \`\-device_video_output overlay\'
 option.
 .PP
 You can change some options of this driver using the SDL specific
 environment variables described in the contrib/sdl/env.txt file.
-.SS slang \(hy System sLang text video (Linux) 
+.SS slang \- System sLang text video (Linux) 
 This driver works in Linux and is able to use current terminal text
 mode from the Linux sLang library.
-.SS curses \(hy System curses text video (Linux) 
+.SS curses \- System curses text video (Linux) 
 This driver works in Linux and is able to use current terminal text
 mode from the Linux ncurses library.
-.SS vbe \(hy System VBE video (DOS) [OBSOLETE] 
+.SS vbe \- System VBE video (DOS) [OBSOLETE] 
 This driver works in DOS and is able to use video modes reported
 by the VBE BIOS.
 .SH SOUND DRIVERS 
 .SS Available Drivers 
 The following is the list of all the sound drivers supported.
-.SS alsa \(hy ALSA sound (Linux) 
+.SS alsa \- ALSA sound (Linux) 
 This driver works in Linux and it uses the ALSA sound library.
-.SS oss \(hy OSS sound (Linux) 
+.SS oss \- OSS sound (Linux) 
 This driver works in Linux and it uses the OSS sound library.
-.SS sdl \(hy SDL sound (Linux, Windows and Mac OS X) 
+.SS sdl \- SDL sound (Linux, Windows and Mac OS X) 
 This driver works in Linux, Windows and Mac OS X and it uses
 the SDL library.
 .PP
-It isn\(cqt able to use the hardware volume control of the sound card.
+It isn\'t able to use the hardware volume control of the sound card.
 The volume changes are simulated reducing the sample values.
 .PP
-It isn\(cqt able to precisely control the amount of bufferized samples.
+It isn\'t able to precisely control the amount of bufferized samples.
 This means that it may add a small latency on the sound output.
 .PP
 You can change some options of this driver using the SDL specific
 environment variables described in the contrib/sdl/env.txt file.
-.SS seal \(hy SEAL sound (DOS) [OBSOLETE] 
+.SS seal \- SEAL sound (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the SEAL sound library with
 some specific changes for MAME.
 .PP
@@ -231,9 +231,9 @@ http://www.mame.net/
 .PP
 .PD
 .RE
-.SS allegro \(hy Allegro sound (DOS) [OBSOLETE] 
+.SS allegro \- Allegro sound (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the Allegro library.
-.SS vsync \(hy VSYNC sound (DOS) [OBSOLETE] 
+.SS vsync \- VSYNC sound (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the VSync sound drivers
 from the VSyncMAME emulator.
 .PP
@@ -248,8 +248,8 @@ http://vsynchmame.mameworld.net/
 .SH INPUT DRIVERS 
 .SS Available Keyboard Drivers 
 The following is the list of all the keyboard drivers supported.
-.SS event \(hy Kernel Input\(hyEvent interface (Linux) 
-This driver works in Linux and it uses the new style input\(hyevent
+.SS event \- Kernel Input\-Event interface (Linux) 
+This driver works in Linux and it uses the new style input\-event
 interface of the Linux kernel.
 .PP
 It supports more than one keyboard at the same time.
@@ -268,7 +268,7 @@ http:///usr/src/linux/Documentation/sysrq.txt
 .RE
 .PP
 Leds control is supported.
-.SS raw \(hy Kernel keyboard (Linux) 
+.SS raw \- Kernel keyboard (Linux) 
 This driver works in Linux and it uses directly the Linux kernel
 keyboard interface.
 .PP
@@ -289,7 +289,7 @@ http:///usr/src/linux/Documentation/sysrq.txt
 .RE
 .PP
 Leds control is supported.
-.SS sdl \(hy SDL keyboard (Linux, Windows and Mac OS X) 
+.SS sdl \- SDL keyboard (Linux, Windows and Mac OS X) 
 This driver works in Linux, Windows and Mac OS X and it uses
 the SDL library.
 .PP
@@ -302,7 +302,7 @@ In a Window Manager environment you can switch to fullscreen
 pressing ALT+ENTER.
 .PP
 Leds control is not supported.
-.SS svgalib \(hy SVGALIB keyboard (Linux) [OBSOLETE] 
+.SS svgalib \- SVGALIB keyboard (Linux) [OBSOLETE] 
 This driver works in Linux and it uses the SVGALIB library.
 .PP
 It supports only one keyboard.
@@ -323,7 +323,7 @@ http:///usr/src/linux/Documentation/sysrq.txt
 .RE
 .PP
 Leds control is not supported.
-.SS allegro \(hy Allegro keyboard (DOS) [OBSOLETE] 
+.SS allegro \- Allegro keyboard (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the Allegro library.
 .PP
 It supports only one keyboard.
@@ -333,14 +333,14 @@ You can break the program pressing CTRL+C, CTRL+BREAK or ALT+CTRL+END.
 Leds control is supported.
 .SS Available Joystick Drivers 
 The following is the list of all the joystick drivers supported.
-.SS event \(hy Kernel Input\(hyEvent interface (Linux) 
-This driver works in Linux and it uses the new style input\(hyevent
+.SS event \- Kernel Input\-Event interface (Linux) 
+This driver works in Linux and it uses the new style input\-event
 interface of the Linux kernel.
 .PP
-It supports more than one joystick or light\(hygun at the same time.
+It supports more than one joystick or light\-gun at the same time.
 .PP
-For USB devices this driver doesn\(cqt require any configuration.
-It\(cqs able to autodetect all the present hardware.
+For USB devices this driver doesn\'t require any configuration.
+It\'s able to autodetect all the present hardware.
 .PP
 This driver is also able to correctly report the type of devices
 found. You should for example expects to have the gas pedal mapped
@@ -348,18 +348,18 @@ on the gas control of the game.
 .PP
 It can also be used with some custom devices connected at the
 Parallel Port. Details on how to build these custom interfaces are
-in the file:///usr/src/linux/Documentation/input/joystick\(hyparport.txt
+in the file:///usr/src/linux/Documentation/input/joystick\-parport.txt
 file.
 .PP
 It has a special support for the ACT Labs Lightgun to fix the wrong
-behavior of the light\(hygun when shooting out of screen.
+behavior of the light\-gun when shooting out of screen.
 .PP
 The joysticks are searched on the /dev/input/eventX devices.
 .PP
 If you have a gameport joystick, the Linux Kernel Joystick driver
 may prevent a correct video vsync if the joystick polling is too slow.
-Generally it results in a missing frame every 5\(hy10 seconds.
-.SS raw \(hy Kernel joystick (Linux) 
+Generally it results in a missing frame every 5\-10 seconds.
+.SS raw \- Kernel joystick (Linux) 
 This driver works in Linux and it uses directly the Linux kernel
 joystick interface.
 .PP
@@ -369,8 +369,8 @@ The joysticks are searched on the /dev/jsX and /dev/input/jsX devices.
 .PP
 If you have a gameport joystick, the Linux Kernel Joystick driver
 may prevent a correct video vsync if the joystick polling is too slow.
-Generally it results in a missing frame every 5\(hy10 seconds.
-.SS sdl \(hy SDL joystick (Linux, Windows and Mac OS X) 
+Generally it results in a missing frame every 5\-10 seconds.
+.SS sdl \- SDL joystick (Linux, Windows and Mac OS X) 
 This driver works in Linux, Windows and Mac OS X and it uses
 the SDL joystick interface.
 .PP
@@ -378,7 +378,7 @@ It supports more than one joystick at the same time.
 .PP
 You can change some options of this driver using the SDL specific
 environment variables described in the contrib/sdl/env.txt file.
-.SS svgalib \(hy SVGALIB joystick (Linux) [OBSOLETE] 
+.SS svgalib \- SVGALIB joystick (Linux) [OBSOLETE] 
 This driver works in Linux and it uses the SVGALIB library.
 .PP
 It supports up to 4 joysticks at the same time.
@@ -387,15 +387,15 @@ The joysticks are searched on the /dev/jsX devices.
 .PP
 If you have a gameport joystick, the Linux Kernel Joystick driver
 may prevent a correct video vsync if the joystick polling is too slow.
-Generally it results in a missing frame every 5\(hy10 seconds.
-.SS allegro \(hy Allegro joystick (DOS) [OBSOLETE] 
+Generally it results in a missing frame every 5\-10 seconds.
+.SS allegro \- Allegro joystick (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the Allegro library.
 .PP
 It supports only one joystick.
 .PP
 Details on how to build the Parallel Port hardware interfaces for
 SNES, PSX, N64 and other pads are in the Allegro sources.
-.SS lgrawinput \(hy Light Gun (Windows XP) 
+.SS lgrawinput \- Light Gun (Windows XP) 
 This driver works in Windows XP and it support lightguns
 using the Windows mouse interface.
 .PP
@@ -405,7 +405,7 @@ of the following types:
 .IP \(bu
 SMOG Lightgun (http://lightgun.splinder.com/)
 .IP \(bu
-Acts Labs Lightgun (http://www.act\(hylabs.com/)
+Acts Labs Lightgun (http://www.act\-labs.com/)
 .PD
 .PP
 The lightgun is automatically calibrated before
@@ -414,23 +414,23 @@ screen every time the program starts or changes video
 mode.
 .SS Available Mouse Drivers 
 The following is the list of all the mouse drivers supported.
-.SS event \(hy Kernel Input\(hyEvent interface (Linux) 
-This driver works in Linux and it uses the new style input\(hyevent
+.SS event \- Kernel Input\-Event interface (Linux) 
+This driver works in Linux and it uses the new style input\-event
 interface of the Linux kernel.
 .PP
 It supports more than one mouse at the same time.
 .PP
-For USB devices this driver doesn\(cqt require any configuration.
-It\(cqs able to autodetect all the present hardware.
+For USB devices this driver doesn\'t require any configuration.
+It\'s able to autodetect all the present hardware.
 .PP
-For serial mouse you must use the \(oqinputattach\(cq system
+For serial mouse you must use the \`inputattach\' system
 utility to attach the serial line at the event interface.
 Generally this utility is available in the joystick
-calibration package of your distribution. In this case it\(cqs
-probably simpler to use the \(oqraw\(cq mouse driver.
+calibration package of your distribution. In this case it\'s
+probably simpler to use the \`raw\' mouse driver.
 .PP
 The mice are searched on the /dev/input/eventX devices.
-.SS raw \(hy Serial mouse (Linux) 
+.SS raw \- Serial mouse (Linux) 
 This driver works in Linux and it communicates directly with
 the configured serial mice. It also supports USB mice
 using the Linux mousedev module which maps mice to the
@@ -441,7 +441,7 @@ It supports more than one mouse at the same time.
 To use this driver you need to configure correctly the
 device_raw_* options to specify the mouse types and the mouse
 devices.
-.SS sdl \(hy SDL mouse (Linux, Windows and Mac OS X) 
+.SS sdl \- SDL mouse (Linux, Windows and Mac OS X) 
 This driver works in Linux, Windows and Mac OS X and it uses
 the SDL mouse interface.
 .PP
@@ -449,19 +449,19 @@ It supports only one mouse and only two axes.
 .PP
 You can change some options of this driver using the SDL specific
 environment variables described in the contrib/sdl/env.txt file.
-.SS svgalib \(hy SVGALIB mouse (Linux) [OBSOLETE] 
+.SS svgalib \- SVGALIB mouse (Linux) [OBSOLETE] 
 This driver works in Linux and it uses the SVGALIB library.
 .PP
 It supports only one mouse.
 .PP
 To use this driver you need to configure correctly the
 SVGALIB mouse support in the file /etc/vga/libvga.config file.
-.SS allegro \(hy Allegro mouse (DOS) [OBSOLETE] 
+.SS allegro \- Allegro mouse (DOS) [OBSOLETE] 
 This driver works in DOS and it uses the Allegro library.
 .PP
 It supports up to 2 mice at the same time using the
-special \(oqoptimous\(cq driver present in the \(oqcontrib/\(cq directory.
-.SS rawinput \(hy Raw input interface (Windows) 
+special \`optimous\' driver present in the \`contrib/\' directory.
+.SS rawinput \- Raw input interface (Windows) 
 This driver works in Windows XP using the raw input interface.
 .PP
 It supports more than one mouse at the same time.
@@ -473,9 +473,9 @@ This driver is the preferred choice for Windows XP.
 .PP
 Please note that this driver is not intented to be used in a window
 environment. The application takes the control of the mouse and
-doesn\(cqt allow to switch to other applications. It\(cqs mainly intented
+doesn\'t allow to switch to other applications. It\'s mainly intented
 for a fullscreen environment.
-.SS cpn \(hy CPN custom driver interface (Windows) 
+.SS cpn \- CPN custom driver interface (Windows) 
 This driver works in Windows 2000/XP using the custom CPN
 mouse driver.
 .PP
@@ -492,12 +492,12 @@ http://cpnmouse.sourceforge.net/
 .PD
 .RE
 .PP
-and in the \(oqcontrib/cpn\(cq directory. Check the \(oqinstall\(cq
-and \(oqunknown\(cq files for install instructions.
+and in the \`contrib/cpn\' directory. Check the \`install\'
+and \`unknown\' files for install instructions.
 .PP
 Please note that this driver is not intented to be used in a window
 environment. The application takes the control of the mouse and
-doesn\(cqt allow to switch to other applications. It\(cqs mainly intented
+doesn\'t allow to switch to other applications. It\'s mainly intented
 for a fullscreen environment.
 .SH VIDEO DRIVERS CONFIGURATION 
 The following are the video configuration options available for
@@ -580,11 +580,11 @@ SVGA generated graphics modes.
 .HP 4
 .I svgaline/nv3_leg
 SVGA legacy driver for nVidia boards.
-If the new driver doesn\(cqt work try this one.
+If the new driver doesn\'t work try this one.
 .HP 4
 .I svgaline/savage_leg
 SVGA legacy driver for S3 boards.
-If the new driver doesn\(cqt work try this one.
+If the new driver doesn\'t work try this one.
 .HP 4
 .I vbeline
 VBE generated graphics modes.
@@ -604,44 +604,44 @@ Options for Windows:
 .I svgawin
 SVGA generated graphics modes with the
 SVGAWIN included library. To use this driver you
-need to install the \(oqsvgawin.sys\(cq driver with the
-\(oqsvgawin.exe\(cq command line utility.
+need to install the \`svgawin.sys\' driver with the
+\`svgawin.exe\' command line utility.
 .HP 4
 .I svgawin/nv3_leg
 SVGA legacy driver for nVidia boards.
-If the new driver doesn\(cqt work try this one.
+If the new driver doesn\'t work try this one.
 .HP 4
 .I svgawin/savage_leg
 SVGA legacy driver for S3 boards.
-If the new driver doesn\(cqt work try this one.
+If the new driver doesn\'t work try this one.
 .HP 4
 .I sdl
 SDL graphics and fake text modes.
 .PD
 .RE
 .PP
-Please note that to use the utilities \(oqadvv\(cq and \(oqadvcfg\(cq you
+Please note that to use the utilities \`advv\' and \`advcfg\' you
 must at least select a graphics and a text video driver. The
-available text video drivers are \(oqvgaline\(cq for DOS, \(oqslang\(cq,
-\(oqcurses\(cq for Linux and \(oqsdl\(cq for Windows.
+available text video drivers are \`vgaline\' for DOS, \`slang\',
+\`curses\' for Linux and \`sdl\' for Windows.
 .PP
 You can force the detection of a specific model of video board
 adding the name of the model driver after the driver name using
-the \(oq/\(cq separator. For example to force the \(oqvbe3\(cq model
-detection of the \(oqvbeline\(cq driver you must specify
-\(oqvbeline/vbe3\(cq.
+the \`/\' separator. For example to force the \`vbe3\' model
+detection of the \`vbeline\' driver you must specify
+\`vbeline/vbe3\'.
 .PP
 To get the list of all the available models try using the
-\(oqhelp\(cq model name. A short help will be printed.
+\`help\' model name. A short help will be printed.
 .PP
 Please note that forcing a specific video driver is discouraged.
-Generally you don\(cqt need it.
+Generally you don\'t need it.
 .PP
 For a more complete description of the drivers check the
-previous \(oqVIDEO DRIVER\(cq section.
+previous \`VIDEO DRIVER\' section.
 .PP
-Example to enable the \(oqvbeline\(cq and the \(oqvgaline\(cq drivers
-with auto\(hydetection for DOS:
+Example to enable the \`vbeline\' and the \`vgaline\' drivers
+with auto\-detection for DOS:
 .PP
 .RS 4
 device_video vbeline vgaline
@@ -650,7 +650,7 @@ device_video vbeline vgaline
 .PD
 .RE
 .PP
-Example to force the \(oqvbeline/vbe3\(cq driver and the \(oqvgaline\(cq
+Example to force the \`vbeline/vbe3\' driver and the \`vgaline\'
 driver for DOS:
 .PP
 .RS 4
@@ -660,7 +660,7 @@ device_video vbeline/vbe3 vgaline
 .PD
 .RE
 .PP
-Example to enable the \(oqfb\(cq and \(oqslang\(cq driver for Linux:
+Example to enable the \`fb\' and \`slang\' driver for Linux:
 .PP
 .RS 4
 device_video fb slang
@@ -698,7 +698,7 @@ color format used is YUY2.
 .PD
 .RE
 .SS device_video_overlaysize 
-Select the favorite horizontal size to use with the \(oqoverlay\(cq
+Select the favorite horizontal size to use with the \`overlay\'
 output mode. The program selects the nearest available video mode.
 .PP
 device_video_overlaysize auto | SIZE
@@ -716,7 +716,7 @@ The user favorite horizontal size.
 .PD
 .RE
 .PP
-This option has effect only with the \(oqoverlay\(cq output mode.
+This option has effect only with the \`overlay\' output mode.
 .SS device_video_cursor 
 Select the mouse cursor mode.
 .PP
@@ -743,9 +743,9 @@ Always on, only if the video mode support it.
 .RE
 .SS Generate Configuration Options 
 The following are the common video configuration options
-available for all \(oqgenerate\(cq video drivers, i.e. all the
-video drivers with the exception of \(oqsdl\(cq and \(oqvbe\(cq.
-The \(oqsdl\(cq and \(oqvbe\(cq video drivers simply ignore these
+available for all \`generate\' video drivers, i.e. all the
+video drivers with the exception of \`sdl\' and \`vbe\'.
+The \`sdl\' and \`vbe\' video drivers simply ignore these
 options.
 .SS device_video_clock 
 Specify the monitor frequency range in term of horizontal and
@@ -767,8 +767,8 @@ Pixel clock range in MHz.
 The lower value is the lower clock generable
 by your video board. The higher value is the
 video bandwidth of your monitor. If you
-don\(cqt know these values you can start
-with \(oq5 \(hy 100\(cq which essentially enable any
+don\'t know these values you can start
+with \`5 \- 100\' which essentially enable any
 video mode.
 .HP 4
 .I HORZ_CLOCK
@@ -776,23 +776,23 @@ Horizontal clock range in kHz.
 .PD
 .RE
 .RS 4
-VERT_CLOCK\(hy Vertical clock range in Hz.
+VERT_CLOCK\- Vertical clock range in Hz.
 .RE
 .PP
-For any range you can specify a single value like \(oq60\(cq or a
-range of values like \(oq50 \(hy 60\(cq. For multistandard TVs and monitors
-you can use more clock specifications separating them with \(oq;\(cq.
+For any range you can specify a single value like \`60\' or a
+range of values like \`50 \- 60\'. For multistandard TVs and monitors
+you can use more clock specifications separating them with \`;\'.
 .PP
 For example:
 .PP
 .RS 4
-device_video_clock 5 \(hy 50 / 15.62 / 50 ; 5 \(hy 50 / 15.73 / 60
+device_video_clock 5 \- 50 / 15.62 / 50 ; 5 \- 50 / 15.73 / 60
 .PD 0
 .PP
 .PD
 .RE
 .PP
-Check the \(oqinstall.txt\(cq file for examples and other information.
+Check the \`install.txt\' file for examples and other information.
 .SS device_video_modeline 
 Define a video modeline. The modeline format is compatible with
 the format used by the Linux SVGALIB library and by the
@@ -802,7 +802,7 @@ device_video_modeline Name CLOCK HDE HRS HRE HT VDE VRS VRE VT
 .PD 0
 .PP
 .PD
-	[\(hyhsync] [\(hyvsync] [+hsync] [+vsync] [doublescan] [interlace]
+	[\-hsync] [\-vsync] [+hsync] [+vsync] [doublescan] [interlace]
 .PD 0
 .PP
 .PD
@@ -813,20 +813,20 @@ Options:
 .HP 4
 .I Name
 Name of the video mode. You can use the quotes
-\(cq\(a"\(oq for the names with spaces.
+\'\[dq]\` for the names with spaces.
 .HP 4
 .I CLOCK
 Pixel clock in MHz
 .HP 4
 .I HDE HRS HRE HT
-Horizontal \(oqDisplay End\(cq,
-\(oqRetrace Start\(cq, \(oqRetrace End\(cq, \(oqTotal\(cq
+Horizontal \`Display End\',
+\`Retrace Start\', \`Retrace End\', \`Total\'
 .HP 4
 .I VDE VRS VRE VT
-Vertical \(oqDisplay End\(cq,
-\(oqRetrace Start\(cq, \(oqRetrace End\(cq, \(oqTotal\(cq
+Vertical \`Display End\',
+\`Retrace Start\', \`Retrace End\', \`Total\'
 .HP 4
-.I \(hyhsync \(hyvsync +hsync +vsync
+.I \-hsync \-vsync +hsync +vsync
 Polarization mode.
 .HP 4
 .I doublescan
@@ -840,11 +840,11 @@ Interlaced mode.
 Examples:
 .PP
 .RS 4
-device_video_modeline tweak320x240 12.59 320 336 356 400 240 \(rs
+device_video_modeline tweak320x240 12.59 320 336 356 400 240 \\
 .PD 0
 .PP
 .PD
-	249 254 262 doublescan \(hyhsync \(hyvsync
+	249 254 262 doublescan \-hsync \-vsync
 .PD 0
 .PP
 .PD
@@ -902,7 +902,7 @@ and for a VGA 31.5 kHz monitor:
 .RE
 .PP
 Which one of these defaults is used depends on the setting of the
-\(oqdevice_video_clock\(cq option.
+\`device_video_clock\' option.
 .SS device_video_singlescan/doublescan/interlace 
 Limit the use of certain features.
 .PP
@@ -925,7 +925,7 @@ Options:
 .HP 4
 .I yes
 Permits the use of the feature if the
-low\(hyend driver allows it (default).
+low\-end driver allows it (default).
 .HP 4
 .I no
 Disable completely the feature.
@@ -933,7 +933,7 @@ Disable completely the feature.
 .RE
 .SS device_color_palette8/br8/bgr15/bgr16/bgr24/bgr32/yuy2 
 Limit the use of some bit depths. If you known that
-the program doesn\(cqt work well with a specific bit depth you
+the program doesn\'t work well with a specific bit depth you
 can disable it.
 .PP
 device_color_palette8 yes | no
@@ -998,7 +998,7 @@ Options:
 .HP 4
 .I yes
 Permits the use of the bit depth if the
-low\(hyend driver allows it (default).
+low\-end driver allows it (default).
 .HP 4
 .I no
 Disable completely the bit depth.
@@ -1007,7 +1007,7 @@ Disable completely the bit depth.
 .SS device_video_fastchange 
 Enable or disable the fast video mode change. If enabled the
 current video mode is not reset before setting another video
-mode. The reset isn\(cqt generally required, but some
+mode. The reset isn\'t generally required, but some
 limited DOS video BIOS need it. So, the fast change is disabled
 for default.
 .PP
@@ -1029,11 +1029,11 @@ Disable the fast video mode change (default).
 .RE
 .SS vbeline Configuration Options 
 The following are the common video configuration options
-available only for the \(oqvbeline\(cq DOS video driver.
+available only for the \`vbeline\' DOS video driver.
 .SS device_vbeline_mode 
-Select which \(oqvbe\(cq mode to use when generating \(oqvbeline\(cq modes.
+Select which \`vbe\' mode to use when generating \`vbeline\' modes.
 .PP
-The use of this option is discouraged, it\(cqs present only for testing.
+The use of this option is discouraged, it\'s present only for testing.
 .PP
 device_vbeline_mode smaller | bigger | ...
 .PD 0
@@ -1045,19 +1045,19 @@ Options:
 .PD 0
 .HP 4
 .I smaller
-Use the biggest \(oqvbe\(cq mode contained in
-the \(oqvbeline\(cq mode (default).
+Use the biggest \`vbe\' mode contained in
+the \`vbeline\' mode (default).
 .HP 4
 .I bigger
-Use the smallest \(oqvbe\(cq mode which contains
-the \(oqvbeline\(cq mode.
+Use the smallest \`vbe\' mode which contains
+the \`vbeline\' mode.
 .HP 4
 .I smaller_upto640
-Like \(oqsmaller\(cq but not
+Like \`smaller\' but not
 bigger than 640x480.
 .HP 4
 .I bigger_upto640
-Like \(oqbigger\(cq but not
+Like \`bigger\' but not
 bigger than 640x480.
 .HP 4
 .I 320
@@ -1078,7 +1078,7 @@ Use always the 800x600 mode.
 .RE
 .SS svgaline Configuration Options 
 The following are the common video configuration options
-available only for the \(oqsvgaline\(cq DOS video driver.
+available only for the \`svgaline\' DOS video driver.
 .SS device_svgaline_skipboard 
 Selects how many board skip in the video card detection. If you have
 more than a video card on your system you and the wrong one is
@@ -1094,7 +1094,7 @@ Options:
 .PD 0
 .HP 4
 .I 0
-Don\(cqt skip any board (default).
+Don\'t skip any board (default).
 .HP 4
 .I 1
 Skip 1 boards.
@@ -1119,7 +1119,7 @@ device_svgaline_skipboard 1
 Divide the pixelclock using the VGA sequencer. It should help to support
 lower pixel clocks on some boards.
 .PP
-The use of this option is discouraged, it\(cqs present only for testing.
+The use of this option is discouraged, it\'s present only for testing.
 .PP
 device_svgaline_divideclock yes | no
 .PD 0
@@ -1134,12 +1134,12 @@ Options:
 Divide the clock by 2.
 .HP 4
 .I no
-Don\(cqt divide the clock (default).
+Don\'t divide the clock (default).
 .PD
 .RE
 .SS svgawin Configuration Options 
 The following are the common video configuration options
-available only for the \(oqsvgawin\(cq Windows video driver.
+available only for the \`svgawin\' Windows video driver.
 .SS device_svgawin_skipboard 
 Selects how many board skip in the video card detection. If you have
 more than a video card on your system you and the wrong one is
@@ -1155,7 +1155,7 @@ Options:
 .PD 0
 .HP 4
 .I 0
-Don\(cqt skip any board (default).
+Don\'t skip any board (default).
 .HP 4
 .I 1
 Skip 1 boards.
@@ -1179,14 +1179,14 @@ device_svgawin_skipboard 1
 .SS device_svgawin_stub 
 Selects how the driver uses the Windows graphics.
 .PP
-The use of this option is discouraged, it\(cqs present only for testing.
+The use of this option is discouraged, it\'s present only for testing.
 .PP
 Options:
 .RS 4
 .PD 0
 .HP 4
 .I none
-Don\(cqt use the Windows graphics support.
+Don\'t use the Windows graphics support.
 .HP 4
 .I window
 Create a stub window before setting the video mode.
@@ -1200,7 +1200,7 @@ the video mode (default).
 Divides the pixelclock using the VGA sequencer. It should help to support
 lower pixel clocks on some boards.
 .PP
-The use of this option is discouraged, it\(cqs present only for testing.
+The use of this option is discouraged, it\'s present only for testing.
 .PP
 device_svgawin_divideclock yes | no
 .PD 0
@@ -1215,12 +1215,12 @@ Options:
 Divide the clock by 2.
 .HP 4
 .I no
-Don\(cqt divide the clock (default).
+Don\'t divide the clock (default).
 .PD
 .RE
 .SH SOUND DRIVERS CONFIGURATION 
 .SS device_sound 
-Specify the sound\(hycard.
+Specify the sound\-card.
 .PP
 device_sound auto | none | DEVICE
 .PD 0
@@ -1366,12 +1366,12 @@ Options:
 .PD 0
 .HP 4
 .I DEVICE
-Output device (default \(cqdefault\(cq).
+Output device (default \'default\').
 .PD
 .RE
 .PP
-Other possible choices generally are \(cqhw:0,0\(cq for using the
-frequency and format chosen directly by the hardware, or \(cqdmix\(cq
+Other possible choices generally are \'hw:0,0\' for using the
+frequency and format chosen directly by the hardware, or \'dmix\'
 for allow concurrent access to other applications at the
 audio card.
 .PP
@@ -1384,9 +1384,9 @@ device_alsa_device dmix
 .PD
 .RE
 .PP
-If you want to configure the ALSA library to remap the \(oqdefault\(cq device
-to the \(oqdmix\(cq device for all the applications, you can create
-the \(oq.asoundrc\(cq file in your home directory with the following content:
+If you want to configure the ALSA library to remap the \`default\' device
+to the \`dmix\' device for all the applications, you can create
+the \`.asoundrc\' file in your home directory with the following content:
 .PP
 .RS 4
 pcm.!default {
@@ -1397,7 +1397,7 @@ pcm.!default {
 .PD 0
 .PP
 .PD
-	slave.pcm \(a"dmixer\(a"
+	slave.pcm \[dq]dmixer\[dq]
 .PD 0
 .PP
 .PD
@@ -1425,7 +1425,7 @@ pcm.dmixer  {
 .PD 0
 .PP
 .PD
-		pcm \(a"hw:0,0\(a"
+		pcm \[dq]hw:0,0\[dq]
 .PD 0
 .PP
 .PD
@@ -1491,8 +1491,8 @@ ctl.dmixer {
 .PD
 .RE
 .PP
-Note that the suggested \(oq.asoundrc\(cq on the ALSA web site has a lower
-\(oqbuffer_size\(cq value (4096). For AdvanceMAME a bigger buffer is required.
+Note that the suggested \`.asoundrc\' on the ALSA web site has a lower
+\`buffer_size\' value (4096). For AdvanceMAME a bigger buffer is required.
 .SS device_alsa_mixer 
 Select the alsa mixer device.
 .PP
@@ -1506,18 +1506,18 @@ Options:
 .PD 0
 .HP 4
 .I DEVICE
-Mixer device. The special \(cqchannel\(cq value is
+Mixer device. The special \'channel\' value is
 used to adjust the volume changing the samples
 instead of using the card mixer. Other values
-like \(oqdefault\(cq are used to select the ALSA mixer.
-(default \(cqchannel\(cq).
+like \`default\' are used to select the ALSA mixer.
+(default \'channel\').
 .PD
 .RE
 .SS sdl Configuration Options 
 .SS device_sdl_samples 
 Select the size of the audio fragment of the SDL library.
 .PP
-The use of this option is discouraged, it\(cqs present only for testing.
+The use of this option is discouraged, it\'s present only for testing.
 .PP
 device_sdl_samples 512 | 1024 | 2048 | 2560 | 3072 | 3584 | 4096 | 6144 | 8192
 .PP
@@ -1559,7 +1559,7 @@ Options for Linux:
 .PD 0
 .HP 4
 .I event
-Linux input\(hyevent interface.
+Linux input\-event interface.
 .HP 4
 .I svgalib
 SVGALIB keyboard interface.
@@ -1627,7 +1627,7 @@ Options for Linux:
 .PD 0
 .HP 4
 .I event
-Linux input\(hyevent interface.
+Linux input\-event interface.
 .HP 4
 .I svgalib
 SVGALIB joystick interface.
@@ -1663,13 +1663,13 @@ Standard joystick.
 Dual joysticks.
 .HP 4
 .I allegro/4button
-4\(hybutton joystick.
+4\-button joystick.
 .HP 4
 .I allegro/6button
-6\(hybutton joystick.
+6\-button joystick.
 .HP 4
 .I allegro/8button
-8\(hybutton joystick.
+8\-button joystick.
 .HP 4
 .I allegro/fspro
 CH Flightstick Pro.
@@ -1690,7 +1690,7 @@ GamePad Pro.
 GrIP.
 .HP 4
 .I allegro/grip4
-GrIP 4\(hyway.
+GrIP 4\-way.
 .HP 4
 .I allegro/sneslpt1
 SNESpad LPT1.
@@ -1738,13 +1738,13 @@ TGX LPT2.
 TGX LPT3.
 .HP 4
 .I allegro/segaisa
-IF\(hySEGA/ISA.
+IF\-SEGA/ISA.
 .HP 4
 .I allegro/segapci
-IF\(hySEGA2/PCI.
+IF\-SEGA2/PCI.
 .HP 4
 .I allegro/segapcifast
-IF\(hySEGA2/PCI.
+IF\-SEGA2/PCI.
 .HP 4
 .I allegro/wingwarrior
 Wingman Warrior.
@@ -1760,8 +1760,8 @@ SDL joystick interface.
 .PD
 .RE
 .PP
-For the \(oqallegro/psxlpt*\(cq, \(oqallegro/db9lpt*\(cq, \(oqallegro/tgxlpt*\(cq
-drivers you can see the source file \(oqadvance/dos/jalleg.c\(cq
+For the \`allegro/psxlpt*\', \`allegro/db9lpt*\', \`allegro/tgxlpt*\'
+drivers you can see the source file \`advance/dos/jalleg.c\'
 for instructions on how to build the lpt interface. See also
 the Allegro library source distribution.
 .SS device_mouse 
@@ -1789,7 +1789,7 @@ Options for Linux:
 .PD 0
 .HP 4
 .I event
-Linux input\(hyevent interface.
+Linux input\-event interface.
 .HP 4
 .I svgalib
 SVGALIB mouse interface.
@@ -1843,7 +1843,7 @@ Devices:
 .HP 4
 .I auto
 Auto detection. It works only sometimes, generally
-it\(cqs better to manually select the type.
+it\'s better to manually select the type.
 .HP 4
 .I pnp
 Plug And Play serial (3 buttons).
@@ -1888,7 +1888,7 @@ Spacetec SpaceBall (6 buttons).
 Wacom Graphire tablet/mouse.
 .HP 4
 .I drmousee4ds
-Digital Research double\(hywheeled mouse.
+Digital Research double\-wheeled mouse.
 .PD
 .RE
 .PP
@@ -1955,7 +1955,7 @@ changes video mode (default).
 .I none
 Never calibrates the lightguns, but it assumes
 that the returned values are already scaled in
-the range 0 \(hy 65536.
+the range 0 \- 65536.
 .PD
 .RE
 .SH COPYRIGHT 

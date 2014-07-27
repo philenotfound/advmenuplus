@@ -3,6 +3,16 @@
                             =======================
 
 
+ADVMENUPLUS VERSION 2014.07.27
+==============================
+
+* Updated to advanceMENU 2.7
+* Layouts: Modified %clone% tag
+* Added joysticks configuration in options 'event_assign'
+* DOS: Added support AC97 audio to chips (Intel, NVidia) 
+* DOS: Added driver for IPP Arcade Joystick (Interfaz Puerto Paralelo)
+
+
 ADVMENUPLUS VERSION 2013.02.02
 ==============================
 

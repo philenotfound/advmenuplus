@@ -1041,11 +1041,14 @@ void cell_pos_t::compute_size(unsigned* rx, unsigned* ry, const adv_bitmap* bitm
 	aspectx *= 3 * video_size_x();
 	aspecty *= 4 * video_size_y();
 
+	//arreglado bug resoluciones altas.
 	if (aspectx * real_dy > aspecty * real_dx) {
 		*rx = real_dx;
-		*ry = static_cast<unsigned>(real_dx * aspecty * aspect_expand / aspectx);
+		double ry_tmp = aspecty * aspect_expand / aspectx;
+		*ry = static_cast<unsigned>(real_dx * ry_tmp);
 	} else {
-		*rx = static_cast<unsigned>(real_dy * aspectx * aspect_expand / aspecty);
+		double rx_tmp =  aspectx * aspect_expand / aspecty;
+		*rx =  static_cast<unsigned>(real_dy * rx_tmp);
 		*ry = real_dy;
 	}
 	if (*rx > real_dx)

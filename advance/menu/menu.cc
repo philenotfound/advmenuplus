@@ -1741,73 +1741,84 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 				ui_bottom = rs.ui_bottom * video_size_y() / scale_y;
 
 				if(rs.mode_get() == mode_custom) {
+
+					double coef_scale_x;
+					double coef_scale_y;
+
+					if (flipxy) {
+						coef_scale_x = video_size_y() * 1.0 / scale_y;
+						coef_scale_y = video_size_x() * 1.0 / scale_x;
+					} else {
+						coef_scale_x = video_size_x() * 1.0 / scale_x;
+						coef_scale_y = video_size_y() * 1.0 / scale_y;
+					}
 					
 					if (fontsize_X==0)
 						fontsize_X =  fontsize_Y;
-					fontsize_X = fontsize_X  * video_size_x() / scale_x;
-					fontsize_Y = fontsize_Y  * video_size_y() / scale_y;
+					fontsize_X = unsigned(fontsize_X  * coef_scale_x);
+					fontsize_Y = unsigned(fontsize_Y  * coef_scale_y);
 
 					if (menu_fontsize_X==0)
 						menu_fontsize_X = menu_fontsize_Y;
-					menu_fontsize_X = menu_fontsize_X  * video_size_x() / scale_x;
-					menu_fontsize_Y = menu_fontsize_Y  * video_size_y() / scale_y;
+					menu_fontsize_X = unsigned(menu_fontsize_X  * coef_scale_x);
+					menu_fontsize_Y = unsigned(menu_fontsize_Y  * coef_scale_y);
 
-					ui_list_x = ui_list_x * video_size_x() / scale_x;
-					ui_list_y = ui_list_y * video_size_y() / scale_y;
-					ui_list_dx = ui_list_dx * video_size_x() / scale_x;
-					ui_list_dy = ui_list_dy * video_size_y() / scale_y;
+					ui_list_x = unsigned(ui_list_x * coef_scale_x);
+					ui_list_y = unsigned(ui_list_y * coef_scale_y);
+					ui_list_dx = unsigned(ui_list_dx * coef_scale_x);
+					ui_list_dy = unsigned(ui_list_dy * coef_scale_y);
 					
-					ui_grid_x = ui_grid_x * video_size_x() / scale_x;
-					ui_grid_y = ui_grid_y * video_size_y() / scale_y;
-					ui_grid_dx = ui_grid_dx * video_size_x() / scale_x;
-					ui_grid_dy = ui_grid_dy * video_size_y() / scale_y;
+					ui_grid_x = unsigned(ui_grid_x * coef_scale_x);
+					ui_grid_y = unsigned(ui_grid_y * coef_scale_y);
+					ui_grid_dx = unsigned(ui_grid_dx * coef_scale_x);
+					ui_grid_dy = unsigned(ui_grid_dy * coef_scale_y);
 					
 					for (int i=0;i<backdrop_win_mac;++i) {
-						backdrop_win[i].x = backdrop_win[i].x * video_size_x() / scale_x;
-						backdrop_win[i].y = backdrop_win[i].y * video_size_y() / scale_y;
-						backdrop_win[i].dx = backdrop_win[i].dx * video_size_x() / scale_x;
-						backdrop_win[i].dy = backdrop_win[i].dy * video_size_y() / scale_y;
+						backdrop_win[i].x = unsigned(backdrop_win[i].x * coef_scale_x);
+						backdrop_win[i].y = unsigned(backdrop_win[i].y * coef_scale_y);
+						backdrop_win[i].dx = unsigned(backdrop_win[i].dx * coef_scale_x);
+						backdrop_win[i].dy = unsigned(backdrop_win[i].dy * coef_scale_y);
 					}
 					
 					if(bar_info_1_dx != 0) {
-						bar_info_1_x = bar_info_1_x* video_size_x() / scale_x;
-						bar_info_1_y = bar_info_1_y * video_size_y() / scale_y;
-						bar_info_1_dx = bar_info_1_dx* video_size_x() / scale_x;
+						bar_info_1_x = unsigned(bar_info_1_x * coef_scale_x);
+						bar_info_1_y = unsigned(bar_info_1_y * coef_scale_y);
+						bar_info_1_dx = unsigned(bar_info_1_dx * coef_scale_x);
 						
-						bar_info_1_font_dx = bar_info_1_dy * video_size_x()/scale_x;
-						bar_info_1_dy = bar_info_1_dy * video_size_y() / scale_y;
+						bar_info_1_font_dx = unsigned(bar_info_1_dy * coef_scale_x);
+						bar_info_1_dy = unsigned(bar_info_1_dy * coef_scale_y);
 					}
 					if(bar_info_2_dx != 0) {
-						bar_info_2_x = bar_info_2_x* video_size_x() / scale_x;
-						bar_info_2_y = bar_info_2_y * video_size_y() / scale_y;
-						bar_info_2_dx = bar_info_2_dx* video_size_x() / scale_x;
+						bar_info_2_x = unsigned(bar_info_2_x * coef_scale_x);
+						bar_info_2_y = unsigned(bar_info_2_y * coef_scale_y);
+						bar_info_2_dx = unsigned(bar_info_2_dx * coef_scale_x);
 						
-						bar_info_2_font_dx = bar_info_2_dy * video_size_x()/scale_x;
-						bar_info_2_dy = bar_info_2_dy * video_size_y() / scale_y;
+						bar_info_2_font_dx = unsigned(bar_info_2_dy * coef_scale_x);
+						bar_info_2_dy = unsigned(bar_info_2_dy * coef_scale_y);
 					}
 					if(bar_info_3_dx != 0) {
-						bar_info_3_x = bar_info_3_x* video_size_x() / scale_x;
-						bar_info_3_y = bar_info_3_y * video_size_y() / scale_y;
-						bar_info_3_dx = bar_info_3_dx* video_size_x() / scale_x;
+						bar_info_3_x = unsigned(bar_info_3_x * coef_scale_x);
+						bar_info_3_y = unsigned(bar_info_3_y * coef_scale_y);
+						bar_info_3_dx = unsigned(bar_info_3_dx * coef_scale_x);
 						
-						bar_info_3_font_dx = bar_info_3_dy * video_size_x()/scale_x;
-						bar_info_3_dy = bar_info_3_dy * video_size_y() / scale_y;
+						bar_info_3_font_dx = unsigned(bar_info_3_dy * coef_scale_x);
+						bar_info_3_dy = unsigned(bar_info_3_dy * coef_scale_y);
 					}
 					if(bar_info_4_dx != 0) {
-						bar_info_4_x = bar_info_4_x* video_size_x() / scale_x;
-						bar_info_4_y = bar_info_4_y * video_size_y() / scale_y;
-						bar_info_4_dx = bar_info_4_dx* video_size_x() / scale_x;
+						bar_info_4_x = unsigned(bar_info_4_x * coef_scale_x);
+						bar_info_4_y = unsigned(bar_info_4_y * coef_scale_y);
+						bar_info_4_dx = unsigned(bar_info_4_dx * coef_scale_x);
 						
-						bar_info_4_font_dx = bar_info_4_dy * video_size_x()/scale_x;
-						bar_info_4_dy = bar_info_4_dy * video_size_y() / scale_y;
+						bar_info_4_font_dx = unsigned(bar_info_4_dy * coef_scale_x);
+						bar_info_4_dy = unsigned(bar_info_4_dy * coef_scale_y);
 					}
 					if(bar_info_5_dx != 0) {
-						bar_info_5_x = bar_info_5_x* video_size_x() / scale_x;
-						bar_info_5_y = bar_info_5_y * video_size_y() / scale_y;
-						bar_info_5_dx = bar_info_5_dx * video_size_x() / scale_x;
+						bar_info_5_x = unsigned(bar_info_5_x * coef_scale_x);
+						bar_info_5_y = unsigned(bar_info_5_y * coef_scale_y);
+						bar_info_5_dx = unsigned(bar_info_5_dx * coef_scale_x);
 						
-						bar_info_5_font_dx = bar_info_5_dy * video_size_x()/scale_x;
-						bar_info_5_dy = bar_info_5_dy * video_size_y() / scale_y;
+						bar_info_5_font_dx = unsigned(bar_info_5_dy * coef_scale_x);
+						bar_info_5_dy = unsigned(bar_info_5_dy * coef_scale_y);
 					}
 					
 				}

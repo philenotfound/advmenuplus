@@ -570,6 +570,26 @@ static bool config_load_iterator_emu_custom_set(adv_conf* config_context, const 
 	return true;
 }
 
+static bool config_load_iterator_layout_set(adv_conf* config_context, const string& tag, layout* lay, void (layout::*set)(const string& s), bool type_path)
+{
+	adv_conf_iterator i;
+	conf_iterator_begin(&i, config_context, tag.c_str());
+	while (!conf_iterator_is_end(&i)) {
+		string arg = borrar_comillas(conf_iterator_string_get(&i));
+		
+		if (type_path) { 
+			if (arg != ""  && arg != "none" && arg != "default" && arg != "auto") { 
+				arg = file_config_file_custom(arg.c_str());
+			}
+		}
+
+		(lay->*set)(arg);
+
+		conf_iterator_next(&i);
+	}
+	return true;
+}
+
 static bool config_load_iterator_emu_path_set(adv_conf* config_context, const string& tag, pemulator_container& emu, void (emulator::*set)(const string& s))
 {
 	adv_conf_iterator i;
@@ -918,116 +938,130 @@ static bool config_load_orientation(adv_conf* config_context, unsigned& mask)
 	return true;
 }
 
-bool config_state::load_custom(adv_conf* config_context, const string& nombre_emulador)
+bool config_state::load_custom(adv_conf* config_context, const string& path_archivo_custom)
 {
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "background_image_path", emu, &emulator::custom_background_path_set, true))
+	for(playout_container::iterator j = lay_cont.begin();j!=lay_cont.end();j++) {
+		if((*j)->name_get() == path_archivo_custom) {
+			return true;
+		}
+	}
+
+	//creo un nuevo layout con el nombre de la ruta al archivo amp
+	layout* lay = new layout(path_archivo_custom);
+
+	//relleno los datos del layout
+	if (!config_load_iterator_layout_set( config_context, "background_image_path", lay, &layout::custom_background_path_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "help_image_path", emu, &emulator::custom_help_path_set, true))
+	if (!config_load_iterator_layout_set( config_context, "help_image_path", lay, &layout::custom_help_path_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "start_image_path", emu, &emulator::custom_start_path_set, true))
+	if (!config_load_iterator_layout_set( config_context, "start_image_path", lay, &layout::custom_start_path_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_path", emu, &emulator::custom_font_path_set, true))
+	if (!config_load_iterator_layout_set( config_context, "list_font_path", lay, &layout::custom_font_path_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_pos_size", emu, &emulator::custom_list_pos_size_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_pos_size", lay, &layout::custom_list_pos_size_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "scroll_pos_size", emu, &emulator::custom_scroll_pos_size_set, false))
+	if (!config_load_iterator_layout_set( config_context, "scroll_pos_size", lay, &layout::custom_scroll_pos_size_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_cols", emu, &emulator::custom_list_cols_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_cols", lay, &layout::custom_list_cols_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_diagonal", emu, &emulator::custom_list_diagonal_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_diagonal", lay, &layout::custom_list_diagonal_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_rows", emu, &emulator::custom_list_rows_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_rows", lay, &layout::custom_list_rows_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_selected_pos", emu, &emulator::custom_list_selected_pos_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_selected_pos", lay, &layout::custom_list_selected_pos_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_align", emu, &emulator::custom_list_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_align", lay, &layout::custom_list_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_color", emu, &emulator::custom_color_font_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_font_color", lay, &layout::custom_color_font_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_select_color", emu, &emulator::custom_color_font_select_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_font_select_color", lay, &layout::custom_color_font_select_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "scroll_color", emu, &emulator::custom_color_scroll_set, false))
+	if (!config_load_iterator_layout_set( config_context, "scroll_color", lay, &layout::custom_color_scroll_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "list_font_size", emu, &emulator::custom_font_size_set, false))
+	if (!config_load_iterator_layout_set( config_context, "list_font_size", lay, &layout::custom_font_size_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_snaps", emu, &emulator::custom_win_snaps_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_snaps", lay, &layout::custom_win_snaps_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_flyers", emu, &emulator::custom_win_flyers_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_flyers", lay, &layout::custom_win_flyers_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_cabinets", emu, &emulator::custom_win_cabinets_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_cabinets", lay, &layout::custom_win_cabinets_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_icons", emu, &emulator::custom_win_icons_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_icons", lay, &layout::custom_win_icons_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_marquees", emu, &emulator::custom_win_marquees_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_marquees", lay, &layout::custom_win_marquees_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_titles", emu, &emulator::custom_win_titles_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_titles", lay, &layout::custom_win_titles_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "win_color", emu, &emulator::custom_win_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "win_color", lay, &layout::custom_win_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1", emu, &emulator::custom_bar_info_1_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_1", lay, &layout::custom_bar_info_1_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_text", emu, &emulator::custom_bar_info_1_text_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_1_text", lay, &layout::custom_bar_info_1_text_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_color", emu, &emulator::custom_bar_info_1_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_1_color", lay, &layout::custom_bar_info_1_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_font", emu, &emulator::custom_bar_info_1_font_set, true))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_1_font", lay, &layout::custom_bar_info_1_font_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_1_align", emu, &emulator::custom_bar_info_1_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_1_align", lay, &layout::custom_bar_info_1_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2", emu, &emulator::custom_bar_info_2_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_2", lay, &layout::custom_bar_info_2_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_text", emu, &emulator::custom_bar_info_2_text_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_2_text", lay, &layout::custom_bar_info_2_text_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_color", emu, &emulator::custom_bar_info_2_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_2_color", lay, &layout::custom_bar_info_2_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_font", emu, &emulator::custom_bar_info_2_font_set, true))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_2_font", lay, &layout::custom_bar_info_2_font_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_2_align", emu, &emulator::custom_bar_info_2_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_2_align", lay, &layout::custom_bar_info_2_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3", emu, &emulator::custom_bar_info_3_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_3", lay, &layout::custom_bar_info_3_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_text", emu, &emulator::custom_bar_info_3_text_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_3_text", lay, &layout::custom_bar_info_3_text_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_color", emu, &emulator::custom_bar_info_3_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_3_color", lay, &layout::custom_bar_info_3_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_font", emu, &emulator::custom_bar_info_3_font_set, true))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_3_font", lay, &layout::custom_bar_info_3_font_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_3_align", emu, &emulator::custom_bar_info_3_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_3_align", lay, &layout::custom_bar_info_3_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4", emu, &emulator::custom_bar_info_4_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_4", lay, &layout::custom_bar_info_4_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_text", emu, &emulator::custom_bar_info_4_text_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_4_text", lay, &layout::custom_bar_info_4_text_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_color", emu, &emulator::custom_bar_info_4_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_4_color", lay, &layout::custom_bar_info_4_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_font", emu, &emulator::custom_bar_info_4_font_set, true))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_4_font", lay, &layout::custom_bar_info_4_font_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_4_align", emu, &emulator::custom_bar_info_4_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_4_align", lay, &layout::custom_bar_info_4_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5", emu, &emulator::custom_bar_info_5_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_5", lay, &layout::custom_bar_info_5_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_text", emu, &emulator::custom_bar_info_5_text_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_5_text", lay, &layout::custom_bar_info_5_text_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_color", emu, &emulator::custom_bar_info_5_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_5_color", lay, &layout::custom_bar_info_5_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_font", emu, &emulator::custom_bar_info_5_font_set, true))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_5_font", lay, &layout::custom_bar_info_5_font_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "bar_info_5_align", emu, &emulator::custom_bar_info_5_align_set, false))
+	if (!config_load_iterator_layout_set( config_context, "bar_info_5_align", lay, &layout::custom_bar_info_5_align_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "background_color", emu, &emulator::custom_background_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "background_color", lay, &layout::custom_background_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_path", emu, &emulator::custom_menu_font_path_set, true))
+	if (!config_load_iterator_layout_set( config_context, "menu_font_path", lay, &layout::custom_menu_font_path_set, true))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_size", emu, &emulator::custom_menu_font_size_set, false))
+	if (!config_load_iterator_layout_set( config_context, "menu_font_size", lay, &layout::custom_menu_font_size_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_title_color", emu, &emulator::custom_menu_title_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "menu_title_color", lay, &layout::custom_menu_title_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_color", emu, &emulator::custom_menu_font_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "menu_font_color", lay, &layout::custom_menu_font_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "menu_font_select_color", emu, &emulator::custom_menu_font_select_color_set, false))
+	if (!config_load_iterator_layout_set( config_context, "menu_font_select_color", lay, &layout::custom_menu_font_select_color_set, false))
 		return false;
-	if (!config_load_iterator_emu_custom_set( config_context, nombre_emulador, "orientation", emu, &emulator::custom_video_orientation_set, false))
+	if (!config_load_iterator_layout_set( config_context, "orientation", lay, &layout::custom_video_orientation_set, false))
 		return false;
+
+	//inserto el nuevo layout en la lista de layouts (playout_container)
+	lay_cont.insert(lay_cont.end(), lay);
+	
 	return true;
 }
 

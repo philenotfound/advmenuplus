@@ -27,6 +27,8 @@
 #include "choice.h"
 #include "conf.h"
 
+#include "layout.h"
+
 #include <list>
 
 #define ADV_COPY \
@@ -337,6 +339,8 @@ public:
 	pemulator_container emu; ///< Supported emulators set.
 	pemulator_container emu_active; ///< Active emulators, a subset of emu.
 
+	playout_container lay_cont; ///< Lista de layouts
+		
 	favorites_container favorites; ///< Game Lists set.
 	pcategory_container type; ///< Type set.
 

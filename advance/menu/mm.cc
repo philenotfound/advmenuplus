@@ -653,7 +653,7 @@ bool layouts_load(config_state& rs)
 					return false;
 				}
 
-				if (!rs.load_custom(custom_context, nombre_emulador)) {
+				if (!rs.load_custom(custom_context, path_archivo_custom)) {
 					conf_done(custom_context);
 					return false;
 				}

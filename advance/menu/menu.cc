@@ -2343,362 +2343,370 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 	log_std(("menu: user begin\n"));
 
 	color_default_load(); // carga los colores por defecto
-	
+
 	// RECOGIDA DE DATOS DEL LAYOUT
-	for(pemulator_container::iterator j = rs.emu.begin();j!=rs.emu.end();j++) {
-		if ((*j)->state_get() == 1) {
-			
-			string orientation = (*j)->custom_video_orientation_get();
-			video_orientation = orientation_load(orientation);
-			flipxy = (video_orientation & ADV_ORIENTATION_FLIP_XY) != 0;
+	for(pemulator_container::iterator k = rs.emu.begin();k!=rs.emu.end();k++) {
+		if((*k)->state_get()==1) {
 
-			bool flag_special = false; //refact siempre es false para layouts
+			string lay_path = (*k)->custom_file_path_get();
+			for(playout_container::iterator j = rs.lay_cont.begin();j!=rs.lay_cont.end();j++) {
+				if((*j)->name_get() == lay_path) {
 
-			emu_start = (*j)->custom_start_path_get();
-			if (emu_start == "")
-				emu_start = "none";
+					string orientation = (*j)->custom_video_orientation_get();
+					video_orientation = orientation_load(orientation);
+					flipxy = (video_orientation & ADV_ORIENTATION_FLIP_XY) != 0;
 
-			img_background = (*j)->custom_background_path_get();
-			if (img_background == "")
-				img_background = "none";
+					bool flag_special = false; //refact siempre es false para layouts
 
-			string c_background = (*j)->custom_background_color_get();
-			if(!color_custom(LCOLOR_BACKGROUND, c_background, flag_special, video_color_def())) {
-				LCOLOR_BACKGROUND = DCOLOR_BACKGROUND;
-			} else {
-				//refact vacio???
-			}
+					emu_start = (*j)->custom_start_path_get();
+					if (emu_start == "")
+						emu_start = "none";
 
-			menu_font_path = (*j)->custom_menu_font_path_get();
-			if(menu_font_path == "")
-				menu_font_path = "none";
+					img_background = (*j)->custom_background_path_get();
+					if (img_background == "")
+						img_background = "none";
 
-			string menu_fontsize = (*j)->custom_menu_font_size_get();
-			if (menu_fontsize != "") {
-				string a0, a1;
-				if (config_split_custom(menu_fontsize, a0, a1)) {
-					menu_fontsize_Y= atoi(a0.c_str());
-					menu_fontsize_X = atoi(a1.c_str());
-				}
-			}
-
-			string c_font_menu_title = (*j)->custom_menu_title_color_get();
-			if(color_custom(LCOLOR_FONT_MENU_TITLE, c_font_menu_title, flag_special, video_color_def())) {
-				COLOR_CHOICE_TITLE = LCOLOR_FONT_MENU_TITLE;
-			}
-			string c_font_menu = (*j)->custom_menu_font_color_get();
-			if(color_custom(LCOLOR_FONT_MENU, c_font_menu, flag_special, video_color_def())) {
-				COLOR_CHOICE_NORMAL = COLOR_CHOICE_HIDDEN = LCOLOR_FONT_MENU;
-			}
-			string c_font_menu_select = (*j)->custom_menu_font_select_color_get();
-			if(color_custom(LCOLOR_FONT_MENU_SELECT, c_font_menu_select, flag_special, video_color_def())) {
-				COLOR_CHOICE_SELECT = COLOR_CHOICE_HIDDEN_SELECT = LCOLOR_FONT_MENU_SELECT;
-			}
-
-			font_path = (*j)->custom_font_path_get();
-			if (font_path == "")
-				font_path = "none";
-
-			string fontsize = (*j)->custom_font_size_get();
-			if (fontsize != "") {
-				string a0="", a1="";
-				if (config_split_custom(fontsize, a0, a1)) {
-					fontsize_Y= atoi(a0.c_str());
-					fontsize_X = atoi(a1.c_str());
-				}
-			}
-
-			string list_pos_size = (*j)->custom_list_pos_size_get();
-			if (list_pos_size != "" && list_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(list_pos_size, a0, a1, a2, a3)) {
-					ui_list_x = atoi(a0.c_str());
-					ui_list_y = atoi(a1.c_str());
-					ui_list_dx = atoi(a2.c_str());
-					ui_list_dy = atoi(a3.c_str());
-				}
-			}
-
-			string list_cols = (*j)->custom_list_cols_get();
-			if (list_cols != "" && list_cols != "default") {
-				string a0, a1;
-				if (config_split_custom(list_cols, a0, a1)) {
-					cols = atoi(a0.c_str());
-					space_cols = atoi(a1.c_str());
-				}
-			}
-
-			string list_rows = (*j)->custom_list_rows_get();
-			if (list_rows != "" && list_rows != "auto") {
-				string a0, a1;
-				if (config_split_custom(list_rows, a0, a1)) {
-					rows = a0;
-					if (a1 == "")
-						a1 = "auto";
-					space_rows = a1;
-				}
-			}
-
-			string list_diagonal = (*j)->custom_list_diagonal_get();
-			if (list_diagonal != "" && list_diagonal != "none")
-				diagonal = atoi(list_diagonal.c_str());
-
-			list_align = (*j)->custom_list_align_get();
-			if(list_align == "") 
-				list_align == "left";
-
-			string c_font = (*j)->custom_color_font_get();
-			if(color_custom(LCOLOR_FONT_LIST, c_font, flag_special, video_color_def())) {
-				COLOR_MENU_NORMAL = COLOR_MENU_TAG = COLOR_MENU_HIDDEN = LCOLOR_FONT_LIST;
-			}
-			string c_font_select = (*j)->custom_color_font_select_get();
-			if(color_custom(LCOLOR_FONT_LIST_SELECT, c_font_select, flag_special, video_color_def())) {
-				COLOR_MENU_SELECT = COLOR_MENU_TAG_SELECT = COLOR_MENU_HIDDEN_SELECT = LCOLOR_FONT_LIST_SELECT;
-			}
-
-			string selected_rel = (*j)->custom_list_selected_pos_get();
-			if (selected_rel != "" && selected_rel != "none") {
-				string a0, a1;
-				if (config_split_custom(selected_rel, a0, a1)) {
-					row_rel = atoi(a0.c_str()) - 1;
-					col_rel = atoi(a1.c_str()) - 1;
-					if (col_rel < 0)
-						col_rel = 0;
-					if (row_rel >= 0)
-						frenado = true;
-				}
-			}
-
-			string grid_pos_size = (*j)->custom_scroll_pos_size_get();
-			if (grid_pos_size != "" && grid_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(grid_pos_size, a0, a1, a2, a3)) {
-					ui_grid_x = atoi(a0.c_str());
-					ui_grid_y = atoi(a1.c_str());
-					ui_grid_dx = atoi(a2.c_str());
-					ui_grid_dy = atoi(a3.c_str());
-				}
-			}
-
-			string c_grid = (*j)->custom_color_scroll_get();
-			if(color_custom(LCOLOR_GRID, c_grid, flag_special, video_color_def())) {
-				COLOR_MENU_GRID = LCOLOR_GRID;
-			}
-
-			string c_win = (*j)->custom_win_color_get();
-			if(!color_custom(LCOLOR_WIN, c_win, backdrop_win_border, video_color_def())) 
-				backdrop_win_border = false;
-
-			backdrop_win = new cell_win_t[6];
-
-			unsigned mac = 0;
-			string win_snaps_pos_size = (*j)->custom_win_snaps_get(); 
-			if (win_snaps_pos_size != "" && win_snaps_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_snaps_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_snap;
-						mac++;
+					string c_background = (*j)->custom_background_color_get();
+					if(!color_custom(LCOLOR_BACKGROUND, c_background, flag_special, video_color_def())) {
+						LCOLOR_BACKGROUND = DCOLOR_BACKGROUND;
+					} else {
+						//refact vacio???
 					}
-				}
-			}
-			string win_flyers_pos_size = (*j)->custom_win_flyers_get();
-			if (win_flyers_pos_size != "" && win_flyers_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_flyers_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_flyer;
-						mac++;
+
+					menu_font_path = (*j)->custom_menu_font_path_get();
+					if(menu_font_path == "")
+						menu_font_path = "none";
+
+					string menu_fontsize = (*j)->custom_menu_font_size_get();
+					if (menu_fontsize != "") {
+						string a0, a1;
+						if (config_split_custom(menu_fontsize, a0, a1)) {
+							menu_fontsize_Y= atoi(a0.c_str());
+							menu_fontsize_X = atoi(a1.c_str());
+						}
 					}
-				}
-			}
-			string win_cabinets_pos_size = (*j)->custom_win_cabinets_get();
-			if (win_cabinets_pos_size != "" && win_cabinets_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_cabinets_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_cabinet;
-						mac++;
+
+					string c_font_menu_title = (*j)->custom_menu_title_color_get();
+					if(color_custom(LCOLOR_FONT_MENU_TITLE, c_font_menu_title, flag_special, video_color_def())) {
+						COLOR_CHOICE_TITLE = LCOLOR_FONT_MENU_TITLE;
 					}
-				}
-			}
-			string win_icons_pos_size = (*j)->custom_win_icons_get(); 
-			if (win_icons_pos_size != "" && win_icons_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_icons_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_icon;
-						mac++;
+					string c_font_menu = (*j)->custom_menu_font_color_get();
+					if(color_custom(LCOLOR_FONT_MENU, c_font_menu, flag_special, video_color_def())) {
+						COLOR_CHOICE_NORMAL = COLOR_CHOICE_HIDDEN = LCOLOR_FONT_MENU;
 					}
-				}
-			}
-			string win_marquees_pos_size = (*j)->custom_win_marquees_get();
-			if (win_marquees_pos_size != "" && win_marquees_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_marquees_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_marquee;
-						mac++;
+					string c_font_menu_select = (*j)->custom_menu_font_select_color_get();
+					if(color_custom(LCOLOR_FONT_MENU_SELECT, c_font_menu_select, flag_special, video_color_def())) {
+						COLOR_CHOICE_SELECT = COLOR_CHOICE_HIDDEN_SELECT = LCOLOR_FONT_MENU_SELECT;
 					}
-				}
-			}
-			string win_titles_pos_size = (*j)->custom_win_titles_get();
-			if (win_titles_pos_size != "" && win_titles_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(win_titles_pos_size, a0, a1, a2, a3)) {
-					if(a3 != "0") {
-						backdrop_win[mac].x = atoi(a0.c_str());
-						backdrop_win[mac].y = atoi(a1.c_str());
-						backdrop_win[mac].dx = atoi(a2.c_str());
-						backdrop_win[mac].dy = atoi(a3.c_str());
-						backdrop_win[mac].preview = preview_title;
-						mac++;
+
+					font_path = (*j)->custom_font_path_get();
+					if (font_path == "")
+						font_path = "none";
+
+					string fontsize = (*j)->custom_font_size_get();
+					if (fontsize != "") {
+						string a0="", a1="";
+						if (config_split_custom(fontsize, a0, a1)) {
+							fontsize_Y= atoi(a0.c_str());
+							fontsize_X = atoi(a1.c_str());
+						}
 					}
+
+					string list_pos_size = (*j)->custom_list_pos_size_get();
+					if (list_pos_size != "" && list_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(list_pos_size, a0, a1, a2, a3)) {
+							ui_list_x = atoi(a0.c_str());
+							ui_list_y = atoi(a1.c_str());
+							ui_list_dx = atoi(a2.c_str());
+							ui_list_dy = atoi(a3.c_str());
+						}
+					}
+
+					string list_cols = (*j)->custom_list_cols_get();
+					if (list_cols != "" && list_cols != "default") {
+						string a0, a1;
+						if (config_split_custom(list_cols, a0, a1)) {
+							cols = atoi(a0.c_str());
+							space_cols = atoi(a1.c_str());
+						}
+					}
+
+					string list_rows = (*j)->custom_list_rows_get();
+					if (list_rows != "" && list_rows != "auto") {
+						string a0, a1;
+						if (config_split_custom(list_rows, a0, a1)) {
+							rows = a0;
+							if (a1 == "")
+								a1 = "auto";
+							space_rows = a1;
+						}
+					}
+
+					string list_diagonal = (*j)->custom_list_diagonal_get();
+					if (list_diagonal != "" && list_diagonal != "none")
+						diagonal = atoi(list_diagonal.c_str());
+
+					list_align = (*j)->custom_list_align_get();
+					if(list_align == "") 
+						list_align == "left";
+
+					string c_font = (*j)->custom_color_font_get();
+					if(color_custom(LCOLOR_FONT_LIST, c_font, flag_special, video_color_def())) {
+						COLOR_MENU_NORMAL = COLOR_MENU_TAG = COLOR_MENU_HIDDEN = LCOLOR_FONT_LIST;
+					}
+					string c_font_select = (*j)->custom_color_font_select_get();
+					if(color_custom(LCOLOR_FONT_LIST_SELECT, c_font_select, flag_special, video_color_def())) {
+						COLOR_MENU_SELECT = COLOR_MENU_TAG_SELECT = COLOR_MENU_HIDDEN_SELECT = LCOLOR_FONT_LIST_SELECT;
+					}
+
+					string selected_rel = (*j)->custom_list_selected_pos_get();
+					if (selected_rel != "" && selected_rel != "none") {
+						string a0, a1;
+						if (config_split_custom(selected_rel, a0, a1)) {
+							row_rel = atoi(a0.c_str()) - 1;
+							col_rel = atoi(a1.c_str()) - 1;
+							if (col_rel < 0)
+								col_rel = 0;
+							if (row_rel >= 0)
+								frenado = true;
+						}
+					}
+
+					string grid_pos_size = (*j)->custom_scroll_pos_size_get();
+					if (grid_pos_size != "" && grid_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(grid_pos_size, a0, a1, a2, a3)) {
+							ui_grid_x = atoi(a0.c_str());
+							ui_grid_y = atoi(a1.c_str());
+							ui_grid_dx = atoi(a2.c_str());
+							ui_grid_dy = atoi(a3.c_str());
+						}
+					}
+
+					string c_grid = (*j)->custom_color_scroll_get();
+					if(color_custom(LCOLOR_GRID, c_grid, flag_special, video_color_def())) {
+						COLOR_MENU_GRID = LCOLOR_GRID;
+					}
+
+					string c_win = (*j)->custom_win_color_get();
+					if(!color_custom(LCOLOR_WIN, c_win, backdrop_win_border, video_color_def())) 
+						backdrop_win_border = false;
+
+					backdrop_win = new cell_win_t[6];
+
+					unsigned mac = 0;
+					string win_snaps_pos_size = (*j)->custom_win_snaps_get(); 
+					if (win_snaps_pos_size != "" && win_snaps_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_snaps_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_snap;
+								mac++;
+							}
+						}
+					}
+					string win_flyers_pos_size = (*j)->custom_win_flyers_get();
+					if (win_flyers_pos_size != "" && win_flyers_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_flyers_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_flyer;
+								mac++;
+							}
+						}
+					}
+					string win_cabinets_pos_size = (*j)->custom_win_cabinets_get();
+					if (win_cabinets_pos_size != "" && win_cabinets_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_cabinets_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_cabinet;
+								mac++;
+							}
+						}
+					}
+					string win_icons_pos_size = (*j)->custom_win_icons_get(); 
+					if (win_icons_pos_size != "" && win_icons_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_icons_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_icon;
+								mac++;
+							}
+						}
+					}
+					string win_marquees_pos_size = (*j)->custom_win_marquees_get();
+					if (win_marquees_pos_size != "" && win_marquees_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_marquees_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_marquee;
+								mac++;
+							}
+						}
+					}
+					string win_titles_pos_size = (*j)->custom_win_titles_get();
+					if (win_titles_pos_size != "" && win_titles_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(win_titles_pos_size, a0, a1, a2, a3)) {
+							if(a3 != "0") {
+								backdrop_win[mac].x = atoi(a0.c_str());
+								backdrop_win[mac].y = atoi(a1.c_str());
+								backdrop_win[mac].dx = atoi(a2.c_str());
+								backdrop_win[mac].dy = atoi(a3.c_str());
+								backdrop_win[mac].preview = preview_title;
+								mac++;
+							}
+						}
+					}
+
+					backdrop_win_mac = mac;
+
+					string bar_info_1_pos_size = (*j)->custom_bar_info_1_get();
+					if (bar_info_1_pos_size != "" && bar_info_1_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(bar_info_1_pos_size, a0, a1, a2, a3)) {
+							bar_info_1_x = atoi(a0.c_str());
+							bar_info_1_y = atoi(a1.c_str());
+							bar_info_1_dx = atoi(a2.c_str());
+							bar_info_1_dy = atoi(a3.c_str());
+						}
+
+						bar_info_1_font_path = (*j)->custom_bar_info_1_font_get();
+						if(bar_info_1_font_path == "")
+							bar_info_1_font_path = "none";
+
+						bar_info_1_text = (*j)->custom_bar_info_1_text_get();
+
+						bar_info_1_align = (*j)->custom_bar_info_1_align_get();
+						if (bar_info_1_align == "")
+							bar_info_1_align = "left";
+
+						string c_info = (*j)->custom_bar_info_1_color_get();
+						if(!color_custom(LCOLOR_BAR_INFO_A, c_info, flag_special, video_color_def()))
+							LCOLOR_BAR_INFO_A = DCOLOR_MENU_NORMAL;
+					}
+					string bar_info_2_pos_size = (*j)->custom_bar_info_2_get();
+					if (bar_info_2_pos_size != "" && bar_info_2_pos_size != "none") {
+						string a0, a1, a2, a3; 
+						if (config_split_custom(bar_info_2_pos_size, a0, a1, a2, a3)) {
+							bar_info_2_x = atoi(a0.c_str());
+							bar_info_2_y = atoi(a1.c_str());
+							bar_info_2_dx = atoi(a2.c_str());
+							bar_info_2_dy = atoi(a3.c_str());
+						}
+
+						bar_info_2_font_path = (*j)->custom_bar_info_2_font_get();
+						if(bar_info_2_font_path == "")
+							bar_info_2_font_path = "none";
+
+						bar_info_2_text = (*j)->custom_bar_info_2_text_get();
+
+						bar_info_2_align = (*j)->custom_bar_info_2_align_get();
+						if (bar_info_2_align == "")
+							bar_info_2_align = "left";
+
+						string c_info = (*j)->custom_bar_info_2_color_get();
+						if(!color_custom(LCOLOR_BAR_INFO_B, c_info,flag_special, video_color_def()))
+							LCOLOR_BAR_INFO_B = DCOLOR_MENU_NORMAL;
+					}
+					string bar_info_3_pos_size = (*j)->custom_bar_info_3_get();
+					if (bar_info_3_pos_size != "" && bar_info_3_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(bar_info_3_pos_size, a0, a1, a2, a3)) {
+							bar_info_3_x = atoi(a0.c_str());
+							bar_info_3_y = atoi(a1.c_str());
+							bar_info_3_dx = atoi(a2.c_str());
+							bar_info_3_dy = atoi(a3.c_str());
+						}
+
+						bar_info_3_font_path = (*j)->custom_bar_info_3_font_get();
+						if(bar_info_3_font_path == "")
+							bar_info_3_font_path = "none";
+
+						bar_info_3_text = (*j)->custom_bar_info_3_text_get();
+
+						bar_info_3_align = (*j)->custom_bar_info_3_align_get();
+						if (bar_info_3_align == "")
+							bar_info_3_align = "left";
+
+						string c_info = (*j)->custom_bar_info_3_color_get();
+						if(!color_custom(LCOLOR_BAR_INFO_C, c_info, flag_special, video_color_def()))
+							LCOLOR_BAR_INFO_C = DCOLOR_MENU_NORMAL;
+					}
+					string bar_info_4_pos_size = (*j)->custom_bar_info_4_get();
+					if (bar_info_4_pos_size != "" && bar_info_4_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(bar_info_4_pos_size, a0, a1, a2, a3)) {
+							bar_info_4_x = atoi(a0.c_str());
+							bar_info_4_y = atoi(a1.c_str());
+							bar_info_4_dx = atoi(a2.c_str());
+							bar_info_4_dy = atoi(a3.c_str());
+						}
+
+						bar_info_4_font_path = (*j)->custom_bar_info_4_font_get();
+						if(bar_info_4_font_path == "")
+							bar_info_4_font_path = "none";
+
+						bar_info_4_text = (*j)->custom_bar_info_4_text_get();
+
+						bar_info_4_align = (*j)->custom_bar_info_4_align_get();
+						if (bar_info_4_align == "")
+							bar_info_4_align = "left";
+
+						string c_info = (*j)->custom_bar_info_4_color_get();
+						if(!color_custom(LCOLOR_BAR_INFO_D, c_info, flag_special, video_color_def()))
+							LCOLOR_BAR_INFO_D = DCOLOR_MENU_NORMAL;
+					}
+
+					string bar_info_5_pos_size = (*j)->custom_bar_info_5_get();
+					if (bar_info_5_pos_size != "" && bar_info_5_pos_size != "none") {
+						string a0, a1, a2, a3;
+						if (config_split_custom(bar_info_5_pos_size, a0, a1, a2, a3)) {
+							bar_info_5_x = atoi(a0.c_str());
+							bar_info_5_y = atoi(a1.c_str());
+							bar_info_5_dx = atoi(a2.c_str());
+							bar_info_5_dy = atoi(a3.c_str());
+						}
+
+						bar_info_5_font_path = (*j)->custom_bar_info_5_font_get();
+						if(bar_info_5_font_path == "")
+							bar_info_5_font_path = "none";
+
+						bar_info_5_text = (*j)->custom_bar_info_5_text_get();
+
+						bar_info_5_align = (*j)->custom_bar_info_5_align_get();
+						if (bar_info_5_align == "")
+							bar_info_5_align = "left";
+
+						string c_info = (*j)->custom_bar_info_5_color_get();
+						if(!color_custom(LCOLOR_BAR_INFO_E, c_info, flag_special, video_color_def()))
+							LCOLOR_BAR_INFO_E = DCOLOR_MENU_NORMAL;
+					}
+
+					break;
 				}
-			}
-
-			backdrop_win_mac = mac;
-
-			string bar_info_1_pos_size = (*j)->custom_bar_info_1_get();
-			if (bar_info_1_pos_size != "" && bar_info_1_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(bar_info_1_pos_size, a0, a1, a2, a3)) {
-					bar_info_1_x = atoi(a0.c_str());
-					bar_info_1_y = atoi(a1.c_str());
-					bar_info_1_dx = atoi(a2.c_str());
-					bar_info_1_dy = atoi(a3.c_str());
-				}
-
-				bar_info_1_font_path = (*j)->custom_bar_info_1_font_get();
-				if(bar_info_1_font_path == "")
-					bar_info_1_font_path = "none";
-
-				bar_info_1_text = (*j)->custom_bar_info_1_text_get();
-
-				bar_info_1_align = (*j)->custom_bar_info_1_align_get();
-				if (bar_info_1_align == "")
-					bar_info_1_align = "left";
-
-				string c_info = (*j)->custom_bar_info_1_color_get();
-				if(!color_custom(LCOLOR_BAR_INFO_A, c_info, flag_special, video_color_def()))
-					LCOLOR_BAR_INFO_A = DCOLOR_MENU_NORMAL;
-			}
-			string bar_info_2_pos_size = (*j)->custom_bar_info_2_get();
-			if (bar_info_2_pos_size != "" && bar_info_2_pos_size != "none") {
-				string a0, a1, a2, a3; 
-				if (config_split_custom(bar_info_2_pos_size, a0, a1, a2, a3)) {
-					bar_info_2_x = atoi(a0.c_str());
-					bar_info_2_y = atoi(a1.c_str());
-					bar_info_2_dx = atoi(a2.c_str());
-					bar_info_2_dy = atoi(a3.c_str());
-				}
-
-				bar_info_2_font_path = (*j)->custom_bar_info_2_font_get();
-				if(bar_info_2_font_path == "")
-					bar_info_2_font_path = "none";
-
-				bar_info_2_text = (*j)->custom_bar_info_2_text_get();
-
-				bar_info_2_align = (*j)->custom_bar_info_2_align_get();
-				if (bar_info_2_align == "")
-					bar_info_2_align = "left";
-
-				string c_info = (*j)->custom_bar_info_2_color_get();
-				if(!color_custom(LCOLOR_BAR_INFO_B, c_info,flag_special, video_color_def()))
-					LCOLOR_BAR_INFO_B = DCOLOR_MENU_NORMAL;
-			}
-			string bar_info_3_pos_size = (*j)->custom_bar_info_3_get();
-			if (bar_info_3_pos_size != "" && bar_info_3_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(bar_info_3_pos_size, a0, a1, a2, a3)) {
-					bar_info_3_x = atoi(a0.c_str());
-					bar_info_3_y = atoi(a1.c_str());
-					bar_info_3_dx = atoi(a2.c_str());
-					bar_info_3_dy = atoi(a3.c_str());
-				}
-
-				bar_info_3_font_path = (*j)->custom_bar_info_3_font_get();
-				if(bar_info_3_font_path == "")
-					bar_info_3_font_path = "none";
-
-				bar_info_3_text = (*j)->custom_bar_info_3_text_get();
-
-				bar_info_3_align = (*j)->custom_bar_info_3_align_get();
-				if (bar_info_3_align == "")
-					bar_info_3_align = "left";
-
-				string c_info = (*j)->custom_bar_info_3_color_get();
-				if(!color_custom(LCOLOR_BAR_INFO_C, c_info, flag_special, video_color_def()))
-					LCOLOR_BAR_INFO_C = DCOLOR_MENU_NORMAL;
-			}
-			string bar_info_4_pos_size = (*j)->custom_bar_info_4_get();
-			if (bar_info_4_pos_size != "" && bar_info_4_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(bar_info_4_pos_size, a0, a1, a2, a3)) {
-					bar_info_4_x = atoi(a0.c_str());
-					bar_info_4_y = atoi(a1.c_str());
-					bar_info_4_dx = atoi(a2.c_str());
-					bar_info_4_dy = atoi(a3.c_str());
-				}
-
-				bar_info_4_font_path = (*j)->custom_bar_info_4_font_get();
-				if(bar_info_4_font_path == "")
-					bar_info_4_font_path = "none";
-
-				bar_info_4_text = (*j)->custom_bar_info_4_text_get();
-
-				bar_info_4_align = (*j)->custom_bar_info_4_align_get();
-				if (bar_info_4_align == "")
-					bar_info_4_align = "left";
-
-				string c_info = (*j)->custom_bar_info_4_color_get();
-				if(!color_custom(LCOLOR_BAR_INFO_D, c_info, flag_special, video_color_def()))
-					LCOLOR_BAR_INFO_D = DCOLOR_MENU_NORMAL;
-			}
-
-			string bar_info_5_pos_size = (*j)->custom_bar_info_5_get();
-			if (bar_info_5_pos_size != "" && bar_info_5_pos_size != "none") {
-				string a0, a1, a2, a3;
-				if (config_split_custom(bar_info_5_pos_size, a0, a1, a2, a3)) {
-					bar_info_5_x = atoi(a0.c_str());
-					bar_info_5_y = atoi(a1.c_str());
-					bar_info_5_dx = atoi(a2.c_str());
-					bar_info_5_dy = atoi(a3.c_str());
-				}
-
-				bar_info_5_font_path = (*j)->custom_bar_info_5_font_get();
-				if(bar_info_5_font_path == "")
-					bar_info_5_font_path = "none";
-
-				bar_info_5_text = (*j)->custom_bar_info_5_text_get();
-
-				bar_info_5_align = (*j)->custom_bar_info_5_align_get();
-				if (bar_info_5_align == "")
-					bar_info_5_align = "left";
-
-				string c_info = (*j)->custom_bar_info_5_color_get();
-				if(!color_custom(LCOLOR_BAR_INFO_E, c_info, flag_special, video_color_def()))
-					LCOLOR_BAR_INFO_E = DCOLOR_MENU_NORMAL;
 			}
 
 			break;

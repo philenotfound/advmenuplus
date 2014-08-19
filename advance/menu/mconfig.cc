@@ -262,64 +262,11 @@ static string borrar_comillas(const string& s) {
 
 void config_state::conf_register_custom(adv_conf* config_context)
 {
-	conf_string_register_default(config_context, "background_image_path", "none");
-	conf_string_register_default(config_context, "help_image_path", "none");
-	conf_string_register_default(config_context, "start_image_path", "none");
-	conf_string_register_default(config_context, "list_font_path", "auto");
-	conf_string_register_default(config_context, "ui_list_left", "20");
-	conf_string_register_default(config_context, "ui_list_top", "20");
-	conf_string_register_default(config_context, "ui_list_width", "60");
-	conf_string_register_default(config_context, "ui_list_height", "200");
-	conf_string_register_default(config_context, "list_pos_size", "");
-	conf_string_register_default(config_context, "scroll_pos_size", "");
-	conf_string_register_default(config_context, "list_cols", "1 0");
-	conf_string_register_default(config_context, "list_rows", "auto");
-	conf_string_register_default(config_context, "list_diagonal", "0");
-	conf_string_register_default(config_context, "list_selected_pos", "none");
-	conf_string_register_default(config_context, "list_align", "left");
-	conf_string_register_default(config_context, "list_font_color", "");
-	conf_string_register_default(config_context, "list_font_select_color", "");
-	conf_string_register_default(config_context, "scroll_color", "");
-	conf_string_register_default(config_context, "list_font_size", "");
-	conf_string_register_default(config_context, "win_snaps", "none");
-	conf_string_register_default(config_context, "win_flyers", "none");
-	conf_string_register_default(config_context, "win_cabinets", "none");
-	conf_string_register_default(config_context, "win_icons", "none");
-	conf_string_register_default(config_context, "win_marquees", "none");
-	conf_string_register_default(config_context, "win_titles", "none");
-	conf_string_register_default(config_context, "win_color", "none");
-	conf_string_register_default(config_context, "bar_info_1", "none");
-	conf_string_register_default(config_context, "bar_info_1_text", "");
-	conf_string_register_default(config_context, "bar_info_1_color", "");
-	conf_string_register_default(config_context, "bar_info_1_font", "auto");
-	conf_string_register_default(config_context, "bar_info_1_align", "left");
-	conf_string_register_default(config_context, "bar_info_2", "none");
-	conf_string_register_default(config_context, "bar_info_2_text", "");
-	conf_string_register_default(config_context, "bar_info_2_color", "");
-	conf_string_register_default(config_context, "bar_info_2_font", "auto");
-	conf_string_register_default(config_context, "bar_info_2_align", "left");
-	conf_string_register_default(config_context, "bar_info_3", "none");
-	conf_string_register_default(config_context, "bar_info_3_text", "");
-	conf_string_register_default(config_context, "bar_info_3_color", "");
-	conf_string_register_default(config_context, "bar_info_3_font", "auto");
-	conf_string_register_default(config_context, "bar_info_3_align", "left");
-	conf_string_register_default(config_context, "bar_info_4", "none");
-	conf_string_register_default(config_context, "bar_info_4_text", "");
-	conf_string_register_default(config_context, "bar_info_4_color", "");
-	conf_string_register_default(config_context, "bar_info_4_font", "auto");
-	conf_string_register_default(config_context, "bar_info_4_align", "left");
-	conf_string_register_default(config_context, "bar_info_5", "none");
-	conf_string_register_default(config_context, "bar_info_5_text", "");
-	conf_string_register_default(config_context, "bar_info_5_color", "");
-	conf_string_register_default(config_context, "bar_info_5_font", "auto");
-	conf_string_register_default(config_context, "bar_info_5_align", "left");
-	conf_string_register_default(config_context, "background_color", "");
-	conf_string_register_default(config_context, "menu_font_path", "auto");
-	conf_string_register_default(config_context, "menu_font_size", "");
-	conf_string_register_default(config_context, "menu_title_color", "");
-	conf_string_register_default(config_context, "menu_font_color", "");
-	conf_string_register_default(config_context, "menu_font_select_color", "");
-	conf_string_register_default(config_context, "orientation", "");	
+	unsigned i;
+	for(i=0; OPTION_LAYOUT[i].option; ++i)
+	{
+		conf_string_register_default(config_context, OPTION_LAYOUT[i].option, OPTION_LAYOUT[i].def_value);
+	}
 }
 
 void config_state::conf_register(adv_conf* config_context)
@@ -570,18 +517,12 @@ static bool config_load_iterator_emu_custom_set(adv_conf* config_context, const 
 	return true;
 }
 
-static bool config_load_iterator_layout_set(adv_conf* config_context, const string& tag, layout* lay, void (layout::*set)(const string& s), bool type_path)
+static bool config_load_iterator_layout_set(adv_conf* config_context, const string& tag, layout* lay, void (layout::*set)(const string& s))
 {
 	adv_conf_iterator i;
 	conf_iterator_begin(&i, config_context, tag.c_str());
 	while (!conf_iterator_is_end(&i)) {
-		string arg = borrar_comillas(conf_iterator_string_get(&i));
-		
-		if (type_path) { 
-			if (arg != ""  && arg != "none" && arg != "default" && arg != "auto") { 
-				arg = file_config_file_custom(arg.c_str());
-			}
-		}
+		const string arg = borrar_comillas(conf_iterator_string_get(&i));
 
 		(lay->*set)(arg);
 
@@ -940,126 +881,25 @@ static bool config_load_orientation(adv_conf* config_context, unsigned& mask)
 
 bool config_state::load_custom(adv_conf* config_context, const string& path_archivo_custom)
 {
+	//mira si ya hay un layout con el mismo nombre (la ruta al *.amp)
 	for(playout_container::iterator j = lay_cont.begin();j!=lay_cont.end();j++) {
 		if((*j)->name_get() == path_archivo_custom) {
 			return true;
 		}
 	}
 
-	//creo un nuevo layout con el nombre de la ruta al archivo amp
+	//crea un nuevo layout con el nombre de la ruta al archivo amp
 	layout* lay = new layout(path_archivo_custom);
 
-	//relleno los datos del layout
-	if (!config_load_iterator_layout_set( config_context, "background_image_path", lay, &layout::custom_background_path_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "help_image_path", lay, &layout::custom_help_path_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "start_image_path", lay, &layout::custom_start_path_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_font_path", lay, &layout::custom_font_path_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_pos_size", lay, &layout::custom_list_pos_size_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "scroll_pos_size", lay, &layout::custom_scroll_pos_size_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_cols", lay, &layout::custom_list_cols_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_diagonal", lay, &layout::custom_list_diagonal_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_rows", lay, &layout::custom_list_rows_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_selected_pos", lay, &layout::custom_list_selected_pos_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_align", lay, &layout::custom_list_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_font_color", lay, &layout::custom_color_font_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_font_select_color", lay, &layout::custom_color_font_select_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "scroll_color", lay, &layout::custom_color_scroll_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "list_font_size", lay, &layout::custom_font_size_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_snaps", lay, &layout::custom_win_snaps_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_flyers", lay, &layout::custom_win_flyers_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_cabinets", lay, &layout::custom_win_cabinets_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_icons", lay, &layout::custom_win_icons_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_marquees", lay, &layout::custom_win_marquees_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_titles", lay, &layout::custom_win_titles_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "win_color", lay, &layout::custom_win_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_1", lay, &layout::custom_bar_info_1_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_1_text", lay, &layout::custom_bar_info_1_text_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_1_color", lay, &layout::custom_bar_info_1_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_1_font", lay, &layout::custom_bar_info_1_font_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_1_align", lay, &layout::custom_bar_info_1_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_2", lay, &layout::custom_bar_info_2_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_2_text", lay, &layout::custom_bar_info_2_text_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_2_color", lay, &layout::custom_bar_info_2_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_2_font", lay, &layout::custom_bar_info_2_font_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_2_align", lay, &layout::custom_bar_info_2_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_3", lay, &layout::custom_bar_info_3_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_3_text", lay, &layout::custom_bar_info_3_text_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_3_color", lay, &layout::custom_bar_info_3_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_3_font", lay, &layout::custom_bar_info_3_font_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_3_align", lay, &layout::custom_bar_info_3_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_4", lay, &layout::custom_bar_info_4_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_4_text", lay, &layout::custom_bar_info_4_text_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_4_color", lay, &layout::custom_bar_info_4_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_4_font", lay, &layout::custom_bar_info_4_font_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_4_align", lay, &layout::custom_bar_info_4_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_5", lay, &layout::custom_bar_info_5_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_5_text", lay, &layout::custom_bar_info_5_text_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_5_color", lay, &layout::custom_bar_info_5_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_5_font", lay, &layout::custom_bar_info_5_font_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "bar_info_5_align", lay, &layout::custom_bar_info_5_align_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "background_color", lay, &layout::custom_background_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "menu_font_path", lay, &layout::custom_menu_font_path_set, true))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "menu_font_size", lay, &layout::custom_menu_font_size_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "menu_title_color", lay, &layout::custom_menu_title_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "menu_font_color", lay, &layout::custom_menu_font_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "menu_font_select_color", lay, &layout::custom_menu_font_select_color_set, false))
-		return false;
-	if (!config_load_iterator_layout_set( config_context, "orientation", lay, &layout::custom_video_orientation_set, false))
-		return false;
-
-	//inserto el nuevo layout en la lista de layouts (playout_container)
+	//rellena los datos del layout
+	unsigned i;
+	for(i=0; OPTION_LAYOUT[i].option; ++i)
+	{
+		if (!config_load_iterator_layout_set( config_context, OPTION_LAYOUT[i].option, lay, OPTION_LAYOUT[i].set))
+			return false;
+	}
+	
+	//inserta el nuevo layout en la lista de layouts (playout_container)
 	lay_cont.insert(lay_cont.end(), lay);
 	
 	return true;

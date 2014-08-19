@@ -25,3 +25,96 @@ layout::layout(const string& Aname) : name(Aname)
 {
 }
 
+void layout::custom_background_path_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+	
+	custom_background_path = A_path;
+}
+
+void layout::custom_help_path_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_help_path = A_path;
+}
+
+void layout::custom_start_path_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_start_path = A_path;
+}
+
+
+void layout::custom_font_path_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_font_path = A_path;
+}
+
+void layout::custom_bar_info_1_font_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_bar_info_1_font = A_path;
+}
+
+void layout::custom_bar_info_2_font_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_bar_info_2_font = A_path;
+}
+
+void layout::custom_bar_info_3_font_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_bar_info_3_font = A_path;
+}
+
+void layout::custom_bar_info_4_font_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_bar_info_4_font = A_path;
+}
+
+void layout::custom_bar_info_5_font_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_bar_info_5_font = A_path;
+}
+
+void layout::custom_menu_font_path_set(const string& A)
+{
+	string A_path = A;
+	if (A_path != ""  && A_path != "none" && A_path != "default" && A_path != "auto")
+		A_path = file_config_file_custom(A.c_str());
+
+	custom_menu_font_path = A_path;
+}
+
+
+

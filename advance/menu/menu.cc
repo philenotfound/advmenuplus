@@ -1909,8 +1909,8 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
 		} else {
-			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
-			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
+			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
+			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
 		}
 	} else {
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
@@ -2937,8 +2937,8 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
 		} else {
-			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
-			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
+			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
+			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
 		}
 	} else {
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;

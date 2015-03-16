@@ -852,15 +852,20 @@ int run_suballmenu(config_state& rs)
 
 int run_subthismenu(config_state& rs)
 {
+	bool is_favorites_allGames = (rs.include_favorites_get() == "All Games");
+	bool enable_filtertype = (rs.favorites_filtertype || is_favorites_allGames);
+
 	choice_bag ch;
 
 	ch.insert(ch.end(), choice(menu_name(rs, "Sort...", EVENT_SORT), 0));
 	ch.insert(ch.end(), choice(menu_name(rs, "Mode...", EVENT_MODE), 1));
 	ch.insert(ch.end(), choice(menu_name(rs, "Preview...", EVENT_PREVIEW), 2));
 	ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_FAVORITES_NEXT), 4));
-	ch.insert(ch.end(), choice(menu_name(rs, "Types...", EVENT_TYPE), 3));
-	ch.insert(ch.end(), choice(menu_name(rs, "Filters...", EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
-
+	if (enable_filtertype)	{
+		ch.insert(ch.end(), choice(menu_name(rs, "Types...", EVENT_TYPE), 3));
+		ch.insert(ch.end(), choice(menu_name(rs, "Filters...", EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
+	}
+	
 	string title;
 	if (rs.sub_has()) {
 		title = " Listing Emulator";

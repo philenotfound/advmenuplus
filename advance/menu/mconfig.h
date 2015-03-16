@@ -437,7 +437,8 @@ public:
 	unsigned ui_bottom; ///< User interface bottom border
 
 	bool rem_selected; ///< Recordar el juego seleccionado de los emuladores
-	
+	bool favorites_filtertype; ///< Indica si las listas de favoritos se pueden fitrar y catalogar por tipo
+		
 	bool ui_top_bar; ///< User interface need top bar
 	bool ui_bottom_bar; ///< User interface need bottom bar
 	std::string ui_gamemsg; ///< Message to display before a game run.

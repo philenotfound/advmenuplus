@@ -3650,7 +3650,11 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 	// recompute the preview mask
 	rs.preview_mask = 0;
-
+	
+	bool is_list_AllGames = (rs.include_favorites_get() == "All Games");
+	//indica si la lista de favoritos (incluida "All Games") se puede filtrar y catalogar por tipo
+	bool enable_filtertype = rs.favorites_filtertype || is_list_AllGames;
+	
 	// select and sort
 	for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
 		// emulator
@@ -3677,13 +3681,13 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		has_favorites = true;
 
 		// type
-		if (rs.include_favorites_get() == "All Games" && !i->type_derived_get()->state_get())
+		if (enable_filtertype && !i->type_derived_get()->state_get())
 			continue;
 
 		has_type = true;
 
 		// filter
-		if (rs.include_favorites_get() == "All Games" && !i->emulator_get()->filter(*i))
+		if (enable_filtertype && !i->emulator_get()->filter(*i))
 			continue;
 
 		has_filter = true;
@@ -3789,6 +3793,14 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 			break;
 		}
 
+		if (enable_filtertype)
+		switch(key) {
+		case EVENT_TYPE :
+		case EVENT_ATTRIB :
+			done=true;
+			break;
+		}
+		
 		switch (key) {
 		case EVENT_ESC :
 		case EVENT_OFF :
@@ -3802,8 +3814,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_LOCK :
 		case EVENT_HELP :
 		case EVENT_FAVORITES_NEXT :
-		case EVENT_TYPE :
-		case EVENT_ATTRIB :
 		case EVENT_SORT :
 		case EVENT_SETFAVORITES :
 		case EVENT_SETTYPE :

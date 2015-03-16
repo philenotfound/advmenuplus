@@ -367,6 +367,7 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_default(config_context, "ui_command_error", "Error running the command");
 	conf_string_register_multi(config_context, "ui_command");
 	conf_bool_register_default(config_context, "rem_selected", 1);
+	conf_bool_register_default(config_context, "favorites_filtertype", 0);
 }
 
 // -------------------------------------------------------------------------
@@ -926,7 +927,9 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		default_menu_base_orig = (int)conf_int_get_default(config_context, "menu_base");
 		default_menu_rel_orig = (int)conf_int_get_default(config_context, "menu_rel");
 	}
-	
+
+	favorites_filtertype = conf_bool_get_default(config_context, "favorites_filtertype");
+		
 	default_preview_orig = (listpreview_t)conf_int_get_default(config_context, "preview");
 
 	double d = conf_float_get_default(config_context, "ui_translucency");

@@ -323,7 +323,7 @@ int run_favorites(config_state& rs)
 	if (i==ch.end())
 		i = ch.begin();
 
-	int key = ch.run(" Show Favorites List", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
+	int key = ch.run(" Load List", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		string f = i->desc_get();
@@ -568,7 +568,7 @@ int run_favorites_move(config_state& rs)
 
 	choice_bag::iterator i = ch.begin();
 
-	int key = ch.favorites_run(" Select Game Lists", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
+	int key = ch.favorites_run(" Add/Remove Game Lists", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		favorites_container f;
@@ -936,10 +936,15 @@ int run_subfavoritesmenu(config_state& rs)
 {
 	choice_bag ch;
 
-	ch.insert(ch.end(), choice(menu_name(rs, "Show List...", EVENT_FAVORITES_NEXT), 0));
+	ch.insert(ch.end(), choice(menu_name(rs, "Load List...", EVENT_FAVORITES_NEXT), 0));
 	//if (rs.favorites.size() > 1)
-		ch.insert(ch.end(), choice(menu_name(rs, "Game Lists...", EVENT_SETFAVORITES), 1, rs.current_game != 0));
-	
+		ch.insert(ch.end(), choice(menu_name(rs, "Add/Rem Game...", EVENT_SETFAVORITES), 1, rs.current_game != 0));
+
+	string text_filtertype = "Enable Filters/Types";
+	if(rs.favorites_filtertype)
+		text_filtertype = "Disable Filters/Types";
+	ch.insert(ch.end(), choice(text_filtertype, 2));
+		
 	choice_bag::iterator i = ch.begin();
 
 	int key;
@@ -948,7 +953,7 @@ int run_subfavoritesmenu(config_state& rs)
 	do {
 		void* save = int_save();
 
-		key = ch.run(" Favorites List", SECOND_CHOICE_X, SECOND_CHOICE_Y, MENU_CHOICE_DX, i);
+		key = ch.run(" Favorites Lists", SECOND_CHOICE_X, SECOND_CHOICE_Y, MENU_CHOICE_DX, i);
 
 		if (key == EVENT_ENTER) {
 			switch (i->value_get()) {
@@ -957,6 +962,9 @@ int run_subfavoritesmenu(config_state& rs)
 				break;
 			case 1 :
 				key = run_favorites_move(rs);
+				break;
+			case 2 :
+				rs.favorites_filtertype = !rs.favorites_filtertype;
 				break;
 			}
 		} else if (key == EVENT_ESC) {
@@ -980,7 +988,7 @@ int run_submenu(config_state& rs)
 	if (!rs.console_mode) {
 		ch.insert(ch.end(), choice("Listing...", 1));
 		ch.insert(ch.end(), choice("Settings...", 0));
-		ch.insert(ch.end(), choice("Favorites List...", 2));
+		ch.insert(ch.end(), choice("Favorites Lists...", 2));
 		if (rs.emu.size() > 1)
 			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU_NEXT), 7));
 		ch.insert(ch.end(), choice("Volume...", 16));

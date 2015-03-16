@@ -1390,6 +1390,8 @@ bool config_state::save(adv_conf* config_context) const
 	conf_int_set(config_context, "", "menu_rel", menu_rel_orig);
 	conf_int_set(config_context, "", "difficulty", difficulty_orig);
 
+	conf_bool_set(config_context, "", "favorites_filtertype", favorites_filtertype);
+
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {
 		(*i)->config_get().save(config_context, config_normalize((*i)->user_name_get()));
 	}

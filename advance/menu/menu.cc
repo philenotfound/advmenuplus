@@ -3650,10 +3650,12 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 	// recompute the preview mask
 	rs.preview_mask = 0;
-	
-	bool is_list_AllGames = (rs.include_favorites_get() == "All Games");
+
+	//Nombre de la lista de favoritos a cargar
+	string include_favorites = rs.include_favorites_get();
+	bool is_list_AllGames = (include_favorites == "All Games");
 	//indica si la lista de favoritos (incluida "All Games") se puede filtrar y catalogar por tipo
-	bool enable_filtertype = rs.favorites_filtertype || is_list_AllGames;
+	bool enable_filtertype = (rs.favorites_filtertype || is_list_AllGames);
 	
 	// select and sort
 	for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
@@ -3665,12 +3667,11 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 		// game lists
 		bool state_favorites = false;
-		if (rs.include_favorites_get() == "All Games") {
+		if (is_list_AllGames) {
 			state_favorites = true;
 		} else if (i->gfavorites_get().size()) {
 			for(favorites_container::const_iterator j=i->gfavorites_get().begin();j!=(i)->gfavorites_get().end();++j) {
-				string fi = rs.include_favorites_get();
-				if (*j == fi)
+				if (include_favorites == *j)
 					state_favorites = true;
 			}
 		}
@@ -3746,6 +3747,12 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 	bool done = false;
 	int key = 0;
+
+	// si la lista de favoritos esta vacia, carga la siguiente.
+	if (!has_favorites && !is_list_AllGames && has_emu) {
+		done = true;
+		key = EVENT_FAVORITES_NEXT;
+	}
 
 	while (!done) {
 		key = run_menu_sort(rs, *psc, category_func, flipxy, silent, empty_msg);

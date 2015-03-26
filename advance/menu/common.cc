@@ -536,6 +536,37 @@ string file_read(const string& file)
 	return ss;
 }
 
+bool file_write(const string& path, const string& text)
+{
+	const char* dir = file_dir(path).c_str();
+	
+	if (access(dir, F_OK)!=0) {
+		if (target_mkdir(dir) != 0) {
+			target_err("Error creating dir %s\n", dir);
+			return false;
+		}
+	}
+	
+	FILE* f = fopen(path.c_str(), "wb");
+	if (!f) {
+		target_err("Error opening the file '%s'.\n", path.c_str());
+		return false;
+	}
+
+	// conversion: (const string) to (char*)
+	char* sc = strcpy((char*)malloc(text.length()+1), text.c_str());
+
+	if (fwrite(sc, text.length(), 1, f)!=1) {
+		fclose(f);
+		target_err("Error writting the file '%s'.\n", path.c_str());
+		return false;
+	}
+
+	fclose(f);
+
+	return true;
+}
+
 string file_dir_custom(const string& s)
 {
 	string path = s;

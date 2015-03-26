@@ -182,6 +182,7 @@ public:
 	bool is_user_favorites_set() const { return flag_get(flag_user_favorites_set); }
 	void gfavorites_set(const favorites_container& A) const;
 	const favorites_container& gfavorites_get() const;
+	void auto_favorites_set(const std::string& A) const;
 	
 	bool is_user_type_set() const { return flag_get(flag_user_type_set); }
 	void auto_type_set(const category* A) const;

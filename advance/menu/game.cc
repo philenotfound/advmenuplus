@@ -196,6 +196,20 @@ void game::gfavorites_set(const favorites_container& A) const
 	gfavorites = A;
 }
 
+void game::auto_favorites_set(const std::string& A) const
+{
+		bool has_list =false;
+		for (favorites_container::const_iterator i = gfavorites.begin();i!=gfavorites.end();++i) {
+			if(*i == A)
+				has_list = true;
+		}
+
+		if (!has_list) {
+			flag |= flag_user_favorites_set;
+			gfavorites.insert(gfavorites.end(), A);
+		}
+}
+
 const favorites_container& game::gfavorites_get() const
 {
 	return	gfavorites;

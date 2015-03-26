@@ -84,6 +84,7 @@ std::string file_select_random(const path_container& c);
 bool file_exists(const std::string& path);
 
 std::string file_read(const std::string& file);
+bool file_write(const std::string& path, const std::string& text);
 
 std::string dir_cat(const std::string& A, const std::string& B);
 std::string dir_cwd();

@@ -185,6 +185,25 @@ struct script {
 
 typedef std::list<script> script_container;
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Contexto temporal para guardar las listas de favoritos
+struct fav_emu {
+	std::string name;
+	std::list<std::string> gam_container;
+};
+
+struct fav_list {
+	std::string name;
+	std::list<fav_emu> emu_container;
+};
+
+typedef std::list<fav_list> fav_list_context;
+typedef std::list<fav_emu> fav_emu_context;
+typedef std::list<std::string> fav_game_context;
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
 class config_emulator_state {
 	bool sort_set_orig; ///< If the sort is set.
 	listsort_t sort_orig; ///< Original sort mode.
@@ -274,6 +293,9 @@ class config_state {
 	void import_desc(const game& g, const std::string& text);
 	void import_info(const game& g, const std::string& text);
 	void import_type(const game& g, const std::string& text);
+
+	bool load_iterator_favorites_import(adv_conf* config_context);
+	void favorites_import(const std::string& fav);
 
 	emulator* sub_emu; ///< Sub emu selected.
 

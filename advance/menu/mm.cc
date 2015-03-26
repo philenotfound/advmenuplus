@@ -428,12 +428,12 @@ static void version(void)
 	target_out("\n");
 
 	target_out("Configuration (in priority order):\n");
-	if (file_config_file_host("advmenu.rc") != 0)
-		target_out("  Host configuration file (R): %s\n", file_config_file_host("advmenu.rc"));
+	if (file_config_file_host("advmenup.rc") != 0)
+		target_out("  Host configuration file (R): %s\n", file_config_file_host("advmenup.rc"));
 	target_out("  Command line (R)\n");
-	target_out("  Home configuration file (RW): %s\n", file_config_file_home("advmenu.rc"));
-	if (file_config_file_data("advmenu.rc") != 0)
-		target_out("  Data configuration file (R): %s\n", file_config_file_data("advmenu.rc"));
+	target_out("  Home configuration file (RW): %s\n", file_config_file_home("advmenup.rc"));
+	if (file_config_file_data("advmenup.rc") != 0)
+		target_out("  Data configuration file (R): %s\n", file_config_file_data("advmenup.rc"));
 }
 
 static void help(void)
@@ -741,7 +741,7 @@ int os_main(int argc, char* argv[])
 	if (opt_cfg) {
 		sncpy(cfg_buffer, sizeof(cfg_buffer), file_config_file_home(opt_cfg));
 	} else {
-		sncpy(cfg_buffer, sizeof(cfg_buffer), file_config_file_home("advmenu.rc"));
+		sncpy(cfg_buffer, sizeof(cfg_buffer), file_config_file_home("advmenup.rc"));
 	}
 
 	if (opt_version) {
@@ -764,14 +764,14 @@ int os_main(int argc, char* argv[])
 
 	log_std(("menu: %s %s\n", __DATE__, __TIME__));
 
-	if (file_config_file_host("advmenu.rc") != 0) {
-		if (conf_input_file_load_adv(config_context, 4, file_config_file_host("advmenu.rc"), 0, 0, 1, STANDARD, sizeof(STANDARD)/sizeof(STANDARD[0]), error_callback, 0) != 0) {
+	if (file_config_file_host("advmenup.rc") != 0) {
+		if (conf_input_file_load_adv(config_context, 4, file_config_file_host("advmenup.rc"), 0, 0, 1, STANDARD, sizeof(STANDARD)/sizeof(STANDARD[0]), error_callback, 0) != 0) {
 			goto err_init;
 		}
 	}
 
-	if (file_config_file_data("advmenu.rc") != 0) {
-		if (conf_input_file_load_adv(config_context, 0, file_config_file_data("advmenu.rc"), 0, 0, 1, STANDARD, sizeof(STANDARD)/sizeof(STANDARD[0]), error_callback, 0) != 0) {
+	if (file_config_file_data("advmenup.rc") != 0) {
+		if (conf_input_file_load_adv(config_context, 0, file_config_file_data("advmenup.rc"), 0, 0, 1, STANDARD, sizeof(STANDARD)/sizeof(STANDARD[0]), error_callback, 0) != 0) {
 			goto err_init;
 		}
 	}

@@ -1856,7 +1856,7 @@ int os_main(int argc, char* argv[])
 		switch (the_advance) {
 			case advance_vbe : opt_rc = "vbe.rc"; break;
 			case advance_vga : opt_rc = "vga.rc"; break;
-			case advance_menu : opt_rc = file_config_file_home("advmenu.rc"); break;
+			case advance_menu : opt_rc = file_config_file_home("advmenup.rc"); break;
 			case advance_mame : opt_rc = file_config_file_home("advmame.rc"); break;
 			case advance_mess : opt_rc = file_config_file_home("advmess.rc"); break;
 			case advance_pac : opt_rc = file_config_file_home("advpac.rc"); break;

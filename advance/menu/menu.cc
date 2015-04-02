@@ -3660,6 +3660,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	// select and sort
 	for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
 		// emulator
+		if (!i->emulator_get()) //ignora los juegos sin emuladores
+			continue;
 		if (!i->emulator_get()->state_get())
 			continue;
 

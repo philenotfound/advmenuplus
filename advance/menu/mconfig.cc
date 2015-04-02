@@ -718,6 +718,14 @@ void config_state::favorites_import(const string& fav)
 				game_set::const_iterator k = gar.find(game(name));
 				if (k!=gar.end()) {
 					k->auto_favorites_set(fav);
+				} else {
+					game g;
+					g.name_set(name);
+					gar.insert(gar.end(), g);
+					game_set::const_iterator z = gar.find(game(name));
+					if (z!=gar.end()) {
+						z->auto_favorites_set(fav);
+					}
 				}
 			}
 		}

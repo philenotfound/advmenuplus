@@ -1394,9 +1394,9 @@ void config_state::conf_default(adv_conf* config_context)
 
 	conf_iterator_begin(&i, config_context, "favorites");
 	if (conf_iterator_is_end(&i)) {
-		conf_set(config_context, "", "favorites", "\"Very Good\"");
-		conf_set(config_context, "", "favorites", "\"Good\"");
-		conf_set(config_context, "", "favorites", "\"Bad\"");
+		conf_set(config_context, "", "favorites", "\"Favorites #1\"");
+		conf_set(config_context, "", "favorites", "\"Favorites #2\"");
+		conf_set(config_context, "", "favorites", "\"Favorites #3\"");
 	}
 
 	conf_iterator_begin(&i, config_context, "type");

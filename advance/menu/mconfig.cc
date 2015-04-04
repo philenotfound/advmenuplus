@@ -695,36 +695,39 @@ static bool config_load_iterator_pcategory(adv_conf* config_context, const strin
 
 void config_state::favorites_import(const string& fav)
 {	
-	string file = "favlist/" + fav + ".fav";
 	string emu = "";
-
-	int j = 0;
+	string file = "favlist/" + fav + ".fav";
 	
-	string ss = file_read(file);
-		
-	while (j < ss.length()) {
-		string s = token_get(ss, j, "\r\n");
-		token_skip(ss, j, "\r\n");
+	int j = 0;
 
-		int i = 0;
+	if (access(file_config_file_home(file.c_str()), F_OK)==0) {
 
-		if (i<s.length() && s[i]=='[') {
-			token_skip(s, i, "[");
-			emu = token_get(s, i, "]");
-		} else if (i<s.length() && isalnum(s[i])) {
-			string rom = s;
-			if (rom.length()) {
-				string name = emu + "/" + rom;
-				game_set::const_iterator k = gar.find(game(name));
-				if (k!=gar.end()) {
-					k->auto_favorites_set(fav);
-				} else {
-					game g;
-					g.name_set(name);
-					gar.insert(gar.end(), g);
-					game_set::const_iterator z = gar.find(game(name));
-					if (z!=gar.end()) {
-						z->auto_favorites_set(fav);
+		string ss = file_read(file);
+
+		while (j < ss.length()) {
+			string s = token_get(ss, j, "\r\n");
+			token_skip(ss, j, "\r\n");
+
+			int i = 0;
+
+			if (i<s.length() && s[i]=='[') {
+				token_skip(s, i, "[");
+				emu = token_get(s, i, "]");
+			} else if (i<s.length() && isalnum(s[i])) {
+				string rom = s;
+				if (rom.length()) {
+					string name = emu + "/" + rom;
+					game_set::const_iterator k = gar.find(game(name));
+					if (k!=gar.end()) {
+						k->auto_favorites_set(fav);
+					} else {
+						game g;
+						g.name_set(name);
+						gar.insert(gar.end(), g);
+						game_set::const_iterator z = gar.find(game(name));
+						if (z!=gar.end()) {
+							z->auto_favorites_set(fav);
+						}
 					}
 				}
 			}

@@ -23,6 +23,7 @@ MENUOBJS += \
 	$(MENUOBJ)/menu/crc.o \
 	$(MENUOBJ)/menu/emulator.o \
 	$(MENUOBJ)/menu/layout.o \
+	$(MENUOBJ)/menu/favlist.o \
 	$(MENUOBJ)/menu/emuxml.o \
 	$(MENUOBJ)/menu/game.o \
 	$(MENUOBJ)/menu/mconfig.o \

@@ -291,7 +291,7 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_multi(config_context, "emulator_font_color");
 	conf_string_register_multi(config_context, "emulator_font_color_select");
 	conf_string_register_multi(config_context, "favorites");
-	conf_string_register_default(config_context, "favorites_include", "All Games");
+	conf_string_register_default(config_context, "favorites_include", "\"All Games\"");
 	conf_string_register_multi(config_context, "type");
 	conf_string_register_multi(config_context, "type_include");
 	conf_string_register_multi(config_context, "type_import");
@@ -433,13 +433,12 @@ static bool config_load_background_list(const string& list, path_container& c)
 	return almost_one;
 }
 
-bool config_state::load_game(const string& name, favorites_container& favorites, const string& type_name, const string& time, const string& session, const string& desc)
+bool config_state::load_game(const string& name, const string& type_name, const string& time, const string& session, const string& desc)
 {
 	game_set::const_iterator i = gar.find(game(name));
 	if (i==gar.end())
 		return false;
 
-	i->gfavorites_set(favorites);
 	i->user_type_set(type.insert(type_name));
 
 	if (desc.length()!=0)
@@ -489,28 +488,6 @@ static bool config_load_iterator(adv_conf* config_context, const string& tag, bo
 		string a0 = conf_iterator_string_get(&i);
 		if (!func(a0)) {
 			config_error_a(a0);
-			return false;
-		}
-		conf_iterator_next(&i);
-	}
-	return true;
-}
-
-static bool config_load_iterator_emu_custom_set(adv_conf* config_context, const string& nombre_emulador, const string& tag, pemulator_container& emu, void (emulator::*set)(const string& s), bool type_path)
-{
-	adv_conf_iterator i;
-	conf_iterator_begin(&i, config_context, tag.c_str());
-	while (!conf_iterator_is_end(&i)) {
-		string arg = borrar_comillas(conf_iterator_string_get(&i));
-		
-		if (type_path) { 
-			if (arg != ""  && arg != "none" && arg != "default" && arg != "auto") { 
-				arg = file_config_file_custom(arg.c_str());
-			}
-		}
-		
-		if (!config_emulator_load(nombre_emulador, emu, set, arg)) {
-			config_error_a(arg);
 			return false;
 		}
 		conf_iterator_next(&i);
@@ -661,9 +638,14 @@ static bool config_load_iterator_emu(adv_conf* config_context, const string& tag
 	return true;
 }
 
-static bool config_load_iterator_favorites(adv_conf* config_context, const string& tag, favorites_container& fav)
+static bool config_load_iterator_favorites(adv_conf* config_context, const string& tag, pfavorites_container& fav)
 {
-	fav.insert(fav.end(), "All Games");
+	if (fav.size() == 0) {
+		favorite* f;
+		f = new favorite("All Games");
+		fav.insert(fav.end(), f);
+	}
+	
 	adv_conf_iterator i;
 	conf_iterator_begin(&i, config_context, tag.c_str());
 	while (!conf_iterator_is_end(&i)) {
@@ -671,8 +653,17 @@ static bool config_load_iterator_favorites(adv_conf* config_context, const strin
 		string s = conf_iterator_string_get(&i);
 		if (!config_split(s, a0))
 			return false;
-		if (a0 != "All Games")
-			fav.insert(fav.end(), a0);
+		if (a0.length() == 0) {
+			config_error_a(s);
+			return false;
+		}
+
+		if(a0 != "All Games") {
+			favorite* f;
+			f = new favorite(a0);
+			fav.insert(fav.end(), f);
+		}
+		
 		conf_iterator_next(&i);
 	}
 	return true;
@@ -688,65 +679,6 @@ static bool config_load_iterator_pcategory(adv_conf* config_context, const strin
 		if (!config_split(s, a0))
 			return false;
 		cat.insert(a0);
-		conf_iterator_next(&i);
-	}
-	return true;
-}
-
-void config_state::favorites_import(const string& fav)
-{	
-	string emu = "";
-	string file = "favlist/" + fav + ".fav";
-	
-	int j = 0;
-
-	if (access(file_config_file_home(file.c_str()), F_OK)==0) {
-
-		string ss = file_read(file);
-
-		while (j < ss.length()) {
-			string s = token_get(ss, j, "\r\n");
-			token_skip(ss, j, "\r\n");
-
-			int i = 0;
-
-			if (i<s.length() && s[i]=='[') {
-				token_skip(s, i, "[");
-				emu = token_get(s, i, "]");
-			} else if (i<s.length() && isalnum(s[i])) {
-				string rom = s;
-				if (rom.length()) {
-					string name = emu + "/" + rom;
-					game_set::const_iterator k = gar.find(game(name));
-					if (k!=gar.end()) {
-						k->auto_favorites_set(fav);
-					} else {
-						game g;
-						g.name_set(name);
-						gar.insert(gar.end(), g);
-						game_set::const_iterator z = gar.find(game(name));
-						if (z!=gar.end()) {
-							z->auto_favorites_set(fav);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-bool config_state::load_iterator_favorites_import(adv_conf* config_context)
-{
-	adv_conf_iterator i;
-	conf_iterator_begin(&i, config_context, "favorites");
-	while (!conf_iterator_is_end(&i)) {
-		string a0;
-		string s = conf_iterator_string_get(&i);
-		if (!config_split(s, a0))
-			return false;
-		if (a0 != "All Games")
-			favorites_import(a0);
-			
 		conf_iterator_next(&i);
 	}
 	return true;
@@ -845,18 +777,11 @@ bool config_state::load_iterator_game(adv_conf* config_context, const string& ta
 	adv_conf_iterator i;
 	conf_iterator_begin(&i, config_context, tag.c_str());
 	while (!conf_iterator_is_end(&i)) {
-		favorites_container f;
 		string s = conf_iterator_string_get(&i);
 		int j = 0;
 		string game = arg_get(s, j);
 		
-		string sfavorites = arg_get(s, j);
-		int k = 0;
-		while (k<sfavorites.length()) {
-			string list = token_get(sfavorites, k, "/");
-			token_skip(sfavorites, k, "/");
-			f.insert(f.end(), list);
-		}
+		string sfavorites = arg_get(s, j); //OJO: en el futuro grupos
 		
 		string type = arg_get(s, j);
 		string time = arg_get(s, j);
@@ -873,7 +798,7 @@ bool config_state::load_iterator_game(adv_conf* config_context, const string& ta
 			return false;
 		}
 
-		if (!load_game(game, f, type, time, session, desc)) {
+		if (!load_game(game, type, time, session, desc)) {
 			++ignored_count;
 			if (ignored_count < 10)
 				target_err("Ignoring info for game '%s'.\n", game.c_str());
@@ -987,8 +912,6 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		default_menu_rel_orig = (int)conf_int_get_default(config_context, "menu_rel");
 	}
 
-	favorites_filtertype = conf_bool_get_default(config_context, "favorites_filtertype");
-		
 	default_preview_orig = (listpreview_t)conf_int_get_default(config_context, "preview");
 
 	double d = conf_float_get_default(config_context, "ui_translucency");
@@ -1253,16 +1176,6 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	}
 
 	if (opt_verbose)
-		target_nfo("log: load game favorites lists\n");
-
-	if (!config_load_iterator_favorites(config_context, "favorites", favorites))
-		return false;
-	default_include_favorites_orig = borrar_comillas(conf_string_get_default(config_context, "favorites_include"));
-	if (default_include_favorites_orig == "") {
-		default_include_favorites_orig = "All Games";
-	}
-	
-	if (opt_verbose)
 		target_nfo("log: load games info\n");
 
 	if (!load_iterator_game(config_context, "game"))
@@ -1300,15 +1213,32 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	if (!load_iterator_import(config_context, "type_import", &config_state::import_type, opt_verbose))
 		return false;
 
-	// carga info de las listas de favoritos (archivos .fav) 
-	if (!load_iterator_favorites_import(config_context))
-		return false;
-	
 	if (opt_verbose)
 		target_nfo("log: load background music list\n");
 
 	config_load_background_list(sound_background_loop_dir, sound_background);
 
+	// ------------------------------------------- LOAD FAVORITES LISTS ---------------------------------------------
+	if (opt_verbose)
+		target_nfo("log: load favorites lists\n");
+
+	if (!config_load_iterator_favorites(config_context, "favorites", favorites))
+		return false;
+
+	if (!config_split(conf_string_get_default(config_context, "favorites_include"), default_include_favorites_orig))
+		return false;
+	if (default_include_favorites_orig == "") {
+		default_include_favorites_orig = "All Games";
+	}
+
+	favorites_filtertype = conf_bool_get_default(config_context, "favorites_filtertype");
+
+	for(pfavorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+		if(!(*i)->import())
+			target_err("Failed to import data from the favorites list '%s'.\n", (*i)->name_get().c_str());
+	}
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
 	if (opt_verbose)
 		target_nfo("log: start\n");
 
@@ -1433,60 +1363,12 @@ void config_state::conf_default(adv_conf* config_context)
 // -------------------------------------------------------------------------
 // Configuration save
 
-bool fav_save(fav_list_context& context)
+bool config_state::save_favorites() const
 {
-	for(fav_list_context::iterator f=context.begin();f!=context.end();++f) {
-		string file_fav = "favlist/" + f->name + ".fav";
-		string path_fav = file_config_file_home(file_fav.c_str());
-		string ss = "";
-		for(fav_emu_context::iterator e=f->emu_container.begin();e!=f->emu_container.end();++e) {
-			ss += "[" + e->name + "]\r\n";
-			for(fav_game_context::iterator g=e->gam_container.begin();g!=e->gam_container.end();++g) {
-				ss += *g + "\r\n";
-			}
-			ss += "\r\n";
-		}
-		if (!ss.length()) ss = "\r\n";
-		file_write(path_fav, ss);
+	for(pfavorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+		if(!(*i)->save())
+			return false;			
 	}
-
-	return true;
-}
-
-bool fav_list_insert(fav_list_context& context, game_set::const_iterator& game)
-{
-	string emu_name = game->name_get();
-
-	int nSlash = emu_name.find('/');
-	string emu = emu_name.substr(0, nSlash);
-	string name = emu_name.substr(nSlash+1, emu_name.length());
-	favorites_container favorites = game->gfavorites_get(); //listas de favoritos en las que esta el juego
-	
-	bool has_emu = false;
-	
-	for(favorites_container::iterator i=favorites.begin();i!=favorites.end();++i) {	//Coge una lista del juego
-		has_emu = false;
-		for(fav_list_context::iterator f=context.begin();f!=context.end();++f) {		//busca la lista del juego en el contexto
-			if(f->name == *i) {																						//Si existe la lista en el contexto
-				for(fav_emu_context::iterator e=f->emu_container.begin();e!=f->emu_container.end();++e) { //Mira si en la lista del contexto existe el emulador
-					if(e->name == emu) {																			//Si existe el emulador en el contexto
-						has_emu = true;
-						//inserta el juego en el emulador del contexto
-						e->gam_container.push_back(name);
-					}
-				}
-				if(!has_emu) {
-					//inserta el emulador en la lista del contexto
-					fav_emu emuTmp;
-					emuTmp.name = emu;
-
-					emuTmp.gam_container.push_back(name);
-					f->emu_container.push_back(emuTmp);
-				}
-			}
-		}
-	}
-
 	return true;
 }
 
@@ -1521,12 +1403,6 @@ bool config_state::save(adv_conf* config_context) const
 		conf_string_set(config_context, "", "emulator_include", config_out(*i).c_str());
 	}
 
-	conf_remove(config_context, "", "favorites");
-	for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
-		if (*i != "All Games")
-			conf_string_set(config_context, "", "favorites", config_out(*i).c_str());
-	}
-
 	conf_remove(config_context, "", "type");
 	for(pcategory_container::const_iterator i=type.begin();i!=type.end();++i) {
 		conf_string_set(config_context, "", "type", config_out((*i)->name_get()).c_str());
@@ -1554,17 +1430,6 @@ bool config_state::save(adv_conf* config_context) const
 	conf_string_set(config_context, "", "display_orientation", s.c_str());
 
 	conf_remove(config_context, "", "game");
-
-	// Guarda listas de favoritos: crea el contexto temporal y lo inicializa con las listas
-	fav_list_context list_context;
-	for(favorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
-		if (*i != "All Games") {
-			fav_list listTmp;
-			listTmp.name = *i;
-			list_context.push_back(listTmp);
-		}
-	}
-	
 	for(game_set::const_iterator i=gar.begin();i!=gar.end();++i) {
 		if (0
 			|| i->is_user_type_set()
@@ -1575,7 +1440,7 @@ bool config_state::save(adv_conf* config_context) const
 			ostringstream f;
 			f << "\"" << i->name_get() << "\"";
 
-			f << " \"\""; //apartir de ahora los dator de los favoritos no se guarda en el RC
+			f << " \"\""; //apartir de ahora los datos de los favoritos no se guarda en el RC
 
 			f << " \"";
 			if (i->is_user_type_set())
@@ -1594,19 +1459,10 @@ bool config_state::save(adv_conf* config_context) const
 
 			conf_string_set(config_context, "", "game", f.str().c_str());
 		}
-
-		// guarda las listas del juego en el contexto de favoritos
-		if (i->is_user_favorites_set()) {
-			fav_list_insert(list_context, i);
-		}
 	}
 
 	// don't print the error message (error_callback==0)
 	if (conf_save(config_context, 1, 0, 0, 0) != 0)
-		return false;
-
-	// guarda las listas de favoritos en archivos .fav
-	if (!fav_save(list_context))
 		return false;
 
 	// prevent data lost if crashing
@@ -1678,10 +1534,16 @@ config_state::config_state()
 
 config_state::~config_state()
 {
+	// delete the favorites
+	for(pfavorites_container::iterator i=favorites.begin();i!=favorites.end();++i) {
+		delete *i;
+	}
+
 	// delete the emulators
 	for(pemulator_container::iterator i=emu.begin();i!=emu.end();++i) {
 		delete *i;
 	}
+	
 	// delete the types
 	for(pcategory_container::iterator i=type.begin();i!=type.end();++i) {
 		delete *i;

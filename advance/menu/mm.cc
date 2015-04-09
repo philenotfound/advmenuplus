@@ -363,6 +363,8 @@ int run_all(adv_conf* config_context, config_state& rs)
 			if (rs.current_clone) {
 				// save before
 				rs.save(config_context);
+				// save the favorites lists
+				rs.save_favorites();
 
 				// run the game
 				if (rs.current_game->software_get()) {
@@ -868,6 +870,8 @@ int os_main(int argc, char* argv[])
 
 	// save all the data
 	rs.save(config_context);
+	// save the favorites lists
+	rs.save_favorites();
 
 	if (opt_log || opt_logsync) {
 		log_done();

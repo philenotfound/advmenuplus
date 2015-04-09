@@ -28,6 +28,7 @@
 #include "conf.h"
 
 #include "layout.h"
+#include "favlist.h"
 
 #include <list>
 
@@ -185,25 +186,6 @@ struct script {
 
 typedef std::list<script> script_container;
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-
-//Contexto temporal para guardar las listas de favoritos
-struct fav_emu {
-	std::string name;
-	std::list<std::string> gam_container;
-};
-
-struct fav_list {
-	std::string name;
-	std::list<fav_emu> emu_container;
-};
-
-typedef std::list<fav_list> fav_list_context;
-typedef std::list<fav_emu> fav_emu_context;
-typedef std::list<std::string> fav_game_context;
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-
 class config_emulator_state {
 	bool sort_set_orig; ///< If the sort is set.
 	listsort_t sort_orig; ///< Original sort mode.
@@ -285,7 +267,7 @@ public:
 };
 
 class config_state {
-	bool load_game(const std::string& name,  favorites_container& favorites, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
+	bool load_game(const std::string& name, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
 	bool load_iterator_game(adv_conf* config_context, const std::string& tag);
 	bool load_iterator_import(adv_conf* config_context, const std::string& tag, void (config_state::*set)(const game&, const std::string&), bool opt_verbose);
 	bool load_iterator_script(adv_conf* config_context, const std::string& tag);
@@ -293,9 +275,6 @@ class config_state {
 	void import_desc(const game& g, const std::string& text);
 	void import_info(const game& g, const std::string& text);
 	void import_type(const game& g, const std::string& text);
-
-	bool load_iterator_favorites_import(adv_conf* config_context);
-	void favorites_import(const std::string& fav);
 
 	emulator* sub_emu; ///< Sub emu selected.
 
@@ -362,8 +341,8 @@ public:
 	pemulator_container emu_active; ///< Active emulators, a subset of emu.
 
 	playout_container lay_cont; ///< Lista de layouts
-		
-	favorites_container favorites; ///< Game Lists set.
+
+	pfavorites_container favorites; ///< Game Lists set.
 	pcategory_container type; ///< Type set.
 
 	bool lock_orig; ///< Original interface locked.
@@ -479,6 +458,8 @@ public:
 
 	bool load(adv_conf* config_context, bool opt_verbose);
 	bool save(adv_conf* config_context) const;
+
+	bool save_favorites() const;
 
 	void restore_load();
 	void restore_save();

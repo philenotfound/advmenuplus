@@ -77,14 +77,12 @@ enum play_t {
 class game;
 
 typedef std::list<const game*> pgame_container;
-typedef std::list<std::string> favorites_container;
 
 class game {
 	static const unsigned flag_session_set = 0x1;
 	static const unsigned flag_time_set = 0x2;
 	static const unsigned flag_user_description_set = 0x4;
 	static const unsigned flag_user_type_set = 0x8;
-	static const unsigned flag_user_favorites_set = 0x10;
 	static const unsigned flag_software = 0x20;
 	static const unsigned flag_tree_present = 0x40;
 
@@ -111,7 +109,6 @@ class game {
 	unsigned aspecty;
 	std::string refresh;
 	
-	mutable favorites_container gfavorites;
 	mutable const category* type;
 	mutable unsigned time;
 
@@ -179,11 +176,6 @@ public:
 	void auto_info_set(const std::string& A) const { info = A; }
 	const std::string& info_get() const { return info; }
 
-	bool is_user_favorites_set() const { return flag_get(flag_user_favorites_set); }
-	void gfavorites_set(const favorites_container& A) const;
-	const favorites_container& gfavorites_get() const;
-	void auto_favorites_set(const std::string& A) const;
-	
 	bool is_user_type_set() const { return flag_get(flag_user_type_set); }
 	void auto_type_set(const category* A) const;
 	void user_type_set(const category* A) const;
@@ -249,7 +241,7 @@ public:
 	const resource& preview_title_get() const { return title_path; }
 
 	bool preview_zip_set(const std::string& zip, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1) const;
-        bool preview_dir_set(const std::string& dir, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1) const;
+	bool preview_dir_set(const std::string& dir, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1) const;
 	bool preview_list_set(const std::string& list, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1) const;
 	bool preview_software_list_set(const std::string& list, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1) const;
 
@@ -311,7 +303,7 @@ public:
 	bool is_game_rom_of(const std::string& name_son, const std::string& name_parent) const;
 	bool is_game_clone_of(const std::string& name_son, const std::string& name_parent) const;
 
-        bool preview_zip_set(const std::string& zip, const std::string& emulator_name, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1);
+	bool preview_zip_set(const std::string& zip, const std::string& emulator_name, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1);
 	bool preview_dir_set(const std::string& dir, const std::string& emulator_name, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1);
 	bool preview_list_set(const std::string& list, const std::string& emulator_name, void (game::*preview_set)(const resource& s) const, const std::string& ext0, const std::string& ext1);
 

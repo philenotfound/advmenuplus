@@ -315,8 +315,8 @@ int run_favorites(config_state& rs)
 {
 	choice_bag ch;
 
-	for(favorites_container::const_iterator j = rs.favorites.begin();j!=rs.favorites.end();++j) {
-		ch.insert(ch.end(), choice((*j), 0));
+	for(pfavorites_container::const_iterator j = rs.favorites.begin();j!=rs.favorites.end();++j) {
+		ch.insert(ch.end(), choice((*j)->name_get(), 0));
 	}
 
 	choice_bag::iterator i = ch.find_by_desc(rs.include_favorites_get());
@@ -338,23 +338,63 @@ void run_favorites_next(config_state& rs)
 	string next_select = "";
 	bool pred_in = false;
 
-	for(favorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();++j) {
-		if (pred_in)
-			next_select = *j;
-		pred_in = false;
-		if ((*j) == rs.include_favorites_get())
-			pred_in = true;
+	for(pfavorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();++j) {
+		if (pred_in) {
+			for(emulator_container::const_iterator k = rs.include_emu_get().begin();k!=rs.include_emu_get().end();++k) {
+				if((*j)->has_emu(*k)) {
+					next_select = (*j)->name_get();
+					pred_in = false;
+					break;
+				}
+			}
+		}
+		if ((*j)->name_get() == rs.include_favorites_get())
+				pred_in = true;
 	}
 	
 	if (next_select == "" && rs.favorites.begin() != rs.favorites.end())
-		next_select = *rs.favorites.begin();
-	
+		next_select = (*rs.favorites.begin())->name_get(); // lista "All Games"
+
 	string f;
 
 	if (next_select != "")
 		f = next_select;
-	
+
 	rs.include_favorites_set(f);
+}
+
+int run_favorites_move(config_state& rs)
+{
+	string game = rs.current_game->name_get();
+
+	choice_bag ch;
+
+	for(pfavorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();++j) {
+		bool tag = false;
+		if ((*j)->name_get() != "All Games") {
+			if((*j)->has_game(game))
+				tag = true;
+			
+			ch.insert(ch.end(), choice((*j)->name_get(), tag, 0));
+		}
+	}
+
+	choice_bag::iterator i = ch.begin();
+
+	int key = ch.favorites_run(" Add/Remove Game Lists", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
+
+	if (key == EVENT_ENTER) {
+		for(choice_bag::const_iterator j=ch.begin();j!=ch.end();++j) {
+			for(pfavorites_container::const_iterator k=rs.favorites.begin();k!=rs.favorites.end();++k) {
+				if((*k)->name_get() == j->desc_get()) {
+					(*k)->game_move(game, j->bistate_get());
+					break;
+				}
+			}
+		}
+	}
+
+	return key;
 }
 
 // ------------------------------------------------------------------------
@@ -429,7 +469,20 @@ void run_emu_next(config_state& rs)
 	string next_select = "";
 	bool pred_in = false;
 
-	for(pemulator_container::const_iterator j=rs.emu_active.begin();j!=rs.emu_active.end();++j) {
+	// Obtiene la lista de favoritos actual
+	pfavorites_container::const_iterator i;
+	for(i=rs.favorites.begin();i!=rs.favorites.end();++i)
+		if((*i)->name_get() == rs.include_favorites_get())
+			break;
+
+	// Obtiene la coleccion de emuladores validos (con juegos para la lista de favoritos actual)
+	pemulator_container emu_valid;
+	for(pemulator_container::const_iterator j=rs.emu_active.begin();j!=rs.emu_active.end();++j)
+		if((*i)->has_emu((*j)->user_name_get()))
+			emu_valid.insert(emu_valid.end(), *j);
+
+	// Recorre los emuladores validos para obtener el emulador siguiente
+	for(pemulator_container::const_iterator j=emu_valid.begin();j!=emu_valid.end();++j) {
 		if (pred_in)
 			next_select = (*j)->user_name_get();
 		pred_in = false;
@@ -440,38 +493,51 @@ void run_emu_next(config_state& rs)
 			}
 		}
 	}
-	if (next_select.length() == 0 && rs.emu_active.begin() != rs.emu_active.end())
-		next_select = (*rs.emu_active.begin())->user_name_get();
+	if (next_select.length() == 0 && emu_valid.begin() != emu_valid.end())
+		next_select = (*emu_valid.begin())->user_name_get();
 
 	emulator_container c;
 
 	if (next_select.length() != 0)
 		c.insert(c.end(), next_select);
 
-	rs.include_emu_set(c);
+	rs.include_emu_set(c);	
 }
 
 void run_emu_pre(config_state& rs)
 {
 	string pre_select = "";
 	string pre_emu = "";
-	for(pemulator_container::const_iterator j=rs.emu_active.begin();j!=rs.emu_active.end();++j) {
+
+	// Obtiene la lista de favoritos actual
+	pfavorites_container::const_iterator i;
+	for(i=rs.favorites.begin();i!=rs.favorites.end();++i)
+		if((*i)->name_get() == rs.include_favorites_get())
+			break;
+
+	// Obtiene la coleccion de emuladores validos (con juegos para la lista de favoritos actual
+	pemulator_container emu_valid;
+	for(pemulator_container::const_iterator j=rs.emu_active.begin();j!=rs.emu_active.end();++j)
+		if((*i)->has_emu((*j)->user_name_get()))
+			emu_valid.insert(emu_valid.end(), *j);
+
+	// Recorre los emuladores validos para obtener el emulador previo
+	for(pemulator_container::const_iterator j=emu_valid.begin();j!=emu_valid.end();++j) {
 		for(emulator_container::const_iterator k = rs.include_emu_get().begin();k!=rs.include_emu_get().end();++k) {
 			if ((*j)->user_name_get() == *k) {
 				pre_select = pre_emu;
 				break;
 			}
-			
 		}
 		pre_emu = (*j)->user_name_get();
 	}
-	if (pre_select.length() == 0 && rs.emu_active.begin() != rs.emu_active.end())
+	if (pre_select.length() == 0 && emu_valid.begin() != emu_valid.end())
 		pre_select = pre_emu;
 
 	emulator_container c;
 
 	if (pre_select.length() != 0)
-			c.insert(c.end(), pre_select);
+		c.insert(c.end(), pre_select);
 
 	rs.include_emu_set(c);
 }
@@ -546,42 +612,6 @@ void run_type_next(config_state& rs)
 
 // ------------------------------------------------------------------------
 // Move menu
-
-int run_favorites_move(config_state& rs)
-{
-	choice_bag ch;
-
-	favorites_container gfavoritos = rs.current_game->gfavorites_get();
-	
-	for(favorites_container::const_iterator j = rs.favorites.begin();j!=rs.favorites.end();++j) {
-
-		bool tag = false;
-		if ((*j) != "All Games") {
-			for(favorites_container::const_iterator k=gfavoritos.begin();k!=gfavoritos.end();++k) {
-				if(*j==*k)
-					tag = true;
-			}
-			
-			ch.insert(ch.end(), choice((*j), tag, 0));
-		}
-	}
-
-	choice_bag::iterator i = ch.begin();
-
-	int key = ch.favorites_run(" Add/Remove Game Lists", THIRD_CHOICE_X, THIRD_CHOICE_Y, FAVORITES_CHOICE_DX, i);
-
-	if (key == EVENT_ENTER) {
-		favorites_container f;
-		for(choice_bag::const_iterator j=ch.begin();j!=ch.end();++j) {
-			if (j->bistate_get()) {
-				f.insert(f.end(), j->desc_get());
-			}
-		}
-		rs.current_game->gfavorites_set(f);
-	}
-
-	return key;
-}
 
 int run_type_move(config_state& rs)
 {
@@ -937,14 +967,11 @@ int run_subfavoritesmenu(config_state& rs)
 	choice_bag ch;
 
 	ch.insert(ch.end(), choice(menu_name(rs, "Load List...", EVENT_FAVORITES_NEXT), 0));
-	//if (rs.favorites.size() > 1)
-		ch.insert(ch.end(), choice(menu_name(rs, "Add/Rem Game...", EVENT_SETFAVORITES), 1, rs.current_game != 0));
+	ch.insert(ch.end(), choice(menu_name(rs, "Add/Rem Game...", EVENT_SETFAVORITES), 1, rs.current_game != 0));
 
-	string text_filtertype = "Enable Filters/Types";
-	if(rs.favorites_filtertype)
-		text_filtertype = "Disable Filters/Types";
+	string text_filtertype = rs.favorites_filtertype ? "Disable Filters/Types" : "Enable Filters/Types"; 
 	ch.insert(ch.end(), choice(text_filtertype, 2));
-		
+	
 	choice_bag::iterator i = ch.begin();
 
 	int key;
@@ -1034,7 +1061,7 @@ int run_submenu(config_state& rs)
 				key = run_subthismenu(rs);
 				break;
 			case 2 :
-				run_subfavoritesmenu(rs);
+				key = run_subfavoritesmenu(rs);
 				break;
 			case 7 :
 				key = run_emu(rs);

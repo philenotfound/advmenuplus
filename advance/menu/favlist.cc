@@ -133,29 +133,33 @@ bool favorite::import() const
 
 bool favorite::save() const
 {
-	if(has_changed) {
-		string file = "favlist/" + name_get() + ".fav";
-		string path = file_config_file_home(file.c_str());
+	if(!has_changed)
+		return true;
+	
+	string file = "favlist/" + name_get() + ".fav";
+	string path = file_config_file_home(file.c_str());
 
-		string s = "";
-		string emu = "";
+	string s = "";
+	string emu = "";
 		
-		gar_fav.sort(); // ordena la lista de juegos
-		for(favorites_container::const_iterator j=gar_fav.begin();j!=gar_fav.end();++j) {
-			string emu_tmp = name_emu_get(*j);
-			string rom = name_without_emu_get(*j);
-			if(emu != emu_tmp) {
-				emu = emu_tmp;
-				s += "\r\n[" + emu + "]\r\n";
-				s += rom + "\r\n";
-			} else {
-				s += rom + "\r\n";
-			}
+	gar_fav.sort(); // ordena la lista de juegos
+	for(favorites_container::const_iterator j=gar_fav.begin();j!=gar_fav.end();++j) {
+		string emu_tmp = name_emu_get(*j);
+		string rom = name_without_emu_get(*j);
+		if(emu != emu_tmp) {
+			emu = emu_tmp;
+			s += "\r\n[" + emu + "]\r\n";
+			s += rom + "\r\n";
+		} else {
+			s += rom + "\r\n";
 		}
-		s += "\r\n";
-
-		if(!file_write(path, s))
-			return false;
 	}
+	s += "\r\n";
+
+	if(!file_write(path, s))
+		return false;
+
+	has_changed = false;
+
 	return true;
 }

@@ -30,8 +30,7 @@ typedef std::list<std::string> favorites_container;
 
 class favorite {
 	std::string name;
-	
-	bool has_changed;
+	mutable bool has_changed;
 
 public :
 	favorite();
@@ -42,8 +41,6 @@ public :
 	
 	void name_set(const std::string& A);
 	const std::string& name_get() const { return name; }
-
-	const bool has_changed_get() const { return has_changed; }
 
 	void game_insert(const std::string& A);
 	void game_remove(const std::string& A);
@@ -58,4 +55,4 @@ public :
 
 typedef std::list<favorite*> pfavorites_container;
 
-#endif // _FAVLIST_H_
+#endif // __FAVLIST_H

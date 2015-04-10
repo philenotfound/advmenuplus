@@ -103,10 +103,11 @@ bool favorite::import() const
 {	
 	string emu = "";
 	string file = "favlist/" + name_get() + ".fav";
+	string path = file_config_file_home(file.c_str());
 
-	int j = 0;
-
-	if (access(file_config_file_home(file.c_str()), F_OK)==0) {
+	if(file_exists(path)) {
+	
+		int j = 0;
 
 		string ss = file_read(file);
 
@@ -128,6 +129,7 @@ bool favorite::import() const
 			}
 		}
 	}
+	
 	return true;
 }
 

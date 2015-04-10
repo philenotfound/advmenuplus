@@ -188,19 +188,6 @@ string game::name_without_emulator_get() const
 		return name_get().substr(i + 1);
 }
 
-void game::gfavorites_set(const favorites_container& A) const
-{
-	if (A.size() != 0)
-		flag |= flag_user_favorites_set;
-	
-	gfavorites = A;
-}
-
-const favorites_container& game::gfavorites_get() const
-{
-	return	gfavorites;
-}
-
 void game::auto_type_set(const category* A) const
 {
 	if (!is_user_type_set())

@@ -28,6 +28,7 @@
 #include "conf.h"
 
 #include "layout.h"
+#include "favlist.h"
 
 #include <list>
 
@@ -266,7 +267,7 @@ public:
 };
 
 class config_state {
-	bool load_game(const std::string& name,  favorites_container& favorites, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
+	bool load_game(const std::string& name, const std::string& type, const std::string& time, const std::string& session, const std::string& desc);
 	bool load_iterator_game(adv_conf* config_context, const std::string& tag);
 	bool load_iterator_import(adv_conf* config_context, const std::string& tag, void (config_state::*set)(const game&, const std::string&), bool opt_verbose);
 	bool load_iterator_script(adv_conf* config_context, const std::string& tag);
@@ -340,8 +341,8 @@ public:
 	pemulator_container emu_active; ///< Active emulators, a subset of emu.
 
 	playout_container lay_cont; ///< Lista de layouts
-		
-	favorites_container favorites; ///< Game Lists set.
+
+	pfavorites_container favorites; ///< Game Lists set.
 	pcategory_container type; ///< Type set.
 
 	bool lock_orig; ///< Original interface locked.
@@ -437,7 +438,8 @@ public:
 	unsigned ui_bottom; ///< User interface bottom border
 
 	bool rem_selected; ///< Recordar el juego seleccionado de los emuladores
-	
+	bool favorites_filtertype; ///< Indica si las listas de favoritos se pueden fitrar y catalogar por tipo
+		
 	bool ui_top_bar; ///< User interface need top bar
 	bool ui_bottom_bar; ///< User interface need bottom bar
 	std::string ui_gamemsg; ///< Message to display before a game run.
@@ -456,6 +458,8 @@ public:
 
 	bool load(adv_conf* config_context, bool opt_verbose);
 	bool save(adv_conf* config_context) const;
+
+	bool save_favorites() const;
 
 	void restore_load();
 	void restore_save();

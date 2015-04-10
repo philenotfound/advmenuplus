@@ -42,6 +42,10 @@ static adv_font* int_font_list = 0;
 static adv_font* int_font_menu = 0;
 static bool is_loaded = false;
 
+//OJO:
+//static target_clock_t inicio = 0;
+//static target_clock_t fin = 0;
+
 // ------------------------------------------------------------------------
 // Menu entry
 
@@ -475,13 +479,6 @@ string tag_info_get(const game* g, int gs, int ga, const string favorites, const
 			ostringstream os;
 			os << ga;
 			info_tag = os.str();
-		} else if (tag_info == "game_favorites") {
-			favorites_container fav = g->gfavorites_get();
-			for(favorites_container::const_iterator i=fav.begin();i!=fav.end();++i) {
-				info_tag += (*i) + "/";
-			}
-			if (info_tag != "")
-				info_tag.erase(info_tag.length() - 1);
 		} else if (tag_info == "clone") {
 			if (g->parent_get())
 				info_tag = "Clone of " + g->parent_get()->name_without_emulator_get();
@@ -1879,7 +1876,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		for(int i=0;i<backdrop_mac;++i)
 			int_backdrop_pos(i, backdrop_map[i].x, backdrop_map[i].y, backdrop_map[i].dx, backdrop_map[i].dy);
 	}
-	
+
 	// reset the sound
 	rs.current_sound = resource();
 
@@ -1909,8 +1906,8 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
 		} else {
-			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
-			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
+			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
+			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
 		}
 	} else {
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
@@ -2022,7 +2019,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			draw_menu_right(bar_right_x, bar_right_y, bar_right_dx, bar_right_dy, pos_base, pos_rel_max, pos_base_upper + pos_rel_max);
 		if (bar_left_dx)
 			int_clear_alpha(bar_left_x, bar_left_y, bar_left_dx, bar_left_dy, COLOR_MENU_BAR.background);
-				
+		
 		if (rs.mode_get() == mode_full_mixed || rs.mode_get() == mode_list_mixed) {
 			bool game_horz = true;
 
@@ -2109,7 +2106,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		}
 
 		int_update(rs.mode_get() != mode_full_mixed && rs.mode_get() != mode_list_mixed);
-
+		
 		log_std(("menu: wait begin\n"));
 
 		int_idle_0_enable(rs.current_game && rs.current_game->emulator_get()->is_runnable());
@@ -2937,8 +2934,8 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
 		} else {
-			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
-			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
+			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
+			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
 		}
 	} else {
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
@@ -3050,7 +3047,7 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			if (backdrop_win[i].dy != 0)
 				backdrop_game_set(effective_game, i, backdrop_win[i].preview, true, false, true, rs);
 		}
-
+		
 		//muestra mensajes
 		if (over_msg.length()) {
 			if(menu_font_path != "none") {
@@ -3063,7 +3060,6 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 
 			// force an update to draw the first time the backdrop images
 			int_update(false);
-
 			dx = int_font_dx_get(over_msg);
 			dy = int_font_dy_get();
 
@@ -3651,58 +3647,73 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	// recompute the preview mask
 	rs.preview_mask = 0;
 
-	// select and sort
-	for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
-		// emulator
-		if (!i->emulator_get()->state_get())
-			continue;
+	if(rs.include_favorites_get() == "All Games") {
+		for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
+			// emu
+			if (!i->emulator_get()->state_get())
+				continue;
+			has_emu = true;
+			// type
+			if (!i->type_derived_get()->state_get())
+				continue;
+			has_type = true;
+			// filter
+			if (!i->emulator_get()->filter(*i))
+				continue;
+			has_filter = true;
+			psc->insert(&*i);
+			// update the preview mask
+			if (i->preview_snap_get().is_valid() || i->preview_clip_get().is_valid())
+				rs.preview_mask |= preview_snap;
+			if (i->preview_flyer_get().is_valid())
+				rs.preview_mask |= preview_flyer;
+			if (i->preview_cabinet_get().is_valid())
+				rs.preview_mask |= preview_cabinet;
+			if (i->preview_icon_get().is_valid())
+				rs.preview_mask |= preview_icon;
+			if (i->preview_marquee_get().is_valid())
+				rs.preview_mask |= preview_marquee;
+			if (i->preview_title_get().is_valid())
+				rs.preview_mask |= preview_title;
+		}
+	} else {
+		for(pfavorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();j++) {
+			if((*j)->name_get() == rs.include_favorites_get()) {
+				for(favorites_container::const_iterator k=(*j)->gar_fav.begin();k!=(*j)->gar_fav.end();++k) {
+					game_set::const_iterator i = rs.gar.find(game(*k));
+					if (i==rs.gar.end())
+						continue;
 
-		has_emu = true;
-
-		// game lists
-		bool state_favorites = false;
-		if (rs.include_favorites_get() == "All Games") {
-			state_favorites = true;
-		} else if (i->gfavorites_get().size()) {
-			for(favorites_container::const_iterator j=i->gfavorites_get().begin();j!=(i)->gfavorites_get().end();++j) {
-				string fi = rs.include_favorites_get();
-				if (*j == fi)
-					state_favorites = true;
+					// emu
+					if (!i->emulator_get()->state_get())
+						continue;
+					has_emu = true;
+					// type
+					if (rs.favorites_filtertype && !i->type_derived_get()->state_get())
+						continue;
+					has_type = true;
+					// filter
+					if (rs.favorites_filtertype && !i->emulator_get()->filter(*i))
+						continue;
+					has_filter = true;
+					psc->insert(&*i);
+					// update the preview mask
+					if (i->preview_snap_get().is_valid() || i->preview_clip_get().is_valid())
+						rs.preview_mask |= preview_snap;
+					if (i->preview_flyer_get().is_valid())
+						rs.preview_mask |= preview_flyer;
+					if (i->preview_cabinet_get().is_valid())
+						rs.preview_mask |= preview_cabinet;
+					if (i->preview_icon_get().is_valid())
+						rs.preview_mask |= preview_icon;
+					if (i->preview_marquee_get().is_valid())
+						rs.preview_mask |= preview_marquee;
+					if (i->preview_title_get().is_valid())
+						rs.preview_mask |= preview_title;
+				}
+				break;						
 			}
 		}
-
-		if (!state_favorites)
-			continue;
-
-		has_favorites = true;
-
-		// type
-		if (rs.include_favorites_get() == "All Games" && !i->type_derived_get()->state_get())
-			continue;
-
-		has_type = true;
-
-		// filter
-		if (rs.include_favorites_get() == "All Games" && !i->emulator_get()->filter(*i))
-			continue;
-
-		has_filter = true;
-
-		psc->insert(&*i);
-
-		// update the preview mask
-		if (i->preview_snap_get().is_valid() || i->preview_clip_get().is_valid())
-			rs.preview_mask |= preview_snap;
-		if (i->preview_flyer_get().is_valid())
-			rs.preview_mask |= preview_flyer;
-		if (i->preview_cabinet_get().is_valid())
-			rs.preview_mask |= preview_cabinet;
-		if (i->preview_icon_get().is_valid())
-			rs.preview_mask |= preview_icon;
-		if (i->preview_marquee_get().is_valid())
-			rs.preview_mask |= preview_marquee;
-		if (i->preview_title_get().is_valid())
-			rs.preview_mask |= preview_title;
 	}
 
 	/* prepare a warning message if the game list is empty */
@@ -3711,8 +3722,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		empty_msg = "No game was found";
 	else if (!has_emu)
 		empty_msg = "No game was found for the emulator " + emu_msg;
-	else if (!has_favorites)
-		empty_msg = "No games in list \"" + rs.include_favorites_get() + "\" for emulator \"" + emu_msg + "\"";
 	else if (!has_type)
 		empty_msg = "No game matches the type selection for " + emu_msg;
 	else if (!has_filter)
@@ -3744,8 +3753,17 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	int key = 0;
 
 	while (!done) {
+
+		//OJO:
+		//fin = target_clock();
+		//cout << (fin - inicio)/1000 << " ms" << std::endl;
+		//cout << "---------------------------------------------" << std::endl;
+		
 		key = run_menu_sort(rs, *psc, category_func, flipxy, silent, empty_msg);
 
+		//OJO:
+		//inicio = target_clock();
+		
 		// don't replay the sound and clip
 		silent = true;
 
@@ -3789,6 +3807,14 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 			break;
 		}
 
+		if (rs.include_favorites_get() == "All Games" || rs.favorites_filtertype)
+		switch(key) {
+		case EVENT_TYPE :
+		case EVENT_ATTRIB :
+			done=true;
+			break;
+		}
+		
 		switch (key) {
 		case EVENT_ESC :
 		case EVENT_OFF :
@@ -3802,8 +3828,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_LOCK :
 		case EVENT_HELP :
 		case EVENT_FAVORITES_NEXT :
-		case EVENT_TYPE :
-		case EVENT_ATTRIB :
 		case EVENT_SORT :
 		case EVENT_SETFAVORITES :
 		case EVENT_SETTYPE :
@@ -3816,7 +3840,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 			break;
 		}
 	}
-
+	
 	delete psc;
 
 	return key;

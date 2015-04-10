@@ -40,8 +40,8 @@ using namespace std;
 // Orientation/Size
 
 static unsigned int_orientation = 0; // orientation flags
-static unsigned int_font_dx; // font width
-static unsigned int_font_dy; // font height
+static unsigned int_font_dx=12; // font width
+static unsigned int_font_dy=12; // font height
 static adv_font* int_font = 0; // font (already orientation corrected)
 
 //arregla bug: pantallazos video start emu

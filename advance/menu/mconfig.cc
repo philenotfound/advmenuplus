@@ -311,8 +311,13 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_default(config_context, "idle_start", "0 0");
 	conf_string_register_default(config_context, "idle_screensaver", "60 10");
 	conf_int_register_enum_default(config_context, "idle_screensaver_preview", conf_enum(OPTION_SAVER), saver_snap);
+
+	// REM SELECTED
+	conf_string_register_default(config_context, "menu_pos", "0 0");
+	// opciones obsoletas del rc
 	conf_int_register_default(config_context, "menu_base", 0);
 	conf_int_register_default(config_context, "menu_rel", 0);
+
 	conf_string_register_default(config_context, "event_repeat", "500 50");
 	conf_bool_register_default(config_context, "input_hotkey", 1);
 	conf_string_register_default(config_context, "ui_gamemsg", "\"Loading\"");
@@ -903,17 +908,8 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 
 	default_sort_orig = (listsort_t)conf_int_get_default(config_context, "sort");
 	default_mode_orig = (listmode_t)conf_int_get_default(config_context, "mode");
-
-	if(conf_bool_get_default(config_context, "rem_selected")) {
-		default_menu_base_orig = 0;
-		default_menu_rel_orig = 0;
-	} else {
-		default_menu_base_orig = (int)conf_int_get_default(config_context, "menu_base");
-		default_menu_rel_orig = (int)conf_int_get_default(config_context, "menu_rel");
-	}
-
 	default_preview_orig = (listpreview_t)conf_int_get_default(config_context, "preview");
-
+	
 	double d = conf_float_get_default(config_context, "ui_translucency");
 	ui_translucency = static_cast<int>(d * 255);
 	if (ui_translucency > 255)
@@ -930,7 +926,6 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	ui_right = conf_int_get_default(config_context, "ui_skipright");
 	ui_top = conf_int_get_default(config_context, "ui_skiptop");
 	ui_bottom = conf_int_get_default(config_context, "ui_skipbottom");
-	rem_selected = conf_bool_get_default(config_context, "rem_selected");
 	ui_top_bar = conf_bool_get_default(config_context, "ui_topbar");
 	ui_bottom_bar = conf_bool_get_default(config_context, "ui_bottombar");
 	script_menu = conf_string_get_default(config_context, "ui_command_menu");
@@ -952,8 +947,15 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	idle_start_first = atoi(a0.c_str());
 	idle_start_rep = atoi(a1.c_str());
-	menu_base_orig = conf_int_get_default(config_context, "menu_base");
-	menu_rel_orig = conf_int_get_default(config_context, "menu_rel");
+	
+	// REM SELECTED
+	rem_selected = conf_bool_get_default(config_context, "rem_selected");
+	// carga la posicion del seleccionado para "rem_selected no"
+	if (!config_split(conf_string_get_default(config_context, "menu_pos"), a0, a1))
+		return false;
+	menu_base_orig = atoi(a0.c_str());
+	menu_rel_orig = atoi(a1.c_str());
+	
 	if (!config_split(conf_string_get_default(config_context, "idle_screensaver"), a0, a1))
 		return false;
 	idle_saver_first = atoi(a0.c_str());
@@ -1062,7 +1064,8 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	if (!config_load_iterator_emu_set(config_context, "emulator_font_color_select", emu, &emulator::nocustom_font_color_select_set))
 		return false;
-	
+
+	// carga las opciones de los emuladores del tipo (emulador/opcion valor)
 	for(pemulator_container::iterator i=emu.begin();i!=emu.end();++i) {
 		if (!(*i)->config_get().load(config_context, config_normalize((*i)->user_name_get())))
 			return false;
@@ -1237,7 +1240,24 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		if(!(*i)->import())
 			target_err("Failed to import data from the favorites list '%s'.\n", (*i)->name_get().c_str());
 	}
-	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	// ------------------------------------ LOAD REM SELECTED ---------------------------------------------
+	// inicializa rem_pos con todos los pares fav/emu con posicion a cero
+	for(pfavorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+		for(pemulator_container::const_iterator j=emu.begin();j!=emu.end();++j) {
+			string name = config_normalize((*i)->name_get()) + "/" + config_normalize((*j)->user_name_get());
+			pos_selected* ps = new pos_selected(name);
+			const char* c;
+			if (conf_string_section_get(config_context, ps->name.c_str(), "menu_pos", &c) == 0) {
+				string a0, a1;
+				if (config_split(c, a0, a1)) {
+					ps->base = atoi(a0.c_str());
+					ps->rel = atoi(a1.c_str());
+				}
+			}
+			rem_pos.insert(rem_pos.end(), ps);
+		}
+	}
 	
 	if (opt_verbose)
 		target_nfo("log: start\n");
@@ -1375,8 +1395,6 @@ bool config_state::save_favorites() const
 bool config_state::save(adv_conf* config_context) const
 {
 	conf_int_set(config_context, "", "mode", default_mode_orig);
-	conf_int_set(config_context, "", "menu_base", default_menu_base_orig);
-	conf_int_set(config_context, "", "menu_rel", default_menu_rel_orig);
 	conf_int_set(config_context, "", "sort", default_sort_orig);
 	conf_int_set(config_context, "", "preview", default_preview_orig);
 
@@ -1388,12 +1406,37 @@ bool config_state::save(adv_conf* config_context) const
 		conf_string_set(config_context, "", "type_include", config_out(*i).c_str());
 	}
 
-	conf_int_set(config_context, "", "menu_base", menu_base_orig);
-	conf_int_set(config_context, "", "menu_rel", menu_rel_orig);
+	// REM SELECTED ---------------------------------------------------------------------------
+
+	// guarda la posicion del seleccionado para el "rem_selected no"
+	ostringstream fnorem;
+	fnorem << menu_base_orig << " " << menu_rel_orig;
+	conf_string_set(config_context, "", "menu_pos", fnorem.str().c_str());
+
+	// guarda las posiciones de los pares fav/emu
+	if(rem_selected) {
+		for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
+			if((*i)->base == 0 && (*i)->rel == 0) {
+				conf_remove(config_context, (*i)->name.c_str(), "menu_pos");
+			} else {
+				ostringstream frem;
+				frem << (*i)->base << " " << (*i)->rel;
+				conf_string_set(config_context, (*i)->name.c_str(), "menu_pos", frem.str().c_str());
+			}
+		}
+	}
+
+	// borra las opciones obsoletas del rc
+	conf_remove(config_context, "", "menu_base");
+	conf_remove(config_context, "", "menu_rel");
+
+	// ---------------------------------------------------------------------------------------------------------
+	
 	conf_int_set(config_context, "", "difficulty", difficulty_orig);
 
 	conf_bool_set(config_context, "", "favorites_filtertype", favorites_filtertype);
 
+	// guarda las opciones de los emuladores del tipo (emulador/opcion valor) del rc
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {
 		(*i)->config_get().save(config_context, config_normalize((*i)->user_name_get()));
 	}
@@ -1478,8 +1521,6 @@ void config_state::restore_load()
 {
 	default_sort_effective = default_sort_orig;
 	default_mode_effective = default_mode_orig;
-	default_menu_base_effective = default_menu_base_orig;
-	default_menu_rel_effective = default_menu_rel_orig;
 	default_preview_effective = default_preview_orig;
 	default_include_favorites_effective = default_include_favorites_orig;
 	default_include_type_effective = default_include_type_orig;
@@ -1499,8 +1540,6 @@ void config_state::restore_save_default()
 {
 	default_sort_orig = default_sort_effective;
 	default_mode_orig = default_mode_effective;
-	default_menu_base_orig = default_menu_base_effective;
-	default_menu_rel_orig = default_menu_rel_effective;
 	default_preview_orig = default_preview_effective;
 	default_include_favorites_orig = default_include_favorites_effective;
 	default_include_type_orig = default_include_type_effective;
@@ -1546,6 +1585,11 @@ config_state::~config_state()
 	
 	// delete the types
 	for(pcategory_container::iterator i=type.begin();i!=type.end();++i) {
+		delete *i;
+	}
+
+	// delete the position selected
+	for(ppos_selected_container::iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
 		delete *i;
 	}
 }
@@ -1600,20 +1644,62 @@ listmode_t config_state::mode_get()
 		return default_mode_effective;
 }
 
+// REM SELECTED
+//get base
 int config_state::menu_base_get()
 {
-	if (sub_has() && sub_get().menu_base_has())
-		return sub_get().menu_base_get();
-	else
-		return default_menu_base_effective;
-}
+	string lista = config_normalize(include_favorites_get());
+	string emu = config_normalize(*include_emu_get().begin());
+	string namepos = lista + "/" + emu;
 
+	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
+		if((*i)->name == namepos)
+			return (*i)->base;
+	}
+	return 0;
+}
+//get rel
 int config_state::menu_rel_get()
 {
-	if (sub_has() && sub_get().menu_rel_has())
-		return sub_get().menu_rel_get();
-	else
-		return default_menu_rel_effective;
+	string lista = config_normalize(include_favorites_get());
+	string emu = config_normalize(*include_emu_get().begin());
+	string namepos = lista + "/" + emu;
+
+	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
+		if((*i)->name == namepos)
+			return (*i)->rel;
+	}
+	return 0;
+}
+//get pos
+void config_state::menu_pos_get(int& base, int& rel)
+{
+	string lista = config_normalize(include_favorites_get());
+	string emu = config_normalize(*include_emu_get().begin());
+	string namepos = lista + "/" + emu;
+
+	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
+		if((*i)->name == namepos) {
+			base = (*i)->base;
+			rel = (*i)->rel;
+			break;
+		}
+	}
+}
+//set pos
+void config_state::menu_pos_set(int& base, int& rel)
+{
+	string lista = config_normalize(include_favorites_get());
+	string emu = config_normalize(*include_emu_get().begin());
+	string namepos = lista + "/" + emu;
+
+	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
+		if((*i)->name == namepos) {
+			(*i)->base = base;
+			(*i)->rel = rel;
+			break;
+		}
+	}
 }
 
 listpreview_t config_state::preview_get()
@@ -1664,22 +1750,6 @@ void config_state::mode_set(listmode_t A)
 		sub_get().mode_set(A);
 	else
 		default_mode_effective = A;
-}
-
-void config_state::menu_base_set(int A)
-{
-	if (sub_has())
-		sub_get().menu_base_set(A);
-	else
-		default_menu_base_effective = A;
-}
-
-void config_state::menu_rel_set(int A)
-{
-	if (sub_has())
-		sub_get().menu_rel_set(A);
-	else
-		default_menu_rel_effective = A;
 }
 
 void config_state::preview_set(listpreview_t A)
@@ -1850,6 +1920,7 @@ bool config_emulator_state::load(adv_conf* config_context, const string& section
 {
 	int i;
 	adv_bool b;
+	const char* c;
 
 	if (conf_int_section_get(config_context, section.c_str(), "sort", &i) == 0) {
 		sort_set_orig = true;
@@ -1863,20 +1934,6 @@ bool config_emulator_state::load(adv_conf* config_context, const string& section
 		mode_orig = (listmode_t)i;
 	} else {
 		mode_set_orig = false;
-	}
-
-	if (conf_int_section_get(config_context, section.c_str(), "menu_base", &i) == 0) {
-		menu_base_set_orig = true;
-		menu_base_orig = (int)i;
-	} else {
-		menu_base_set_orig = false;
-	}
-
-	if (conf_int_section_get(config_context, section.c_str(), "menu_rel", &i) == 0) {
-		menu_rel_set_orig = true;
-		menu_rel_orig = (int)i;
-	} else {
-		menu_rel_set_orig = false;
 	}
 
 	if (conf_int_section_get(config_context, section.c_str(), "preview", &i) == 0) {
@@ -1912,17 +1969,10 @@ void config_emulator_state::save(adv_conf* config_context, const string& section
 		conf_remove(config_context, section.c_str(), "mode");
 	}
 
-	if (menu_base_set_orig) {
-		conf_int_set(config_context, section.c_str(), "menu_base", menu_base_orig);
-	} else {
-		conf_remove(config_context, section.c_str(), "menu_base");
-	}
-
-	if (menu_rel_set_orig) {
-		conf_int_set(config_context, section.c_str(), "menu_rel", menu_rel_orig);
-	} else {
-		conf_remove(config_context, section.c_str(), "menu_rel");
-	}
+	// REM SELECTED
+	// borra las opciones obsoletas del rc
+	conf_remove(config_context, section.c_str(), "menu_base");
+	conf_remove(config_context, section.c_str(), "menu_rel");
 	
 	if (sort_set_orig) {
 		conf_int_set(config_context, section.c_str(), "sort", sort_orig);
@@ -1948,18 +1998,10 @@ void config_emulator_state::restore_load()
 {
 	sort_effective = sort_orig;
 	mode_effective = mode_orig;
-
-	menu_base_effective = menu_base_orig;
-	menu_rel_effective = menu_rel_orig;
-	
 	preview_effective = preview_orig;
 	include_type_effective = include_type_orig;
 	sort_set_effective = sort_set_orig;
 	mode_set_effective = mode_set_orig;
-
-	menu_base_set_effective = menu_base_set_orig;
-	menu_rel_set_effective = menu_rel_set_orig;
-	
 	preview_set_effective = preview_set_orig;
 	include_type_set_effective = include_type_set_orig;
 }
@@ -1968,18 +2010,10 @@ void config_emulator_state::restore_save()
 {
 	sort_orig = sort_effective;
 	mode_orig = mode_effective;
-
-	menu_base_orig = menu_base_effective;
-	menu_rel_orig = menu_rel_effective;
-	
 	preview_orig = preview_effective;
 	include_type_orig = include_type_effective;
 	sort_set_orig = sort_set_effective;
 	mode_set_orig = mode_set_effective;
-
-	menu_base_set_orig = menu_base_set_effective;
-	menu_rel_set_orig = menu_rel_set_effective;
-	
 	preview_set_orig = preview_set_effective;
 	include_type_set_orig = include_type_set_effective;
 }
@@ -1992,16 +2026,6 @@ bool config_emulator_state::sort_has()
 bool config_emulator_state::mode_has()
 {
 	return mode_set_effective;
-}
-
-bool config_emulator_state::menu_base_has()
-{
-	return menu_base_set_effective;
-}
-
-bool config_emulator_state::menu_rel_has()
-{
-	return menu_rel_set_effective;
 }
 
 bool config_emulator_state::preview_has()
@@ -2027,16 +2051,6 @@ listsort_t config_emulator_state::sort_get()
 listmode_t config_emulator_state::mode_get()
 {
 	return mode_effective;
-}
-
-int config_emulator_state::menu_base_get()
-{
-	return menu_base_effective;
-}
-
-int config_emulator_state::menu_rel_get()
-{
-	return menu_rel_effective;
 }
 
 listpreview_t config_emulator_state::preview_get()
@@ -2066,18 +2080,6 @@ void config_emulator_state::mode_set(listmode_t A)
 	mode_effective = A;
 }
 
-void config_emulator_state::menu_base_set(int A)
-{
-	menu_base_set_effective = true;
-	menu_base_effective = A;
-}
-
-void config_emulator_state::menu_rel_set(int A)
-{
-	menu_rel_set_effective = true;
-	menu_rel_effective = A;
-}
-
 void config_emulator_state::preview_set(listpreview_t A)
 {
 	preview_set_effective = true;
@@ -2098,16 +2100,6 @@ void config_emulator_state::sort_unset()
 void config_emulator_state::mode_unset()
 {
 	mode_set_effective = false;
-}
-
-void config_emulator_state::menu_base_unset()
-{
-	menu_base_set_effective = false;
-}
-
-void config_emulator_state::menu_rel_unset()
-{
-	menu_rel_set_effective = false;
 }
 
 void config_emulator_state::preview_unset()

@@ -186,6 +186,20 @@ struct script {
 
 typedef std::list<script> script_container;
 
+// ----------------------------------------------------
+// REM SELECTED
+
+struct pos_selected {
+	std::string name; // lista/emulador
+	int base;
+	int rel;
+	pos_selected(const std::string& A) : name(A) { base=0; rel= 0; }
+};
+
+typedef std::list<pos_selected*> ppos_selected_container;
+
+// ----------------------------------------------------
+
 class config_emulator_state {
 	bool sort_set_orig; ///< If the sort is set.
 	listsort_t sort_orig; ///< Original sort mode.
@@ -197,15 +211,6 @@ class config_emulator_state {
 	bool mode_set_effective; ///< If the mode is set.
 	listmode_t mode_effective; ///< List mode.
 
-	bool menu_base_set_orig; ///< If the base position is set.
-	int menu_base_orig; ///< Original base position.
-	bool menu_base_set_effective; ///< If the base position is set.
-	int menu_base_effective; ///< Base position.
-	bool menu_rel_set_orig; ///< If the relative position is set.
-	int menu_rel_orig; ///< Original relative position.
-	bool menu_rel_set_effective; ///< If the relative position is set.
-	int menu_rel_effective; ///< Relative position.
-		
 	bool preview_set_orig; ///< If the preview is set.
 	listpreview_t preview_orig; ///< Original preview type selected.
 	bool preview_set_effective; ///< If the preview is set.
@@ -229,17 +234,11 @@ public:
 	listsort_t sort_get();
 	listmode_t mode_get();
 
-	int menu_base_get();
-	int menu_rel_get();
-	
 	listpreview_t preview_get();
 	const category_container& include_type_get();
 
 	bool sort_has();
 	bool mode_has();
-
-	bool menu_base_has();
-	bool menu_rel_has();
 
 	bool preview_has();
 	bool include_type_has();
@@ -248,17 +247,11 @@ public:
 	void sort_unset();
 	void mode_unset();
 
-	void menu_base_unset();
-	void menu_rel_unset();
-
 	void preview_unset();
 	void include_type_unset();
 
 	void sort_set(listsort_t A);
 	void mode_set(listmode_t A);
-
-	void menu_base_set(int A);
-	void menu_rel_set(int A);
 
 	void preview_set(listpreview_t A);
 	void include_type_set(const category_container& A);
@@ -284,11 +277,6 @@ class config_state {
 	listmode_t default_mode_orig; ///< Original list mode.
 	listmode_t default_mode_effective; ///< List mode.
 
-	int default_menu_base_orig; ///< Original base position.
-	int default_menu_base_effective; ///< Base position.
-	int default_menu_rel_orig; ///< Original relative position.
-	int default_menu_rel_effective; ///< Relative position.
-		
 	listpreview_t default_preview_orig; ///< Original preview type selected.
 	listpreview_t default_preview_effective; ///< Preview type selected.
 
@@ -308,9 +296,6 @@ public:
 	listsort_t sort_get();
 	listmode_t mode_get();
 	
-	int menu_base_get();
-	int menu_rel_get();
-
 	listpreview_t preview_get();
 	const std::string& include_favorites_get() { return default_include_favorites_effective; }
 	const category_container& include_type_get();
@@ -320,8 +305,15 @@ public:
 	void sort_set(listsort_t A);
 	void mode_set(listmode_t A);
 
-	void menu_base_set(int A);
-	void menu_rel_set(int A);
+	// REM SELECTED
+	bool rem_selected;									///< Indica si recordar el juego seleccionado
+	ppos_selected_container rem_pos;		///< Contenedor de las posiciones del juego seleccionado por pares list/emu
+	void menu_pos_get(int& base, int& rel);	///< Devuelve por referencia la posicion del juego seleccionado actual
+	void menu_pos_set(int& base, int& rel);	///< Asigna la posicion del juego seleccionado actual
+	int menu_base_get();								///< Devuelve la posicion base del juego seleccionado actual
+	int menu_rel_get();									///< Devuelve la posicion rel del juego seleccionado actual
+	std::string list_pre;									///< Almacena la lista previa
+	std::string emu_pre;									///< Almacena el emu previo
 
 	void preview_set(listpreview_t A);
 	void include_favorites_set(const std::string& A) { default_include_favorites_effective = A; }
@@ -437,9 +429,8 @@ public:
 	unsigned ui_top; ///< User interface top border
 	unsigned ui_bottom; ///< User interface bottom border
 
-	bool rem_selected; ///< Recordar el juego seleccionado de los emuladores
 	bool favorites_filtertype; ///< Indica si las listas de favoritos se pueden fitrar y catalogar por tipo
-		
+
 	bool ui_top_bar; ///< User interface need top bar
 	bool ui_bottom_bar; ///< User interface need bottom bar
 	std::string ui_gamemsg; ///< Message to display before a game run.

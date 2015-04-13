@@ -1888,39 +1888,49 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 	if (pos_base_upper < 0)
 		pos_base_upper = 0;
 
+	// ---------------------- GET POSITION SELECTED -------------------------
+	
 	// restore the old position
-	int pos_base;
-	int pos_rel;
-
-	if (rs.current_game) {
-		// if a game is selected search the same game
-		int i;
-		i = 0;
-
-		log_std(("menu: search for game %s\n", rs.current_game->name_get().c_str()));
-
+	int pos_base = 0;
+	int pos_rel = 0;
+	
+	// determina la posicion en el listado del juego selecionado
+	if (rs.current_game
+	    && rs.list_pre == rs.include_favorites_get()
+	    && rs.emu_pre == *rs.include_emu_get().begin())
+	{
+		// busca en el nuevo listado el juego seleccionado de la anterior lista
+		int i = 0;
 		while (i < gc.size() && (!gc[i]->has_game() || &gc[i]->game_get() != rs.current_game))
 			++i;
 
-		if (i < gc.size()) {
+		if (i < gc.size()) { // si lo encuentra lo selecciona
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
-		} else {
-			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
-			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
+		} else { // si no lo encuentra selecciona por posicon
+			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
+			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
 		}
 	} else {
+		// selecciona por posicon
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 		pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
 	}
-
+	
+	// ---------- Comprobaciones de la posicion -----------
+	
 	if (pos_base < 0) {
 		pos_base = pos_base + pos_rel;
 		pos_rel = 0;
 	}
 
-	// ensure that the position is valid
+	// si la posicion es mayor que el numero de juegos listados
 	if (pos_base + pos_rel >= gc.size()) {
+		// a) selecciona el primero
+		//pos_base = 0;
+		//pos_rel = 0;
+		
+		// b) selecciona el ultimo
 		pos_base = pos_base_upper;
 		pos_rel = pos_rel_max - 1;
 		if (pos_base + pos_rel >= gc.size()) {
@@ -1951,7 +1961,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		if (pos_base > pos_base_upper)
 			pos_base = pos_base_upper;
 	}
-	
+
 	if (pos_base + pos_rel < gc.size() && gc[pos_base+pos_rel]->has_game()) {
 		rs.current_game = &gc[pos_base+pos_rel]->game_get();
 		rs.current_clone = 0;
@@ -1960,6 +1970,8 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		rs.current_clone = 0;
 	}
 
+	// ---------------------------------------------------------------------
+	
 	// count the real games
 	{
 		int i;
@@ -2236,11 +2248,14 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		}
 	}
 
-	rs.menu_base_set(pos_base);
-	rs.menu_rel_set(pos_rel);
-	
+	// guarda la posicion del seleccionado
+	rs.menu_pos_set(pos_base, pos_rel);
 	rs.menu_base_effective = pos_base;
 	rs.menu_rel_effective = pos_rel;
+
+	// guarda la lista y el emu actual
+	rs.list_pre = rs.include_favorites_get();
+	rs.emu_pre = *rs.include_emu_get().begin();
 
 	delete [] int_map;
 	delete [] backdrop_map;
@@ -2916,39 +2931,49 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 	if (pos_base_upper < 0)
 		pos_base_upper = 0;
 
+	// ---------------------- GET POSITION SELECTED -------------------------
+	
 	// restore the old position
-	int pos_base;
-	int pos_rel;
-
-	if (rs.current_game) {
-		// if a game is selected search the same game
-		int i;
-		i = 0;
-
-		log_std(("menu: search for game %s\n", rs.current_game->name_get().c_str()));
-
+	int pos_base = 0;
+	int pos_rel = 0;
+	
+	// determina la posicion en el listado del juego selecionado
+	if (rs.current_game
+	    && rs.list_pre == rs.include_favorites_get()
+	    && rs.emu_pre == *rs.include_emu_get().begin())
+	{
+		// busca en el nuevo listado el juego seleccionado de la anterior lista
+		int i = 0;
 		while (i < gc.size() && (!gc[i]->has_game() || &gc[i]->game_get() != rs.current_game))
 			++i;
 
-		if (i < gc.size()) {
+		if (i < gc.size()) { // si lo encuentra lo selecciona
 			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 			pos_rel = i - pos_base;
-		} else {
-			pos_base = (!is_loaded && rs.rem_selected) ? rs.menu_base_get() : 0;
-			pos_rel = (!is_loaded && rs.rem_selected) ? rs.menu_rel_get() : 0;
+		} else { // si no lo encuentra selecciona por posicon
+			pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
+			pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
 		}
 	} else {
+		// selecciona por posicon
 		pos_base = rs.rem_selected ? rs.menu_base_get() : rs.menu_base_effective;
 		pos_rel = rs.rem_selected ? rs.menu_rel_get() : rs.menu_rel_effective;
 	}
-
+	
+	// ---------- Comprobaciones de la posicion -----------
+	
 	if (pos_base < 0) {
 		pos_base = pos_base + pos_rel;
 		pos_rel = 0;
 	}
 
-	// ensure that the position is valid
+	// si la posicion es mayor que el numero de juegos listados
 	if (pos_base + pos_rel >= gc.size()) {
+		// a) selecciona el primero
+		//pos_base = 0;
+		//pos_rel = 0;
+		
+		// b) selecciona el ultimo
 		pos_base = pos_base_upper;
 		pos_rel = pos_rel_max - 1;
 		if (pos_base + pos_rel >= gc.size()) {
@@ -2980,11 +3005,6 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			pos_base = pos_base_upper;
 	}
 
-	if (frenado) {
-		pos_base = pos_base + pos_rel - rel;
-		pos_rel = rel;
-	}
-	
 	if (pos_base + pos_rel < gc.size() && gc[pos_base+pos_rel]->has_game()) {
 		rs.current_game = &gc[pos_base+pos_rel]->game_get();
 		rs.current_clone = 0;
@@ -2993,6 +3013,8 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 		rs.current_clone = 0;
 	}
 
+	// -------------------------------------------------------------------------
+	
 	// count the real games
 	{
 		int i;
@@ -3222,12 +3244,15 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 		}
 	}
 
-	rs.menu_base_set(pos_base);
-	rs.menu_rel_set(pos_rel);
-	
+	// guarda la posicion del seleccionado
+	rs.menu_pos_set(pos_base, pos_rel);
 	rs.menu_base_effective = pos_base;
 	rs.menu_rel_effective = pos_rel;
 
+	// guarda la lista y el emu actual
+	rs.list_pre = rs.include_favorites_get();
+	rs.emu_pre = *rs.include_emu_get().begin();
+	
 	delete [] int_map;
 	delete [] backdrop_map;
 	delete [] backdrop_map_bis;

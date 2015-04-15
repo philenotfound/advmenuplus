@@ -160,6 +160,11 @@ static bool config_path_import(const string& s, string& a0)
 
 	a0 = path_import(file_config_file_home(a0.c_str()));
 
+	if (!file_exists(a0)) {
+		target_err("File '%s' not found.\n", a0.c_str());
+		return false;
+	}
+
 	return true;
 }
 
@@ -174,6 +179,11 @@ static bool config_path(const string& s, string& a0)
 		return true;
 
 	a0 = file_config_file_home(a0.c_str());
+
+	if (!file_exists(a0)) {
+		target_err("File '%s' not found.\n", a0.c_str());
+		return false;
+	}
 
 	return true;
 }

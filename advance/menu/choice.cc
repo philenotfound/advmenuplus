@@ -285,6 +285,7 @@ int choice_bag::run(const string& title, int x, int y, int dx, choice_container:
 					}
 					break;
 				}
+				key = int_event_clear();
 				break;
 			case EVENT_ENTER :
 				pos = begin() + pos_base + pos_rel;
@@ -374,6 +375,7 @@ int choice_bag::favorites_run(const string& title, int x, int y, int dx, choice_
 			case EVENT_SPACE :
 				pos = begin() + pos_base + pos_rel;
 				pos->bistate_set(!pos->bistate_get());
+				key = int_event_clear();
 				break;
 			case EVENT_ENTER :
 				done = 1;

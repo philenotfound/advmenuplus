@@ -72,6 +72,7 @@ void event_push(int event);
 void event_push_repeat(int event);
 int event_pop();
 int event_peek();
+void event_clear();
 
 void event_setup(const std::string& press_sound, double delay_repeat_ms, double delay_repeat_next_ms, bool alpha_mode);
 

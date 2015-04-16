@@ -104,6 +104,7 @@ void int_update_post(unsigned y = 0);
 
 unsigned int_event_get(bool update_background = true);
 bool int_event_waiting();
+unsigned int_event_clear();
 
 void int_idle_time_reset();
 void int_idle_0_enable(bool state);

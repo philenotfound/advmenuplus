@@ -3027,4 +3027,9 @@ unsigned int_event_get(bool update_background)
 	return int_last = event_pop();
 }
 
-
+unsigned int_event_clear()
+{
+	event_clear();
+	
+	return 0;
+}

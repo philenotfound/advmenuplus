@@ -420,7 +420,10 @@ static void event_push_norepeat(int event, target_clock_t& time, unsigned& count
 	if (counter == 0) {
 		time = target_clock();
 		++counter;
-		event_queue.push_front(event);
+		if (event == EVENT_SPACE)
+			event_queue.push_back(event);
+		else
+			event_queue.push_front(event);
 		event_signal();
 	} else if (is_repeat && counter == 1 && delay_ms > event_delay_repeat_ms) {
 		time = target_clock();
@@ -523,4 +526,8 @@ void event_setup(const string& press_sound, double delay_repeat_ms, double delay
 	event_delay_repeat_next_ms = delay_repeat_next_ms;
 }
 
-
+void event_clear()
+{
+	if (event_queue.size() > 0)
+		event_queue.clear();
+}

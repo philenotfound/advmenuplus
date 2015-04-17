@@ -3005,6 +3005,11 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			pos_base = pos_base_upper;
 	}
 
+	if (frenado) {
+		pos_base = pos_base + pos_rel - rel;
+		pos_rel = rel;
+	}
+	
 	if (pos_base + pos_rel < gc.size() && gc[pos_base+pos_rel]->has_game()) {
 		rs.current_game = &gc[pos_base+pos_rel]->game_get();
 		rs.current_clone = 0;

@@ -119,9 +119,14 @@ int run_sub(config_state& rs, bool silent)
 				silent = false;
 				run_type_move(rs);
 				break;
-			case EVENT_ROTATE :
+			
 			case EVENT_ESC :
 			case EVENT_OFF :
+				silent = false;
+				if(rs.security_exit && !run_exit(rs))
+					break;
+				disable_fonts();
+			case EVENT_ROTATE :
 				done = true;
 				break;
 			}

@@ -383,6 +383,7 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_multi(config_context, "ui_command");
 	conf_bool_register_default(config_context, "rem_selected", 1);
 	conf_bool_register_default(config_context, "favorites_filtertype", 0);
+	conf_bool_register_default(config_context, "security_exit", 1);
 }
 
 // -------------------------------------------------------------------------
@@ -1016,6 +1017,8 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	merge = (merge_t)conf_int_get_default(config_context, "merge");
 	icon_space = conf_int_get_default(config_context, "icon_space");
 
+	security_exit = conf_bool_get_default(config_context, "security_exit");
+	
 	if (!config_path_import(conf_string_get_default(config_context, "sound_foreground_begin"), sound_foreground_begin))
 		return false;
 	if (!config_path_import(conf_string_get_default(config_context, "sound_foreground_end"), sound_foreground_end))
@@ -1445,6 +1448,8 @@ bool config_state::save(adv_conf* config_context) const
 	conf_int_set(config_context, "", "difficulty", difficulty_orig);
 
 	conf_bool_set(config_context, "", "favorites_filtertype", favorites_filtertype);
+
+	conf_bool_set(config_context, "", "security_exit", security_exit);
 
 	// guarda las opciones de los emuladores del tipo (emulador/opcion valor) del rc
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {

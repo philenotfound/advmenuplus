@@ -431,6 +431,8 @@ public:
 
 	bool favorites_filtertype; ///< Indica si las listas de favoritos se pueden fitrar y catalogar por tipo
 
+	bool security_exit; ///< Indica si se muestra la ventana de confirmacion de salida
+
 	bool ui_top_bar; ///< User interface need top bar
 	bool ui_bottom_bar; ///< User interface need bottom bar
 	std::string ui_gamemsg; ///< Message to display before a game run.

@@ -2961,7 +2961,7 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 	}
 	
 	// ---------- Comprobaciones de la posicion -----------
-	
+
 	if (pos_base < 0) {
 		pos_base = pos_base + pos_rel;
 		pos_rel = 0;
@@ -3221,12 +3221,16 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			done = true;
 			break;
 		case EVENT_ESC :
-			if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode)
+			if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode) {
+				if(menu_font_path != "none") usar_fuente(int_font_menu);
 				done = true;
+			}
 			break;
 		case EVENT_OFF :
-			if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all)
+			if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all) {
+				if(menu_font_path != "none") usar_fuente(int_font_menu);
 				done = true;
+			}
 			break;
 		}
 
@@ -3850,7 +3854,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_OFF :
 		case EVENT_ESC_FORCE :
 		case EVENT_OFF_FORCE :
-			disable_fonts();
+			//disable_fonts();
 		case EVENT_ENTER :
 		case EVENT_CLONE :
 		case EVENT_IDLE_0 :

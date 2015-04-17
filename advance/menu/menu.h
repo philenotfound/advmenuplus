@@ -49,4 +49,6 @@ typedef std::vector<menu_entry*> menu_array;
 
 int run_menu(config_state& rs, bool flipxy, bool silent);
 
+void disable_fonts();
+
 #endif

@@ -815,6 +815,7 @@ int run_suballmenu(config_state& rs)
 	ch.insert(ch.end(), choice("Save all settings", 6));
 	ch.insert(ch.end(), choice("Restore all settings", 20));
 	ch.insert(ch.end(), choice(menu_name(rs, "Lock settings", EVENT_LOCK), 11));
+	ch.insert(ch.end(), choice(rs.security_exit ? "Disable Security Exit" : "Enable Security Exit", 12));
 
 	choice_bag::iterator i = ch.begin();
 
@@ -857,6 +858,9 @@ int run_suballmenu(config_state& rs)
 				break;
 			case 11 :
 				rs.lock_effective = !rs.lock_effective;
+				break;
+			case 12 :
+				rs.security_exit = !rs.security_exit;
 				break;
 			}
 		} else if (key == EVENT_ESC) {
@@ -1475,4 +1479,27 @@ void run_stat(config_state& rs)
 	int_event_get();
 }
 
+// ------------------------------------------------------------------------
+// Security Exit
 
+int run_exit(config_state& rs)
+{
+	int dx = int_font_dx_get() * 10;
+	int x = (int_dx_get() - dx) / 2;
+	int y = int_dy_get() / 3;
+	
+	choice_bag ch;
+
+	ch.insert(ch.end(), choice("Continue", 0));
+	ch.insert(ch.end(), choice("Exit", 1));
+
+	choice_bag::iterator i = ch.begin();
+	
+	int key = ch.run(" Security Exit", x, y, dx, i);
+
+	if (key == EVENT_ENTER) {
+		return i->value_get();
+	}
+
+	return 0;
+}

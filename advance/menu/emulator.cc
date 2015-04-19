@@ -3028,10 +3028,31 @@ bool generic::load_info(game_set& gar)
 
 bool generic::load_game(game_set& gar, bool quiet)
 {
+	// ROMS
 	load_dirlist(gar, list_abs(list_import(user_rom_path), exe_dir_get()), list_import(user_rom_filter), quiet);
 
-	string info_file = path_abs(path_import(file_config_file_home((user_name_get() + ".lst").c_str())), dir_cwd());
+	// XML
+	string xml_file = path_abs(path_import(file_config_file_home((user_name_get() + ".xml").c_str())), dir_cwd());
+	if (access(cpath_export(xml_file), R_OK)==0) {
+		log_std(("%s: loading info %s\n", user_name_get().c_str(), cpath_export(xml_file)));
+		
+		ifstream f(cpath_export(xml_file), ios::in | ios::binary);
+		if (!f) {
+			target_err("Error opening the '%s' information file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
+			return false;
+		}
+		if (!load_xml(f, gar)) {
+			f.close();
+			target_err("Error reading the '%s' information from file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
+			return false;
+		}
+		f.close();
+	} else {
+		log_std(("%s: missing info %s\n", user_name_get().c_str(), cpath_export(xml_file)));
+	}
 
+	// LST
+	string info_file = path_abs(path_import(file_config_file_home((user_name_get() + ".lst").c_str())), dir_cwd());
 	if (access(cpath_export(info_file), R_OK)==0) {
 		log_std(("%s: loading info %s\n", user_name_get().c_str(), cpath_export(info_file)));
 

@@ -102,6 +102,31 @@ static void process_game(struct state_t* state, enum token_t t, const char* s, u
 	}
 }
 
+static void process_game_generic(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
+{
+	if (t == token_open) {
+		state->g = new game;
+		state->g->emulator_set(state->e);
+	} else if (t == token_close) {
+		game_set::const_iterator i = state->a->find(game(state->g->name_get()));
+		if (i!=state->a->end()) {
+			if (state->g->description_get().length())
+				i->auto_description_set(state->g->description_get());
+			if (state->g->manufacturer_get().length())
+				(const_cast<game&>(*i)).manufacturer_set(state->g->manufacturer_get());
+			if (state->g->year_get().length())
+				(const_cast<game&>(*i)).year_set(state->g->year_get());
+			if (state->g->cloneof_get().length())
+				(const_cast<game&>(*i)).cloneof_set(state->g->cloneof_get());
+		} else {		
+			//state->a->insert(*state->g);
+		}
+		
+		delete state->g;
+		state->g = 0;
+	}
+}
+
 static void process_runnable(struct state_t* state, enum token_t t, const char* s, unsigned len, const char** attributes)
 {
 	if (t == token_data) {
@@ -227,7 +252,8 @@ static void process_cloneof(struct state_t* state, enum token_t t, const char* s
 			process_error(state, 0, "invalid state");
 			return;
 		}
-		state->g->cloneof_set(state->e->user_name_get() + "/" + string(s, len));
+		if (string(s, len).length())
+			state->g->cloneof_set(state->e->user_name_get() + "/" + string(s, len));
 	}
 }
 
@@ -434,6 +460,7 @@ static void process_videoaspecty(struct state_t* state, enum token_t t, const ch
 	}
 }
 
+static const char* match_generic = "menu"; // "menu" -> etiqueta del xml
 static const char* match_mamemessraine = "mame|mess|raine";
 static const char* match_gamemachine = "game|machine";
 
@@ -449,6 +476,7 @@ struct conversion_t {
 
 static struct conversion_t CONV1[] = {
 	{ 1, { match_mamemessraine, match_gamemachine, 0, 0, 0 }, process_game },
+	{ 1, { match_generic, match_gamemachine, 0, 0, 0 }, process_game_generic },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 
@@ -465,6 +493,11 @@ static struct conversion_t CONV2[] = {
 	{ 2, { match_mamemessraine, match_gamemachine, "rom", 0, 0 }, process_rom },
 	{ 2, { match_mamemessraine, match_gamemachine, "device", 0, 0 }, process_device },
 	{ 2, { match_mamemessraine, match_gamemachine, "ismechanical", 0, 0 }, process_mechanical },
+	{ 2, { match_generic, match_gamemachine, "name", 0, 0 }, process_name },
+	{ 2, { match_generic, match_gamemachine, "description", 0, 0 }, process_description },
+	{ 2, { match_generic, match_gamemachine, "manufacturer", 0, 0 }, process_manufacturer },
+	{ 2, { match_generic, match_gamemachine, "year", 0, 0 }, process_year },
+	{ 2, { match_generic, match_gamemachine, "cloneof", 0, 0 }, process_cloneof },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 
@@ -517,6 +550,9 @@ static struct conversion_t* identify(unsigned depth, const struct level_t* level
 		for(int j=depth;equal && j>=0;--j) {
 			if (conv[i].name[j] == match_mamemessraine) {
 				if (strcmp(level[j].tag, "mame") != 0 && strcmp(level[j].tag, "mess") != 0 && strcmp(level[j].tag, "raine") != 0)
+					equal = false;
+			} else if (conv[i].name[j] == match_generic) {
+				if (strcmp(level[j].tag, "menu") != 0)
 					equal = false;
 			} else if (conv[i].name[j] == match_gamemachine) {
 				if (strcmp(level[j].tag, "game") != 0 && strcmp(level[j].tag, "machine") != 0)
@@ -621,7 +657,8 @@ static void start_handler(void* data, const XML_Char* name, const XML_Char** att
 // determina la posicion en el XML donde comenzará la lectura
 void determinar_inicio_lectura_XML(istream& is)
 {
-	const char* textoInicio = "<?xml version=\"1.0\"?>"; //texto de inicio de lectura
+	//const char* textoInicio = "<?xml version=\"1.0\"?>"; //texto de inicio de lectura
+	const char* textoInicio = "<?xml"; //texto de inicio de lectura
 	char bufXML[1024];
 	char* p_inicio; //puntero a la posicion de inicio de lectura
 	int pos_inicio = 0; //posicion del caracter de inicio de lectura
@@ -692,3 +729,57 @@ bool mame_info::load_xml(istream& is, game_set& gar)
 	return true;
 }
 
+bool generic::load_xml(istream& is, game_set& gar)
+{
+	struct state_t state;
+	char buf[16384];
+
+	determinar_inicio_lectura_XML(is);
+	
+	state.parser = XML_ParserCreate(NULL);
+	if (!state.parser) {
+		return false;
+	}
+
+	state.depth = -1;
+	state.error = 0;
+	state.e = this;
+	state.g = 0;
+	state.a = &gar;
+	state.m = 0;
+
+	XML_SetUserData(state.parser, &state);
+	XML_SetElementHandler(state.parser, start_handler, end_handler);
+	XML_SetCharacterDataHandler(state.parser, data_handler);
+
+	while (1) {
+		bool done;
+		int len;
+
+		is.read(buf, sizeof(buf));
+		if (is.bad()) {
+			process_error(&state, "", "read error");
+			break;
+		}
+
+		len = is.gcount();
+
+		done = is.eof();
+
+		if (XML_Parse(state.parser, buf, len, done) == XML_STATUS_ERROR) {
+			process_error(&state, "", XML_ErrorString(XML_GetErrorCode(state.parser)));
+			break;
+		}
+
+		if (done)
+			break;
+	}
+
+	XML_ParserFree(state.parser);
+
+	if (state.error) {
+		return false;
+	}
+
+	return true;
+}

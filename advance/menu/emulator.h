@@ -406,6 +406,7 @@ public:
 
 class generic : public emulator {
 	bool load_info(game_set& gar);
+	bool load_xml(std::istream& is, game_set& gar);
 public:
 	generic(const std::string& Aname, const std::string& Aexe_path, const std::string& Acmd_arg);
 

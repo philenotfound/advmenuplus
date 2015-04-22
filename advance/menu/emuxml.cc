@@ -654,33 +654,11 @@ static void start_handler(void* data, const XML_Char* name, const XML_Char** att
 	}
 }
 
-// determina la posicion en el XML donde comenzará la lectura
-void determinar_inicio_lectura_XML(istream& is)
-{
-	//const char* textoInicio = "<?xml version=\"1.0\"?>"; //texto de inicio de lectura
-	const char* textoInicio = "<?xml"; //texto de inicio de lectura
-	char bufXML[1024];
-	char* p_inicio; //puntero a la posicion de inicio de lectura
-	int pos_inicio = 0; //posicion del caracter de inicio de lectura
-
-	//guarda en bufXML los primeros 1024 caracteres del XML
-	is.read(bufXML, sizeof(bufXML)); 
-	//busca en bufXML el texto de inicio de lectura
-	p_inicio = strstr(bufXML, textoInicio); 
-	//determina la posicion del primer caracter del texto de lectura, restando a la direccion de memoria del
-	//inicio correcto de lectura la direccion de memoria del comienzo del bufXML
-	pos_inicio = p_inicio - bufXML; 
-	//posiciona el cursor de lectura al inicio del texto de lectura
-	is.seekg(pos_inicio); 
-}
-
 bool mame_info::load_xml(istream& is, game_set& gar)
 {
 	struct state_t state;
 	char buf[16384];
 
-	determinar_inicio_lectura_XML(is);
-	
 	state.parser = XML_ParserCreate(NULL);
 	if (!state.parser) {
 		return false;
@@ -734,8 +712,6 @@ bool generic::load_xml(istream& is, game_set& gar)
 	struct state_t state;
 	char buf[16384];
 
-	determinar_inicio_lectura_XML(is);
-	
 	state.parser = XML_ParserCreate(NULL);
 	if (!state.parser) {
 		return false;

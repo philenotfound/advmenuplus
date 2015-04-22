@@ -271,15 +271,15 @@ static void int_key_disable()
 static int int_mouse_delta; // mouse delta for a movement
 static int int_mouse_pos_x; // mouse x position
 static int int_mouse_pos_y; // mouse y position
-static int int_mouse_axes_invert; // mouse invert axes
-static adv_conf_enum_int MOUSE_AXES_INVERT[] = {{"x", 1},{"y", 2},{"xy", 3},{"none", 0}};
+static int int_mouse_axis_invert; // mouse invert axis
+static adv_conf_enum_int MOUSE_AXIS_INVERT[] = {{"x", 1},{"y", 2},{"xy", 3},{"none", 0}};
 
 static void int_mouse_reg(adv_conf* config_context)
 {
 	mouseb_reg(config_context, 0);
 	mouseb_reg_driver_all(config_context);
 	conf_int_register_limit_default(config_context, "mouse_delta", 1, 1000, 100);
-	conf_int_register_enum_default(config_context, "mouse_axes_invert", conf_enum(MOUSE_AXES_INVERT), 0);
+	conf_int_register_enum_default(config_context, "mouse_axis_invert", conf_enum(MOUSE_AXIS_INVERT), 0);
 }
 
 static void int_mouse_unreg()
@@ -291,7 +291,7 @@ static bool int_mouse_load(adv_conf* config_context)
 	int_mouse_pos_x = 0;
 	int_mouse_pos_y = 0;
 	int_mouse_delta = conf_int_get_default(config_context, "mouse_delta");
-	int_mouse_axes_invert = conf_int_get_default(config_context, "mouse_axes_invert");
+	int_mouse_axis_invert = conf_int_get_default(config_context, "mouse_axis_invert");
 
 	if (mouseb_load(config_context) != 0)
 		return false;
@@ -342,7 +342,7 @@ static void int_mouse_move_raw_poll()
 
 	if (int_mouse_pos_x >= int_mouse_delta) {
 		int_mouse_pos_x -= int_mouse_delta;
-		if(int_mouse_axes_invert == 1 || int_mouse_axes_invert == 3)
+		if(int_mouse_axis_invert == 1 || int_mouse_axis_invert == 3)
 			event_push(EVENT_LEFT);
 		else
 			event_push_repeat(EVENT_RIGHT);
@@ -350,7 +350,7 @@ static void int_mouse_move_raw_poll()
 
 	if (int_mouse_pos_x <= -int_mouse_delta) {
 		int_mouse_pos_x += int_mouse_delta;
-		if(int_mouse_axes_invert == 1 || int_mouse_axes_invert == 3)
+		if(int_mouse_axis_invert == 1 || int_mouse_axis_invert == 3)
 			event_push(EVENT_RIGHT);
 		else
 			event_push_repeat(EVENT_LEFT);
@@ -358,7 +358,7 @@ static void int_mouse_move_raw_poll()
 
 	if (int_mouse_pos_y >= int_mouse_delta) {
 		int_mouse_pos_y -= int_mouse_delta;
-		if(int_mouse_axes_invert == 2 || int_mouse_axes_invert == 3)
+		if(int_mouse_axis_invert == 2 || int_mouse_axis_invert == 3)
 			event_push(EVENT_UP);
 		else
 			event_push_repeat(EVENT_DOWN);
@@ -366,7 +366,7 @@ static void int_mouse_move_raw_poll()
 
 	if (int_mouse_pos_y <= -int_mouse_delta) {
 		int_mouse_pos_y += int_mouse_delta;
-		if(int_mouse_axes_invert == 2 || int_mouse_axes_invert == 3)
+		if(int_mouse_axis_invert == 2 || int_mouse_axis_invert == 3)
 			event_push(EVENT_DOWN);
 		else
 			event_push_repeat(EVENT_UP);

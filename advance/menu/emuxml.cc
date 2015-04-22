@@ -118,8 +118,9 @@ static void process_game_generic(struct state_t* state, enum token_t t, const ch
 				(const_cast<game&>(*i)).year_set(state->g->year_get());
 			if (state->g->cloneof_get().length())
 				(const_cast<game&>(*i)).cloneof_set(state->g->cloneof_get());
-		} else {		
-			//state->a->insert(*state->g);
+		} else {
+			state->g->size_set(1); //para indentificar los juegos como missing deben tener algun tamaño
+			state->a->insert(*state->g);
 		}
 		
 		delete state->g;

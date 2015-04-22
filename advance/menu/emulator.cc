@@ -207,7 +207,7 @@ void emulator::scan_dir(const game_set& gar, const string& dir, bool quiet)
 
 	while ((dd = readdir(d))!=0) {
 		string file = file_import(dd->d_name);
-		if (file_ext(file) == ".zip") {
+		if (file_ext(file) == ".zip" || file_ext(file) == ".7z") {
 			scan_game(gar, dir + "/" + file, user_name_get() + "/" + file_basename(file));
 		}
 	}
@@ -1851,7 +1851,7 @@ void dmess::scan_software_by_sys(game_container& gac, const string& software, co
 	struct dirent* ddir;
 	while ((ddir = readdir(dir))!=0) {
 		string file = file_import(ddir->d_name);
-		if (file_ext(file) == ".zip") {
+		if (file_ext(file) == ".zip"  || file_ext(file) == ".7z") {
 			string name = file_basename(file);
 
 			game g;
@@ -2173,7 +2173,7 @@ void advmess::scan_software_by_sys(game_container& gac, const string& software, 
 			string file = file_import(ddir->d_name);
 			string ext = file_ext(file);
 
-			if (ext == ".zip") {
+			if (ext == ".zip" || ext == ".7z") {
 				found = true;
 			} else if (ext.length() > 1) {
 				string ext_without_dot = string(ext, 1, ext.length() - 1);

@@ -461,9 +461,9 @@ static void process_videoaspecty(struct state_t* state, enum token_t t, const ch
 	}
 }
 
-static const char* match_generic = "menu"; // "menu" -> etiqueta del xml
+static const char* match_generic = "menu|softwarelist"; // etiqueta inicio y fin del xml
 static const char* match_mamemessraine = "mame|mess|raine";
-static const char* match_gamemachine = "game|machine";
+static const char* match_gamemachine = "game|machine|software";
 
 /**
  * Conversion table.
@@ -496,9 +496,10 @@ static struct conversion_t CONV2[] = {
 	{ 2, { match_mamemessraine, match_gamemachine, "ismechanical", 0, 0 }, process_mechanical },
 	{ 2, { match_generic, match_gamemachine, "name", 0, 0 }, process_name },
 	{ 2, { match_generic, match_gamemachine, "description", 0, 0 }, process_description },
-	{ 2, { match_generic, match_gamemachine, "manufacturer", 0, 0 }, process_manufacturer },
-	{ 2, { match_generic, match_gamemachine, "year", 0, 0 }, process_year },
 	{ 2, { match_generic, match_gamemachine, "cloneof", 0, 0 }, process_cloneof },
+	{ 2, { match_generic, match_gamemachine, "manufacturer", 0, 0 }, process_manufacturer },
+	{ 2, { match_generic, match_gamemachine, "publisher", 0, 0 }, process_manufacturer },
+	{ 2, { match_generic, match_gamemachine, "year", 0, 0 }, process_year },
 	{ 0, { 0, 0, 0, 0, 0 }, 0 }
 };
 
@@ -553,10 +554,10 @@ static struct conversion_t* identify(unsigned depth, const struct level_t* level
 				if (strcmp(level[j].tag, "mame") != 0 && strcmp(level[j].tag, "mess") != 0 && strcmp(level[j].tag, "raine") != 0)
 					equal = false;
 			} else if (conv[i].name[j] == match_generic) {
-				if (strcmp(level[j].tag, "menu") != 0)
+				if (strcmp(level[j].tag, "menu") != 0 && strcmp(level[j].tag, "softwarelist") != 0)
 					equal = false;
 			} else if (conv[i].name[j] == match_gamemachine) {
-				if (strcmp(level[j].tag, "game") != 0 && strcmp(level[j].tag, "machine") != 0)
+				if (strcmp(level[j].tag, "game") != 0 && strcmp(level[j].tag, "machine") != 0 && strcmp(level[j].tag, "software") != 0)
 					equal = false;
 			} else {
 				if (strcmp(level[j].tag, conv[i].name[j]) != 0)

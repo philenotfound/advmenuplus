@@ -3066,7 +3066,16 @@ bool generic::load_info(game_set& gar)
 					if (cloneof.length())
 						(const_cast<game&>(*i)).cloneof_set(cloneof);
 				} else {
-					log_std(("%s: ignoring game info %s\n", user_name_get().c_str(), name.c_str()));
+					if (description.length())
+						g.auto_description_set(description);
+					if (manufacturer.length())
+						g.manufacturer_set(manufacturer);
+					if (year.length())
+						g.year_set(year);
+					if (cloneof.length())
+						g.cloneof_set(cloneof);
+					g.size_set(1); //para indentificar los juegos como missing deben tener algun tamaño
+					gar.insert(g);
 				}
 			}
 		} else {

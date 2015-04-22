@@ -2908,6 +2908,7 @@ bool draine::run(const game& g, const game* bios, unsigned orientation, bool set
 generic::generic(const string& Aname, const string& Aexe_path, const string& Acmd_arg)
 	: emulator(Aname, Aexe_path, Acmd_arg)
 {
+	exclude_clone_orig = exclude;
 }
 
 int generic::attrib_run(int x, int y)
@@ -2915,6 +2916,7 @@ int generic::attrib_run(int x, int y)
 	choice_bag ch;
 
 	ch.insert(ch.end(), choice("Present or Missing", " Only\tPresent", " Only\tMissing", exclude_missing_effective, 0));
+	ch.insert(ch.end(), choice("Parent or Clone", " Only\tParent", " Only\tClone", exclude_clone_effective, 0));
 
 	choice_bag::iterator i = ch.begin();
 
@@ -2922,14 +2924,65 @@ int generic::attrib_run(int x, int y)
 
 	if (key == EVENT_ENTER) {
 		exclude_missing_effective = ch[0].tristate_get();
+		exclude_clone_effective = ch[1].tristate_get();
 	}
 
 	return key;
 }
 
+void generic::attrib_load()
+{
+	emulator::attrib_load();
+	exclude_clone_effective = exclude_clone_orig;
+}
+
+void generic::attrib_save()
+{
+	emulator::attrib_save();
+	exclude_clone_orig = exclude_clone_effective;
+}
+
+bool generic::attrib_set(const string& value0, const string& value1)
+{
+	if (emulator::attrib_set(value0, value1))
+		return true;
+
+	if (value0 == "clone") {
+		if (!tristate(exclude_clone_orig, value1))
+			return false;
+	} else {
+		return false;
+	}
+	return true;
+}
+
+void generic::attrib_get(adv_conf* config_context, const char* section, const char* tag)
+{
+	emulator::attrib_get(config_context, section, tag);
+	conf_string_set(config_context, section, tag, attrib_compile("clone", tristate(exclude_clone_orig)).c_str());
+}
+
+bool generic::filter(const game& g) const
+{
+	if (!emulator::filter(g))
+		return false;
+
+	if (exclude_clone_effective == exclude && g.parent_get()!=0)
+			return false;
+	if (exclude_clone_effective == exclude_not && g.parent_get()==0)
+		return false;
+
+	return true;
+}
+	
+void generic::cache(const game_set& gar, const game& g) const
+{
+	emulator::cache(gar, g);
+}
+
 bool generic::tree_get() const
 {
-	return false;
+	return exclude_clone_effective == exclude;
 }
 
 string generic::type_get() const

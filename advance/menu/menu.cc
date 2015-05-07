@@ -42,10 +42,6 @@ static adv_font* int_font_list = 0;
 static adv_font* int_font_menu = 0;
 static bool is_loaded = false;
 
-//OJO:
-//static target_clock_t inicio = 0;
-//static target_clock_t fin = 0;
-
 // ------------------------------------------------------------------------
 // Menu entry
 
@@ -3775,12 +3771,9 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		rs.mode_mask &= ~mode_tile_marquee;
 	rs.preview_mask &= ~(preview_icon | preview_marquee);
 
-	if (rs.preview_mask == 0)
-		rs.mode_mask = mode_text | mode_custom;
-
-	if (rs.mode_mask == 0)
+	if (rs.preview_mask == 0 || rs.mode_mask == 0)
 		rs.mode_mask = mode_text;
-
+	
 	log_std(("menu: sort end\n"));
 
 	bool done = false;
@@ -3788,16 +3781,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 
 	while (!done) {
 
-		//OJO:
-		//fin = target_clock();
-		//cout << (fin - inicio)/1000 << " ms" << std::endl;
-		//cout << "---------------------------------------------" << std::endl;
-		
 		key = run_menu_sort(rs, *psc, category_func, flipxy, silent, empty_msg);
 
-		//OJO:
-		//inicio = target_clock();
-		
 		// don't replay the sound and clip
 		silent = true;
 
@@ -3818,9 +3803,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 					case mode_tile_enormous : rs.mode_set(mode_tile_giant); break;
 					case mode_tile_giant : rs.mode_set(mode_tile_icon); break;
 					case mode_tile_icon : rs.mode_set(mode_tile_marquee); break;
-					case mode_tile_marquee : 
-						rs.mode_set(mode_custom);	break;
-					case mode_custom : rs.mode_set(mode_full); break;													
+					case mode_tile_marquee : rs.mode_set(mode_custom); break;
+					case mode_custom : rs.mode_set(mode_full); break;												
 					}
 				} while ((rs.mode_get() & rs.mode_mask) == 0);
 			}
@@ -3854,7 +3838,6 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_OFF :
 		case EVENT_ESC_FORCE :
 		case EVENT_OFF_FORCE :
-			//disable_fonts();
 		case EVENT_ENTER :
 		case EVENT_CLONE :
 		case EVENT_IDLE_0 :

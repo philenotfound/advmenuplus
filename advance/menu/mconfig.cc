@@ -1215,10 +1215,11 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	if (!config_load_iterator_emu_include(config_context, "emulator_include", include_emu_orig))
 		return false;
 
-	// if the set is empty add all the emulator
+	// if the set is empty add the first emulator
 	if (include_emu_orig.size() == 0) {
 		for(pemulator_container::iterator i=emu_active.begin();i!=emu_active.end();++i) {
 			include_emu_orig.insert(include_emu_orig.end(), (*i)->user_name_get());
+			break;
 		}
 	}
 

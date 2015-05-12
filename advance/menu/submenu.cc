@@ -811,6 +811,10 @@ int run_suballmenu(config_state& rs)
 	rs.sub_disable(); // force the use of the default config
 	if (rs.type.size() > 1)
 		ch.insert(ch.end(), choice(menu_name(rs, "Game Type...", EVENT_SETTYPE), 8, rs.current_game != 0));
+
+	// MENU SYSTEMS
+	ch.insert(ch.end(), choice((rs.menu_systems_activated ? "Disable Menu Systems" : "Enable Menu Systems"), 14));
+	
 	ch.insert(ch.end(), choice("Calibration...", 9));
 	ch.insert(ch.end(), choice("Save all settings", 6));
 	ch.insert(ch.end(), choice("Restore all settings", 20));
@@ -861,6 +865,19 @@ int run_suballmenu(config_state& rs)
 				break;
 			case 12 :
 				rs.security_exit = !rs.security_exit;
+				break;
+			case 14 : // MENU SYSTEMS
+				rs.menu_systems_activated = !rs.menu_systems_activated;
+				if(!rs.menu_systems_activated && rs.menu_systems->state_get() && rs.current_game != 0) {
+					emulator_container c;
+					c.insert(c.end(), rs.current_game->name_without_emulator_get());
+					rs.include_emu_set(c);
+				}
+				if(rs.menu_systems_activated && !rs.menu_systems->state_get()) {
+					emulator_container c;
+					c.insert(c.end(), rs.menu_systems->user_name_get());
+					rs.include_emu_set(c);
+				}
 				break;
 			}
 		} else if (key == EVENT_ESC) {

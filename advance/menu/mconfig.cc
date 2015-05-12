@@ -281,6 +281,9 @@ void config_state::conf_register_custom(adv_conf* config_context)
 
 void config_state::conf_register(adv_conf* config_context)
 {
+	// MENU SYSTEMS
+	conf_bool_register_default(config_context, "menu_systems", 0);
+	
 	conf_string_register_multi(config_context, "emulator");
 	conf_string_register_multi(config_context, "emulator_roms");
 	conf_string_register_multi(config_context, "emulator_roms_filter");
@@ -607,6 +610,14 @@ static bool config_load_skip(adv_conf* config_context, unsigned& mask)
 	}
 
 	return true;
+}
+
+// MENU SYSTEMS
+static bool config_load_menu_systems(adv_conf* config_context, const string& tag, pmenu_systems& menusystems)
+{
+	menusystems = new systems("MENU SYSTEMS", "", "");
+	
+	return conf_bool_get_default(config_context, tag.c_str());
 }
 
 static bool config_load_iterator_emu(adv_conf* config_context, const string& tag, pemulator_container& emu)
@@ -1041,6 +1052,10 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	if (!config_split(conf_string_get_default(config_context, "sound_background_loop_dir"), sound_background_loop_dir))
 		return false;
+
+	// MENU SYSTEMS
+	menu_systems_activated = config_load_menu_systems(config_context, "menu_systems", menu_systems);
+	
 	if (!config_load_iterator_emu(config_context, "emulator", emu))
 		return false;
 	if (!config_load_iterator_emu_attrib(config_context, "emulator_attrib", emu))
@@ -1167,6 +1182,18 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		return false;
 	}
 
+	// MENU SYSTEMS
+	// establece los emuladores del Menu Systems
+	for(pemulator_container::iterator j=emu_active.begin();j!=emu_active.end();++j) {
+		string name = menu_systems->user_name_get() + "/" + (*j)->user_name_get();
+		game g;
+		g.name_set(name);
+		g.auto_description_set((*j)->user_name_get());
+		g.emulator_set(menu_systems);
+				
+		gar.insert(g);
+	}
+	
 	// cache some values and relations
 	if (opt_verbose)
 		target_nfo("log: cache\n");
@@ -1211,10 +1238,15 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		}
 	}
 
+	// MENU SYSTEMS
 	// load the emulator active
-	if (!config_load_iterator_emu_include(config_context, "emulator_include", include_emu_orig))
+	if (menu_systems_activated) {
+		include_emu_orig.clear();
+		include_emu_orig.insert(include_emu_orig.end(), menu_systems->user_name_get());
+	} else if (!config_load_iterator_emu_include(config_context, "emulator_include", include_emu_orig)) {
 		return false;
-
+	}
+	
 	// if the set is empty add the first emulator
 	if (include_emu_orig.size() == 0) {
 		for(pemulator_container::iterator i=emu_active.begin();i!=emu_active.end();++i) {
@@ -1420,6 +1452,9 @@ bool config_state::save(adv_conf* config_context) const
 		conf_string_set(config_context, "", "type_include", config_out(*i).c_str());
 	}
 
+	// MENU SYSTEMS
+	conf_bool_set(config_context, "", "menu_systems", menu_systems_activated);
+	
 	// REM SELECTED ---------------------------------------------------------------------------
 
 	// guarda la posicion del seleccionado para el "rem_selected no"
@@ -1593,6 +1628,9 @@ config_state::~config_state()
 	for(pfavorites_container::iterator i=favorites.begin();i!=favorites.end();++i) {
 		delete *i;
 	}
+
+	// delete the Menu Systems
+	delete menu_systems;
 
 	// delete the emulators
 	for(pemulator_container::iterator i=emu.begin();i!=emu.end();++i) {

@@ -123,10 +123,19 @@ int run_sub(config_state& rs, bool silent)
 			case EVENT_ESC :
 			case EVENT_OFF :
 				silent = false;
+				// MENU SYSTEMS: Al salir de un emulador carga el Menu Systems (si esta activado)
+				if (rs.menu_systems_activated && !rs.menu_systems->state_get()) {
+					emulator_container c;
+					c.insert(c.end(), rs.menu_systems->user_name_get());
+					rs.include_emu_set(c);
+					key = EVENT_NONE;
+					break;
+				}
+				// Muestra ventana de confirmacion de salida (Security Exit)
 				if(rs.security_exit && !run_exit(rs))
 					break;
-				disable_fonts();
 			case EVENT_ROTATE :
+				disable_fonts();
 				done = true;
 				break;
 			}
@@ -156,8 +165,14 @@ int run_sub(config_state& rs, bool silent)
 			// replay the sound and clip
 			silent = false;
 			if (rs.current_game) {
-				done = true;
-				is_run = true;
+				if (rs.menu_systems->state_get()) { // MENU SYSTEMS
+					emulator_container c;
+					c.insert(c.end(), rs.current_game->name_without_emulator_get());
+					rs.include_emu_set(c);
+				} else {
+					done = true;
+					is_run = true;
+				}
 			}
 			break;
 		}

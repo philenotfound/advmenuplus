@@ -3177,3 +3177,46 @@ bool generic::run(const game& g, const game* bios, unsigned orientation, bool se
 	return emulator::run(g, bios, orientation, set_difficulty, difficulty, set_attenuation, attenuation, ignore_error);
 }
 
+//---------------------------------------------------------------------------
+// MENU SYSTEMS
+
+systems::systems(const string& Aname, const string& Aexe_path, const string& Acmd_arg)
+	: emulator(Aname, Aexe_path, Acmd_arg)
+{
+}
+
+int systems::attrib_run(int x, int y)
+{
+	return 0;
+}
+
+bool systems::tree_get() const
+{
+	return false;
+}
+
+string systems::type_get() const
+{
+	return "systems";
+}
+
+bool systems::load_cfg(const game_set& gar, bool quiet)
+{
+	return true;
+}
+
+bool systems::load_data(const game_set& gar)
+{
+	return true;
+}
+
+bool systems::load_game(game_set& gar, bool quiet)
+{
+	return true;
+}
+
+bool systems::load_software(game_set&, bool quiet)
+{
+	return true;
+}
+

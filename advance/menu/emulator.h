@@ -437,8 +437,25 @@ public:
 	virtual bool is_empty() const;
 };
 
+// MENU SYSTEMS
+class systems : public emulator {
+public:
+	systems(const std::string& Aname, const std::string& Aexe_path, const std::string& Acmd_arg);
+
+	virtual int attrib_run(int x, int y);
+	virtual bool tree_get() const;
+
+	virtual bool load_cfg(const game_set& gar, bool quiet);
+	virtual bool load_data(const game_set& gar);
+	virtual bool load_game(game_set& gar, bool quiet);
+	virtual bool load_software(game_set& gar, bool quiet);
+
+	virtual std::string type_get() const;
+};
+
 typedef std::list<emulator*> pemulator_container;
 typedef std::list<std::string> emulator_container;
+typedef emulator* pmenu_systems;
 
 inline bool pgame_by_time_less(const game* A, const game* B)
 {

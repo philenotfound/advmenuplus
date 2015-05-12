@@ -1238,64 +1238,72 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 	string font_path;
 	unsigned fontsize_X = 0;
 	unsigned fontsize_Y = 0;
-	
-	for(pemulator_container::iterator j = rs.emu.begin();j!=rs.emu.end();j++) {
-		if ((*j)->state_get() == 1) {
 
-			emu_start = (*j)->nocustom_start_path_get();
-			if (emu_start == "")
-				emu_start = "none";
+	emulator* emu_actual = 0;
 
-			img_background = (*j)->nocustom_background_path_get();
-			if (img_background == "" || img_background == "default")
-				img_background = rs.ui_back;
-
-			font_path = (*j)->nocustom_font_path_get();
-			if (font_path == "" || font_path == "default")
-				font_path = rs.video_font_path;
-
-			string fontsize = (*j)->nocustom_font_size_get();
-			if (fontsize == "") {
-				fontsize_X= rs.video_fontx;
-				fontsize_Y = rs.video_fonty;
-			} else {
-				string a0, a1;
-				if (config_split_custom(fontsize, a0, a1)) {
-					fontsize_Y= atoi(a0.c_str());
-					fontsize_X = atoi(a1.c_str());
-				}
+	// RECOGIDA DE DATOS DEL EMU NO LAYOUT
+	if (rs.menu_systems->state_get()) {
+		emu_actual = rs.menu_systems;
+	} else {
+		for (pemulator_container::iterator e=rs.emu.begin();e!=rs.emu.end();++e) {
+			if ((*e)->state_get()) {
+				emu_actual = *e;
+				break;
 			}
-
-			if (fontsize_Y >= 5 && fontsize_Y <= 100)
-				fontsize_Y = video_size_y() / fontsize_Y;
-			else
-				fontsize_Y = video_size_y() / 45;
-			if (fontsize_X >= 5 && fontsize_X <= 200)
-				fontsize_X = video_size_x() / fontsize_X;
-			else
-				fontsize_X = fontsize_Y * video_size_x() * 3 / video_size_y() / 4;
-
-			color_rc_load();
-
-			string c_font = (*j)->nocustom_font_color_get();
-			if(color_nocustom(COLOR_MENU_NORMAL, c_font, false, video_color_def(), rs.ui_translucency)) {
-				COLOR_HELP_NORMAL = COLOR_HELP_TAG = COLOR_CHOICE_TITLE = COLOR_CHOICE_NORMAL = COLOR_MENU_NORMAL;
-				COLOR_CHOICE_HIDDEN = COLOR_MENU_HIDDEN = COLOR_MENU_TAG = COLOR_MENU_NORMAL;
-				COLOR_MENU_BAR_TAG = COLOR_MENU_BAR_HIDDEN = COLOR_MENU_GRID = COLOR_MENU_NORMAL;
-				COLOR_MENU_BACKDROP = COLOR_MENU_ICON = COLOR_MENU_CURSOR = COLOR_MENU_NORMAL;
-				COLOR_MENU_BAR = COLOR_MENU_NORMAL;
-
-				string c_font_select = (*j)->nocustom_font_color_select_get();
-				if(c_font_select == "")
-					invertir_colores(c_font_select, c_font);
-
-				if(color_nocustom(COLOR_MENU_SELECT, c_font_select, true, video_color_def(), rs.ui_translucency))
-					COLOR_MENU_TAG_SELECT = COLOR_CHOICE_SELECT = COLOR_CHOICE_HIDDEN_SELECT = COLOR_MENU_HIDDEN_SELECT = COLOR_MENU_SELECT;
-			}
-			break;
 		}
 	}
 
+	emu_start = emu_actual->nocustom_start_path_get();
+	if (emu_start == "")
+		emu_start = "none";
+
+	img_background = emu_actual->nocustom_background_path_get();
+	if (img_background == "" || img_background == "default")
+		img_background = rs.ui_back;
+
+	font_path = emu_actual->nocustom_font_path_get();
+	if (font_path == "" || font_path == "default")
+		font_path = rs.video_font_path;
+
+	string fontsize = emu_actual->nocustom_font_size_get();
+	if (fontsize == "") {
+		fontsize_X= rs.video_fontx;
+		fontsize_Y = rs.video_fonty;
+	} else {
+		string a0, a1;
+		if (config_split_custom(fontsize, a0, a1)) {
+			fontsize_Y= atoi(a0.c_str());
+			fontsize_X = atoi(a1.c_str());
+		}
+	}
+
+	if (fontsize_Y >= 5 && fontsize_Y <= 100)
+		fontsize_Y = video_size_y() / fontsize_Y;
+	else
+		fontsize_Y = video_size_y() / 45;
+	if (fontsize_X >= 5 && fontsize_X <= 200)
+		fontsize_X = video_size_x() / fontsize_X;
+	else
+		fontsize_X = fontsize_Y * video_size_x() * 3 / video_size_y() / 4;
+
+	color_rc_load();
+
+	string c_font = emu_actual->nocustom_font_color_get();
+	if(color_nocustom(COLOR_MENU_NORMAL, c_font, false, video_color_def(), rs.ui_translucency)) {
+		COLOR_HELP_NORMAL = COLOR_HELP_TAG = COLOR_CHOICE_TITLE = COLOR_CHOICE_NORMAL = COLOR_MENU_NORMAL;
+		COLOR_CHOICE_HIDDEN = COLOR_MENU_HIDDEN = COLOR_MENU_TAG = COLOR_MENU_NORMAL;
+		COLOR_MENU_BAR_TAG = COLOR_MENU_BAR_HIDDEN = COLOR_MENU_GRID = COLOR_MENU_NORMAL;
+		COLOR_MENU_BACKDROP = COLOR_MENU_ICON = COLOR_MENU_CURSOR = COLOR_MENU_NORMAL;
+		COLOR_MENU_BAR = COLOR_MENU_NORMAL;
+
+		string c_font_select = emu_actual->nocustom_font_color_select_get();
+		if(c_font_select == "")
+			invertir_colores(c_font_select, c_font);
+
+		if(color_nocustom(COLOR_MENU_SELECT, c_font_select, true, video_color_def(), rs.ui_translucency))
+			COLOR_MENU_TAG_SELECT = COLOR_CHOICE_SELECT = COLOR_CHOICE_HIDDEN_SELECT = COLOR_MENU_HIDDEN_SELECT = COLOR_MENU_SELECT;
+	}
+	
 	log_std(("menu: user begin\n"));
 	
 	//arregla bug: pantallazos video start emu
@@ -3652,6 +3660,20 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		}
 		(*i)->state_set(state);
 	}
+	
+	// MENU SYSTEMS
+	// establece el estado (si es listado o no) del Menu Systems
+	bool state = false;
+	for(emulator_container::const_iterator j=rs.include_emu_get().begin();j!=rs.include_emu_get().end();++j) {
+		if (rs.menu_systems->user_name_get() == *j) {
+			state = true;
+			if (emu_msg.length())
+				emu_msg += ", ";
+			emu_msg += rs.menu_systems->user_name_get();
+			break;
+		}
+	}
+	rs.menu_systems->state_set(state);
 
 	// setup the type state
 	for(pcategory_container::iterator i=rs.type.begin();i!=rs.type.end();++i) {

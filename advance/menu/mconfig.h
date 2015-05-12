@@ -463,6 +463,10 @@ public:
 
 	static void conf_register_custom(adv_conf* config_context);
 	bool load_custom(adv_conf* config_context, const std::string& nombre_emulador);
+
+	// MENU SYSTEMS
+	bool menu_systems_activated;	
+	pmenu_systems menu_systems;	///< emulador del menu de sistemas
 };
 
 // ------------------------------------------------------------------------

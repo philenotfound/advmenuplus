@@ -335,13 +335,19 @@ int run_favorites(config_state& rs)
 
 void run_favorites_next(config_state& rs)
 {
+	bool with_or_without_games = false; // indica si carga la siguiente lista tenga o no juegos
+	
+	// si Menu Systems activado -> carga la lista siguiente tenga o no juegos
+	// si Menu Systems desactivado -> carga la lista siguiente con juegos
+	with_or_without_games = rs.menu_systems_activated;
+	
 	string next_select = "";
 	bool pred_in = false;
 
 	for(pfavorites_container::const_iterator j=rs.favorites.begin();j!=rs.favorites.end();++j) {
 		if (pred_in) {
 			for(emulator_container::const_iterator k = rs.include_emu_get().begin();k!=rs.include_emu_get().end();++k) {
-				if((*j)->has_emu(*k)) {
+				if (with_or_without_games || (*j)->has_emu(*k)) {
 					next_select = (*j)->name_get();
 					pred_in = false;
 					break;
@@ -349,7 +355,7 @@ void run_favorites_next(config_state& rs)
 			}
 		}
 		if ((*j)->name_get() == rs.include_favorites_get())
-				pred_in = true;
+			pred_in = true;
 	}
 	
 	if (next_select == "" && rs.favorites.begin() != rs.favorites.end())

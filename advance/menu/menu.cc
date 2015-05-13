@@ -3699,7 +3699,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	// recompute the preview mask
 	rs.preview_mask = 0;
 
-	if(rs.include_favorites_get() == "All Games") {
+	if(rs.include_favorites_get() == "All Games" || rs.menu_systems->state_get()) {
 		for(game_set::const_iterator i=rs.gar.begin();i!=rs.gar.end();++i) {
 			// emu
 			if (!i->emulator_get()->state_get())

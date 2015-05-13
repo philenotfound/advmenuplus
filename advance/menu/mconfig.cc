@@ -1288,8 +1288,21 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	}
 	
 	// ------------------------------------ LOAD REM SELECTED ---------------------------------------------
-	// inicializa rem_pos con todos los pares fav/emu con posicion a cero
+	// inicializa rem_pos con todos los pares fav/emu
 	for(pfavorites_container::const_iterator i=favorites.begin();i!=favorites.end();++i) {
+		// posicion del Menu Systems
+		string name = config_normalize((*i)->name_get()) + "/" + config_normalize(menu_systems->user_name_get());
+		pos_selected* ps = new pos_selected(name);
+		const char* c;
+		if (conf_string_section_get(config_context, ps->name.c_str(), "menu_pos", &c) == 0) {
+			string a0, a1;
+			if (config_split(c, a0, a1)) {
+				ps->base = atoi(a0.c_str());
+				ps->rel = atoi(a1.c_str());
+			}
+		}
+		rem_pos.insert(rem_pos.end(), ps);
+		// posiciones de los emuladores
 		for(pemulator_container::const_iterator j=emu.begin();j!=emu.end();++j) {
 			string name = config_normalize((*i)->name_get()) + "/" + config_normalize((*j)->user_name_get());
 			pos_selected* ps = new pos_selected(name);

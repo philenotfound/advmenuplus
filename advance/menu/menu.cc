@@ -2145,94 +2145,107 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		key = menu_key(key, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
 
 		is_loaded = true;
-		
+
 		switch (key) {
-		case EVENT_INS :
-			if (pos_base + pos_rel < gc.size() && pos_base + pos_rel > 0) {
-				unsigned new_pos = pos_base + pos_rel - 1;
-				string i = gc[new_pos]->category(category_extract);
-				while (new_pos>0 && gc[new_pos-1]->category(category_extract)== i)
-					--new_pos;
-				menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-			}
-			break;
-		case EVENT_DEL :
-			if (pos_base + pos_rel < gc.size()) {
-				unsigned new_pos = pos_base + pos_rel;
-				string i = gc[new_pos]->category(category_extract);
-				while (new_pos<gc.size()-1 && gc[new_pos]->category(category_extract)== i)
-					++new_pos;
-				menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-			}
-			break;
-		default:
-			if (key>32 && key<128 && isalnum(key)) {
-				oldfast.insert(oldfast.length(), 1, (char)key);
-				menu_array::const_iterator i;
-				for(i=gc.begin();i!=gc.end();++i) {
-					if (menu_fast_compare((*i)->desc_get(), oldfast)) {
-						break;
-					}
+			case EVENT_INS :
+				if (pos_base + pos_rel < gc.size() && pos_base + pos_rel > 0) {
+					unsigned new_pos = pos_base + pos_rel - 1;
+					string i = gc[new_pos]->category(category_extract);
+					while (new_pos>0 && gc[new_pos-1]->category(category_extract)== i)
+						--new_pos;
+					menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
 				}
-				if (i==gc.end()) {
+				break;
+			case EVENT_DEL :
+				if (pos_base + pos_rel < gc.size()) {
+					unsigned new_pos = pos_base + pos_rel;
+					string i = gc[new_pos]->category(category_extract);
+					while (new_pos<gc.size()-1 && gc[new_pos]->category(category_extract)== i)
+						++new_pos;
+					menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
+				}
+				break;
+			default:
+				if (key>32 && key<128 && isalnum(key)) {
+					oldfast.insert(oldfast.length(), 1, (char)key);
+					menu_array::const_iterator i;
 					for(i=gc.begin();i!=gc.end();++i) {
-						if ((*i)->has_game()) {
-							const game& g = (*i)->game_get().clone_best_get();
-							if (menu_fast_compare(g.name_without_emulator_get(), oldfast)) {
-								break;
+						if (menu_fast_compare((*i)->desc_get(), oldfast)) {
+							break;
+						}
+					}
+					if (i==gc.end()) {
+						for(i=gc.begin();i!=gc.end();++i) {
+							if ((*i)->has_game()) {
+								const game& g = (*i)->game_get().clone_best_get();
+								if (menu_fast_compare(g.name_without_emulator_get(), oldfast)) {
+									break;
+								}
 							}
 						}
 					}
+					if (i!=gc.end()) {
+						int pos = i - gc.begin();
+						menu_pos(pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
+						rs.fast = oldfast;
+					}
 				}
-				if (i!=gc.end()) {
-					int pos = i - gc.begin();
-					menu_pos(pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-					rs.fast = oldfast;
-				}
-			}
-			break;
-		case EVENT_ENTER :
-		case EVENT_CLONE :
-		case EVENT_LOCK :
-			done = true;
-			break;
-		case EVENT_IDLE_0 :
-		case EVENT_IDLE_1 :
-			done = true;
-			break;
-		}
-		if (!rs.lock_effective)
-		switch (key) {
-		case EVENT_EMU_NEXT :
-		case EVENT_EMU_PRE :
-			is_loaded = false;
-			done = true;
-			break;
-		case EVENT_ROTATE :
-		case EVENT_SETFAVORITES :
-			if (!rs.current_game) break;
-		case EVENT_MODE :
-		case EVENT_HELP :
-		case EVENT_FAVORITES_NEXT :
-		case EVENT_TYPE :
-		case EVENT_ATTRIB :
-		case EVENT_SORT :
-		case EVENT_SETTYPE :
-		case EVENT_COMMAND :
-		case EVENT_MENU :
-		case EVENT_PREVIEW :
-			done = true;
-			break;
-		case EVENT_ESC :
-			if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode)
+				break;
+			case EVENT_ENTER :
+			case EVENT_CLONE :
+			case EVENT_LOCK :
+			case EVENT_IDLE_0 :
+			case EVENT_IDLE_1 :
 				done = true;
-			break;
-		case EVENT_OFF :
-			if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all)
-				done = true;
-			break;
+				break;
 		}
 
+		if (!rs.lock_effective) {
+			// eventos desactivados si MenuSystems listado
+			if (!rs.menu_systems->state_get()) {
+				if (!rs.menu_systems_activated) {
+					// eventos desactivados si MenuSystems activado
+					switch (key) {
+						case EVENT_EMU_PRE :				//F6
+						case EVENT_EMU_NEXT :				//F7
+							is_loaded = false;
+							done = true;
+							break;
+					}
+				}
+				switch (key) {
+					case EVENT_SETFAVORITES :			//F9
+						if (!rs.current_game) break;
+					case EVENT_TYPE :							//F3
+					case EVENT_SETTYPE :						//F10
+						done = true;
+						break;
+				}
+			}
+			// eventos comunes
+			switch (key) {
+				case EVENT_ROTATE :
+				case EVENT_MODE :
+				case EVENT_HELP :
+				case EVENT_FAVORITES_NEXT :
+				case EVENT_ATTRIB :
+				case EVENT_SORT :
+				case EVENT_COMMAND :
+				case EVENT_MENU :
+				case EVENT_PREVIEW :
+					done = true;
+					break;
+				case EVENT_ESC :
+					if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode)
+						done = true;
+					break;
+				case EVENT_OFF :
+					if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all)
+						done = true;
+					break;
+			}
+		}
+		
 		if (pos_rel + pos_base < gc.size() && gc[pos_rel + pos_base]->has_game()) {
 			rs.current_game = &gc[pos_rel+pos_base]->game_get();
 			rs.current_clone = 0;
@@ -3128,114 +3141,121 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 			key = menu_key_custom(key, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
 		
 		is_loaded = true;
-		
+
 		switch (key) {
-		case EVENT_INS :
-			if (pos_base + pos_rel < gc.size() && pos_base + pos_rel > 0) {
-				unsigned new_pos = pos_base + pos_rel - 1;
-				string i = gc[new_pos]->category(category_extract);
-				while (new_pos>0 && gc[new_pos-1]->category(category_extract)== i)
-					--new_pos;
-				if (!frenado)
-					menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-				else
-					pos_base = new_pos - pos_rel;
-			}
-			break;
-		case EVENT_DEL :
-			if (pos_base + pos_rel < gc.size()) {
-				unsigned new_pos = pos_base + pos_rel;
-				string i = gc[new_pos]->category(category_extract);
-				while (new_pos<gc.size()-1 && gc[new_pos]->category(category_extract)== i)
-					++new_pos;
-				if (!frenado)
-					menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-				else
-					pos_base = new_pos - pos_rel;
-			}
-			break;
-		default:
-			if (key>32 && key<128 && isalnum(key)) {
-				oldfast.insert(oldfast.length(), 1, (char)key);
-				menu_array::const_iterator i;
-				for(i=gc.begin();i!=gc.end();++i) {
-					if (menu_fast_compare((*i)->desc_get(), oldfast)) {
-						break;
-					}
+			case EVENT_INS :
+				if (pos_base + pos_rel < gc.size() && pos_base + pos_rel > 0) {
+					unsigned new_pos = pos_base + pos_rel - 1;
+					string i = gc[new_pos]->category(category_extract);
+					while (new_pos>0 && gc[new_pos-1]->category(category_extract)== i)
+						--new_pos;
+					if (!frenado)
+						menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
+					else
+						pos_base = new_pos - pos_rel;
 				}
-				if (i==gc.end()) {
+				break;
+			case EVENT_DEL :
+				if (pos_base + pos_rel < gc.size()) {
+					unsigned new_pos = pos_base + pos_rel;
+					string i = gc[new_pos]->category(category_extract);
+					while (new_pos<gc.size()-1 && gc[new_pos]->category(category_extract)== i)
+						++new_pos;
+					if (!frenado)
+						menu_pos(new_pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
+					else
+						pos_base = new_pos - pos_rel;
+				}
+				break;
+			default:
+				if (key>32 && key<128 && isalnum(key)) {
+					oldfast.insert(oldfast.length(), 1, (char)key);
+					menu_array::const_iterator i;
 					for(i=gc.begin();i!=gc.end();++i) {
-						if ((*i)->has_game()) {
-							const game& g = (*i)->game_get().clone_best_get();
-							if (menu_fast_compare(g.name_without_emulator_get(), oldfast)) {
-								break;
+						if (menu_fast_compare((*i)->desc_get(), oldfast)) {
+							break;
+						}
+					}
+					if (i==gc.end()) {
+						for(i=gc.begin();i!=gc.end();++i) {
+							if ((*i)->has_game()) {
+								const game& g = (*i)->game_get().clone_best_get();
+								if (menu_fast_compare(g.name_without_emulator_get(), oldfast)) {
+									break;
+								}
 							}
 						}
 					}
+					if (i!=gc.end()) {
+						int pos = i - gc.begin();
+						if (!frenado)
+							menu_pos(pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
+						else
+							pos_base = pos - pos_rel;
+						rs.fast = oldfast;
+					}
 				}
-				if (i!=gc.end()) {
-					int pos = i - gc.begin();
-					if (!frenado)
-						menu_pos(pos, pos_base, pos_rel, pos_rel_max, pos_base_upper, coln, gc.size());
-					else
-						pos_base = pos - pos_rel;
-					rs.fast = oldfast;
-				}
-			}
-			break;
-		case EVENT_ENTER :
-		case EVENT_CLONE :
-			if(menu_font_path != "none") {
-				usar_fuente(int_font_menu);
-			}
-		case EVENT_LOCK :
-			done = true;
-			break;
-		case EVENT_IDLE_0 :
-		case EVENT_IDLE_1 :
-			done = true;
-			break;
+				break;
+			case EVENT_ENTER :
+			case EVENT_CLONE :
+				if(menu_font_path != "none") usar_fuente(int_font_menu);
+			case EVENT_LOCK :
+			case EVENT_IDLE_0 :
+			case EVENT_IDLE_1 :
+				done = true;
+				break;
 		}
-		if (!rs.lock_effective)
-		switch (key) {
-		case EVENT_EMU_NEXT :
-		case EVENT_EMU_PRE :
-			is_loaded = false;
-			done = true;
-			break;
-		case EVENT_ROTATE :
-				break;
-		case EVENT_SETFAVORITES :
-			if (!rs.current_game)
-				break;
-		case EVENT_HELP :
-		case EVENT_FAVORITES_NEXT :
-		case EVENT_TYPE :
-		case EVENT_ATTRIB :
-		case EVENT_SORT :
-		case EVENT_SETTYPE :
-		case EVENT_COMMAND :
-		case EVENT_MENU :
-			if(menu_font_path != "none") {
-				usar_fuente(int_font_menu);
-			}
-		case EVENT_MODE :
 		
-		case EVENT_PREVIEW :
-			done = true;
-			break;
-		case EVENT_ESC :
-			if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode) {
-				if(menu_font_path != "none") usar_fuente(int_font_menu);
-				done = true;
+		if (!rs.lock_effective) {
+			// eventos desactivados si MenuSystems listado
+			if (!rs.menu_systems->state_get()) {
+				if (!rs.menu_systems_activated) {
+					// eventos desactivados si MenuSystems activado
+					switch (key) {
+						case EVENT_EMU_NEXT :
+						case EVENT_EMU_PRE :
+							is_loaded = false;
+							done = true;
+							break;
+					}
+				}
+				switch (key) {
+					case EVENT_SETFAVORITES :
+					case EVENT_SETTYPE :
+						if(!rs.current_game) break;
+						if(menu_font_path != "none") usar_fuente(int_font_menu);
+					case EVENT_TYPE :
+						done = true;
+						break;
+				}
 			}
-			break;
-		case EVENT_OFF :
-			if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all) {
-				if(menu_font_path != "none") usar_fuente(int_font_menu);
-				done = true;
+			switch (key) {
+				case EVENT_ROTATE :
+					break;
+				case EVENT_HELP :			//F1
+				case EVENT_ATTRIB :		//F4
+				case EVENT_SORT :			//F5
+				case EVENT_COMMAND :	//F12
+				case EVENT_MENU :
+					if(menu_font_path != "none") usar_fuente(int_font_menu);
+				case EVENT_FAVORITES_NEXT :	//F2
+				case EVENT_MODE :
+				case EVENT_PREVIEW :
+					done = true;
+					break;
+				case EVENT_ESC :
+					if (rs.exit_mode == exit_normal || rs.exit_mode == exit_all || rs.console_mode) {
+						if(menu_font_path != "none") usar_fuente(int_font_menu);
+						done = true;
+					}
+					break;
+				case EVENT_OFF :
+					if (rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all) {
+						if(menu_font_path != "none") usar_fuente(int_font_menu);
+						done = true;
+					}
+					break;
 			}
-			break;
 		}
 
 		if (pos_rel + pos_base < gc.size() && gc[pos_rel + pos_base]->has_game()) {

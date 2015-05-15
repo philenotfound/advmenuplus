@@ -62,6 +62,7 @@ int run_sub(config_state& rs, bool silent)
 			key = EVENT_MENU;
 
 		if (!rs.lock_effective) {
+			
 			if (key == EVENT_MENU) {
 				// replay the sound and clip
 				silent = false;
@@ -157,8 +158,14 @@ int run_sub(config_state& rs, bool silent)
 			silent = false;
 			run_clone(rs);
 			if (rs.current_clone) {
-				done = true;
-				is_run = true;
+				if (rs.menu_systems->state_get()) { // MENU SYSTEMS
+					emulator_container c;
+					c.insert(c.end(), rs.current_clone->name_without_emulator_get());
+					rs.include_emu_set(c);
+				} else {
+					done = true;
+					is_run = true;
+				}
 			}
 			break;
 		case EVENT_ENTER :

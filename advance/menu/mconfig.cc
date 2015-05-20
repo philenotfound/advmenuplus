@@ -283,6 +283,20 @@ void config_state::conf_register(adv_conf* config_context)
 {
 	// MENU SYSTEMS
 	conf_bool_register_default(config_context, "menu_systems", 0);
+	conf_string_register_default(config_context, "menu_systems_altss", "");
+	conf_string_register_default(config_context, "menu_systems_flyers", "");
+	conf_string_register_default(config_context, "menu_systems_cabinets", "");
+	conf_string_register_default(config_context, "menu_systems_icons", "");
+	conf_string_register_default(config_context, "menu_systems_marquees", "");
+	conf_string_register_default(config_context, "menu_systems_titles", "");
+	conf_string_register_default(config_context, "menu_systems_layout", "");
+	conf_string_register_default(config_context, "menu_systems_background", "");
+	conf_string_register_default(config_context, "menu_systems_help", "");
+	conf_string_register_default(config_context, "menu_systems_start", "");
+	conf_string_register_default(config_context, "menu_systems_font", "");
+	conf_string_register_default(config_context, "menu_systems_font_size", "");
+	conf_string_register_default(config_context, "menu_systems_font_color", "");
+	conf_string_register_default(config_context, "menu_systems_font_color_select", "");
 	
 	conf_string_register_multi(config_context, "emulator");
 	conf_string_register_multi(config_context, "emulator_roms");
@@ -618,6 +632,36 @@ static bool config_load_menu_systems(adv_conf* config_context, const string& tag
 	menusystems = new systems("MENU SYSTEMS", "", "");
 	
 	return conf_bool_get_default(config_context, tag.c_str());
+}
+//
+static bool config_load_menu_systems_set(adv_conf* config_context, const string& tag, pmenu_systems& menusystems, void (emulator::*set)(const string& s))
+{
+	string s, a0;
+	s = conf_string_get_default(config_context, tag.c_str());
+
+	if (!config_split(s, a0))
+		return false;
+
+	((menusystems)->*set)(a0);
+	
+	return true;
+}
+//
+static bool config_load_menu_systems_path_set(adv_conf* config_context, const string& tag, pmenu_systems& menusystems, void (emulator::*set)(const string& s))
+{
+	string s, a0;
+	s = conf_string_get_default(config_context, tag.c_str());
+
+	if (!config_split(s, a0))
+		return false;
+
+	if (a0 != "none" && a0 != "default") {
+		a0 = file_config_file_home(a0.c_str());
+	}
+
+	((menusystems)->*set)(a0);
+	
+	return true;
 }
 
 static bool config_load_iterator_emu(adv_conf* config_context, const string& tag, pemulator_container& emu)
@@ -1055,6 +1099,34 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 
 	// MENU SYSTEMS
 	menu_systems_activated = config_load_menu_systems(config_context, "menu_systems", menu_systems);
+	if (!config_load_menu_systems_set(config_context, "menu_systems_altss", menu_systems, &systems::user_alts_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_flyers", menu_systems, &systems::user_flyer_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_cabinets", menu_systems, &systems::user_cabinet_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_icons", menu_systems, &systems::user_icon_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_marquees", menu_systems, &systems::user_marquee_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_titles", menu_systems, &systems::user_title_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_layout", menu_systems, &systems::custom_file_path_set))
+		return false;
+	if (!config_load_menu_systems_path_set(config_context, "menu_systems_background", menu_systems, &systems::nocustom_background_path_set))
+		return false;
+	if (!config_load_menu_systems_path_set(config_context, "menu_systems_help", menu_systems, &systems::nocustom_help_path_set))
+		return false;
+	if (!config_load_menu_systems_path_set(config_context, "menu_systems_start", menu_systems, &systems::nocustom_start_path_set))
+		return false;
+	if (!config_load_menu_systems_path_set(config_context, "menu_systems_font", menu_systems, &systems::nocustom_font_path_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_font_size", menu_systems, &systems::nocustom_font_size_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_font_color", menu_systems, &systems::nocustom_font_color_set))
+		return false;
+	if (!config_load_menu_systems_set(config_context, "menu_systems_font_color_select", menu_systems, &systems::nocustom_font_color_select_set))
+		return false;
 	
 	if (!config_load_iterator_emu(config_context, "emulator", emu))
 		return false;
@@ -1183,7 +1255,7 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 	}
 
 	// MENU SYSTEMS
-	// establece los emuladores del Menu Systems
+	// establece los emuladores del Menu Systems como juegos
 	for(pemulator_container::iterator j=emu_active.begin();j!=emu_active.end();++j) {
 		string name = menu_systems->user_name_get() + "/" + (*j)->user_name_get();
 		game g;
@@ -1193,6 +1265,13 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 				
 		gar.insert(g);
 	}
+	// carga la configuracion, path de las imagenes, ...
+	if (!menu_systems->load_cfg(gar, quiet)) {
+		if (!quiet)
+			target_err("Emulator '%s' without configuration, ignoring it.\n", menu_systems->user_exe_path_get().c_str());
+	}
+	// carga las previews del Menu Systems
+	menu_systems->preview_set(gar);
 	
 	// cache some values and relations
 	if (opt_verbose)

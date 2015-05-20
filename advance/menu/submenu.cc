@@ -1141,23 +1141,31 @@ int run_submenu(config_state& rs)
 void run_help(config_state& rs)
 {
 	string img_help = "";
-	for(pemulator_container::iterator k = rs.emu.begin();k!=rs.emu.end();k++) {
-		if ((*k)->state_get() == 1) {
-			if (rs.mode_get() == mode_custom) {
-				string lay_path = (*k)->custom_file_path_get();
-				for(playout_container::iterator j = rs.lay_cont.begin();j!=rs.lay_cont.end();j++) {
-					if((*j)->name_get() == lay_path) {
-						img_help = (*j)->custom_help_path_get();
-						break;
-					}
-				}
-			} else {
-				img_help = (*k)->nocustom_help_path_get();
-				if (img_help == "" || img_help == "default")
-					img_help = rs.ui_help;
+	emulator* emu_actual = 0;
+	
+	if (rs.menu_systems->state_get()) {
+		emu_actual = rs.menu_systems;
+	} else {
+		for(pemulator_container::iterator k = rs.emu.begin();k!=rs.emu.end();k++) {
+			if ((*k)->state_get() == 1) {
+				emu_actual = *k;
+				break;
 			}
-			break;
 		}
+	}
+
+	if (rs.mode_get() == mode_custom) {
+		string lay_path = emu_actual->custom_file_path_get();
+		for(playout_container::iterator j = rs.lay_cont.begin();j!=rs.lay_cont.end();j++) {
+			if((*j)->name_get() == lay_path) {
+				img_help = (*j)->custom_help_path_get();
+				break;
+			}
+		}
+	} else {
+		img_help = emu_actual->nocustom_help_path_get();
+		if (img_help == "" || img_help == "default")
+			img_help = rs.ui_help;
 	}
 	
 	bool wait = true;

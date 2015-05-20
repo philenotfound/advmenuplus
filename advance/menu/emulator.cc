@@ -3202,6 +3202,15 @@ string systems::type_get() const
 
 bool systems::load_cfg(const game_set& gar, bool quiet)
 {
+	string ref_dir = exe_dir_get();
+
+	config_alts_path = list_abs(list_import(user_alts_path), ref_dir);
+	config_flyer_path = list_abs(list_import(user_flyer_path), ref_dir);
+	config_cabinet_path = list_abs(list_import(user_cabinet_path), ref_dir);
+	config_marquee_path = list_abs(list_import(user_marquee_path), ref_dir);
+	config_title_path = list_abs(list_import(user_title_path), ref_dir);
+	config_icon_path = list_abs(list_import(user_icon_path), ref_dir);
+
 	return true;
 }
 

@@ -655,7 +655,7 @@ static bool config_load_menu_systems_path_set(adv_conf* config_context, const st
 	if (!config_split(s, a0))
 		return false;
 
-	if (a0 != "none" && a0 != "default") {
+	if (a0 != "" && a0 != "none" && a0 != "default") {
 		a0 = file_config_file_home(a0.c_str());
 	}
 

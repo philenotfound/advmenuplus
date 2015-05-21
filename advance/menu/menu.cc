@@ -1642,6 +1642,11 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 				rown = 3;
 				name_dy = int_font_dy_get();
 				break;
+			case mode_tile_tiny :
+				coln = 3;
+				rown = 2;
+				name_dy = int_font_dy_get();
+				break;
 			}
 		} else {
 			switch (rs.mode_get()) {
@@ -1683,6 +1688,11 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			case mode_tile_small :
 				coln = 3;
 				rown = 4;
+				name_dy = int_font_dy_get();
+				break;
+			case mode_tile_tiny :
+				coln = 2;
+				rown = 3;
 				name_dy = int_font_dy_get();
 				break;
 			}
@@ -3808,7 +3818,7 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		empty_msg = "";
 
 	rs.mode_mask = ~rs.mode_skip_mask & (mode_full | mode_full_mixed
-		| mode_text | mode_list | mode_list_mixed | mode_tile_small
+		| mode_text | mode_list | mode_list_mixed | mode_tile_tiny | mode_tile_small
 		| mode_tile_normal | mode_tile_big | mode_tile_enormous
 		| mode_tile_giant | mode_tile_icon | mode_tile_marquee | mode_custom);
 
@@ -3844,7 +3854,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 					case mode_full_mixed : rs.mode_set(mode_text); break;
 					case mode_text : rs.mode_set(mode_list); break;
 					case mode_list : rs.mode_set(mode_list_mixed); break;
-					case mode_list_mixed : rs.mode_set(mode_tile_small); break;
+					case mode_list_mixed : rs.mode_set(mode_tile_tiny); break;
+					case mode_tile_tiny : rs.mode_set(mode_tile_small); break;
 					case mode_tile_small : rs.mode_set(mode_tile_normal); break;
 					case mode_tile_normal : rs.mode_set(mode_tile_big); break;
 					case mode_tile_big : rs.mode_set(mode_tile_enormous); break;

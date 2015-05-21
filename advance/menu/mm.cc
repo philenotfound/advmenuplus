@@ -135,8 +135,8 @@ int run_sub(config_state& rs, bool silent)
 				// Muestra ventana de confirmacion de salida (Security Exit)
 				if(rs.security_exit && !run_exit(rs))
 					break;
-			case EVENT_ROTATE :
 				disable_fonts();
+			case EVENT_ROTATE :
 				done = true;
 				break;
 			}

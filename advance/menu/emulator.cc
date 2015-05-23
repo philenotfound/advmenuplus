@@ -3219,8 +3219,127 @@ bool systems::load_data(const game_set& gar)
 	return true;
 }
 
+bool systems::load_info(game_set& gar)
+{
+	info_t token = info_token_get();
+	while (token!=info_eof) {
+		if (token != info_symbol) return false;
+		bool isgame = strcmp(info_text_get(), "emu")==0 || strcmp(info_text_get(), "game")==0;
+		if (isgame) {
+			if (info_token_get() != info_open) return false;
+
+			string name;
+			string description;
+			string manufacturer;
+			string year;
+			string cloneof;
+
+			token = info_token_get();
+			while (token != info_close) {
+				if (token != info_symbol)
+					return false;
+				if (strcmp(info_text_get(), "name")==0) {
+					if (info_token_get() != info_symbol) return false;
+					name = user_name_get() + "/" + info_text_get();
+				} else if (strcmp(info_text_get(), "description")==0) {
+					if (info_token_get() != info_string) return false;
+					description = info_text_get();
+				} else if (strcmp(info_text_get(), "manufacturer")==0) {
+					if (info_token_get() != info_string) return false;
+					manufacturer = info_text_get();
+				} else if (strcmp(info_text_get(), "year")==0) {
+					if (info_token_get() != info_symbol) return false;
+					year = info_text_get();
+				} else if (strcmp(info_text_get(), "cloneof")==0) {
+					if (info_token_get() != info_symbol) return false;
+					cloneof = user_name_get() + "/" + info_text_get();
+				} else {
+					if (info_skip_value() == info_error) return false;
+				}
+				token = info_token_get();
+			}
+			if (name.length()) {
+				game g;
+				g.emulator_set(this);
+				g.name_set(name);
+				game_set::const_iterator i = gar.find(g);
+				if (i!=gar.end()) {
+					if (description.length())
+						i->auto_description_set(description);
+					if (manufacturer.length())
+						(const_cast<game&>(*i)).manufacturer_set(manufacturer);
+					if (year.length())
+						(const_cast<game&>(*i)).year_set(year);
+					if (cloneof.length())
+						(const_cast<game&>(*i)).cloneof_set(cloneof);
+				} else {
+					if (description.length())
+						g.auto_description_set(description);
+					if (manufacturer.length())
+						g.manufacturer_set(manufacturer);
+					if (year.length())
+						g.year_set(year);
+					if (cloneof.length())
+						g.cloneof_set(cloneof);
+					g.size_set(1); //para indentificar los juegos como missing deben tener algun tamaño
+					gar.insert(g);
+				}
+			}
+		} else {
+			if (info_skip_value() == info_error)
+				return false;
+		}
+		token = info_token_get();
+	}
+
+	return true;
+}
+
 bool systems::load_game(game_set& gar, bool quiet)
 {
+	// XML
+	string xml_file = path_abs(path_import(file_config_file_home("systems.xml")), dir_cwd());
+	if (access(cpath_export(xml_file), R_OK)==0) {
+		log_std(("%s: loading info %s\n", user_name_get().c_str(), cpath_export(xml_file)));
+		
+		ifstream f(cpath_export(xml_file), ios::in | ios::binary);
+		if (!f) {
+			target_err("Error opening the '%s' information file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
+			return false;
+		}
+		if (!load_xml(f, gar)) {
+			f.close();
+			target_err("Error reading the '%s' information from file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
+			return false;
+		}
+		f.close();
+	} else {
+		log_std(("%s: missing info %s\n", user_name_get().c_str(), cpath_export(xml_file)));
+	}
+
+	// LST
+	string info_file = path_abs(path_import(file_config_file_home("systems.lst")), dir_cwd());
+	if (access(cpath_export(info_file), R_OK)==0) {
+		log_std(("%s: loading info %s\n", user_name_get().c_str(), cpath_export(info_file)));
+
+		ifstream f(cpath_export(info_file), ios::in | ios::binary);
+		if (!f) {
+			target_err("Error opening the '%s' information file '%s'.\n", user_name_get().c_str(), cpath_export(info_file));
+			return false;
+		}
+		info_init(info_ext_get, info_ext_unget, &f);
+		if (!load_info(gar)) {
+			info_done();
+			f.close();
+			target_err("Error reading the '%s' information from file '%s' at row %d column %d.\n", user_name_get().c_str(), cpath_export(info_file), info_row_get()+1, info_col_get()+1);
+			return false;
+		}
+		info_done();
+		f.close();
+	} else {
+		log_std(("%s: missing info %s\n", user_name_get().c_str(), cpath_export(info_file)));
+	}
+	
 	return true;
 }
 

@@ -463,7 +463,7 @@ static void process_videoaspecty(struct state_t* state, enum token_t t, const ch
 
 static const char* match_generic = "menu|softwarelist"; // etiqueta inicio y fin del xml
 static const char* match_mamemessraine = "mame|mess|raine";
-static const char* match_gamemachine = "game|machine|software";
+static const char* match_gamemachine = "emu|game|machine|software";
 
 /**
  * Conversion table.
@@ -557,7 +557,7 @@ static struct conversion_t* identify(unsigned depth, const struct level_t* level
 				if (strcmp(level[j].tag, "menu") != 0 && strcmp(level[j].tag, "softwarelist") != 0)
 					equal = false;
 			} else if (conv[i].name[j] == match_gamemachine) {
-				if (strcmp(level[j].tag, "game") != 0 && strcmp(level[j].tag, "machine") != 0 && strcmp(level[j].tag, "software") != 0)
+				if (strcmp(level[j].tag, "emu") != 0 && strcmp(level[j].tag, "game") != 0 && strcmp(level[j].tag, "machine") != 0 && strcmp(level[j].tag, "software") != 0)
 					equal = false;
 			} else {
 				if (strcmp(level[j].tag, conv[i].name[j]) != 0)
@@ -761,3 +761,58 @@ bool generic::load_xml(istream& is, game_set& gar)
 
 	return true;
 }
+
+bool systems::load_xml(istream& is, game_set& gar)
+{
+	struct state_t state;
+	char buf[16384];
+
+	state.parser = XML_ParserCreate(NULL);
+	if (!state.parser) {
+		return false;
+	}
+
+	state.depth = -1;
+	state.error = 0;
+	state.e = this;
+	state.g = 0;
+	state.a = &gar;
+	state.m = 0;
+
+	XML_SetUserData(state.parser, &state);
+	XML_SetElementHandler(state.parser, start_handler, end_handler);
+	XML_SetCharacterDataHandler(state.parser, data_handler);
+
+	while (1) {
+		bool done;
+		int len;
+
+		is.read(buf, sizeof(buf));
+		if (is.bad()) {
+			process_error(&state, "", "read error");
+			break;
+		}
+
+		len = is.gcount();
+
+		done = is.eof();
+
+		if (XML_Parse(state.parser, buf, len, done) == XML_STATUS_ERROR) {
+			process_error(&state, "", XML_ErrorString(XML_GetErrorCode(state.parser)));
+			break;
+		}
+
+		if (done)
+			break;
+	}
+
+	XML_ParserFree(state.parser);
+
+	if (state.error) {
+		return false;
+	}
+
+	return true;
+}
+
+

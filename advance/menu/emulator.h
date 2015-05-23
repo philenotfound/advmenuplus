@@ -439,6 +439,9 @@ public:
 
 // MENU SYSTEMS
 class systems : public emulator {
+protected:
+	bool load_info(game_set& gar);
+	bool load_xml(std::istream& is, game_set& gar);
 public:
 	systems(const std::string& Aname, const std::string& Aexe_path, const std::string& Acmd_arg);
 

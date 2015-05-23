@@ -159,9 +159,14 @@ int run_sub(config_state& rs, bool silent)
 			run_clone(rs);
 			if (rs.current_clone) {
 				if (rs.menu_systems->state_get()) { // MENU SYSTEMS
-					emulator_container c;
-					c.insert(c.end(), rs.current_clone->name_without_emulator_get());
-					rs.include_emu_set(c);
+					for(pemulator_container::const_iterator i=rs.emu_active.begin();i!=rs.emu_active.end();++i) {
+						if((*i)->user_name_get() == rs.current_clone->name_without_emulator_get()) {
+							emulator_container c;
+							c.insert(c.end(), (*i)->user_name_get());
+							rs.include_emu_set(c);
+							break;
+						}
+					}
 				} else {
 					done = true;
 					is_run = true;
@@ -173,9 +178,14 @@ int run_sub(config_state& rs, bool silent)
 			silent = false;
 			if (rs.current_game) {
 				if (rs.menu_systems->state_get()) { // MENU SYSTEMS
-					emulator_container c;
-					c.insert(c.end(), rs.current_game->name_without_emulator_get());
-					rs.include_emu_set(c);
+					for(pemulator_container::const_iterator i=rs.emu_active.begin();i!=rs.emu_active.end();++i) {
+						if((*i)->user_name_get() == rs.current_game->name_without_emulator_get()) {
+							emulator_container c;
+							c.insert(c.end(), (*i)->user_name_get());
+							rs.include_emu_set(c);
+							break;
+						}
+					}
 				} else {
 					done = true;
 					is_run = true;

@@ -1263,13 +1263,17 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		g.name_set(name);
 		g.auto_description_set((*j)->user_name_get());
 		g.emulator_set(menu_systems);
-				
 		gar.insert(g);
 	}
 	// carga la configuracion, path de las imagenes, ...
 	if (!menu_systems->load_cfg(gar, quiet)) {
 		if (!quiet)
-			target_err("Emulator '%s' without configuration, ignoring it.\n", menu_systems->user_exe_path_get().c_str());
+			target_err("Menu Systems without configuration.\n");
+	}
+	// carga la informacion de los emuladores LST/XML 
+	if (!menu_systems->load_game(gar, quiet)) {
+		if (!quiet)
+			target_err("Menu Systems without emu information.\n");
 	}
 	// carga las previews del Menu Systems
 	menu_systems->preview_set(gar);

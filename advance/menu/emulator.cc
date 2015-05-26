@@ -3183,21 +3183,87 @@ bool generic::run(const game& g, const game* bios, unsigned orientation, bool se
 systems::systems(const string& Aname, const string& Aexe_path, const string& Acmd_arg)
 	: emulator(Aname, Aexe_path, Acmd_arg)
 {
+	exclude_clone_orig = exclude;
 }
 
 int systems::attrib_run(int x, int y)
 {
-	return 0;
+	choice_bag ch;
+
+	ch.insert(ch.end(), choice("Present or Missing", " Only\tPresent", " Only\tMissing", exclude_missing_effective, 0));
+	ch.insert(ch.end(), choice("Parent or Clone", " Only\tParent", " Only\tClone", exclude_clone_effective, 0));
+
+	choice_bag::iterator i = ch.begin();
+
+	int key = ch.run(" " + user_name_get() + " Filters", x, y, ATTRIB_CHOICE_DX, i);
+
+	if (key == EVENT_ENTER) {
+		exclude_missing_effective = ch[0].tristate_get();
+		exclude_clone_effective = ch[1].tristate_get();
+	}
+
+	return key;
+	//return 0;
+}
+void systems::attrib_load()
+{
+	emulator::attrib_load();
+	exclude_clone_effective = exclude_clone_orig;
+}
+void systems::attrib_save()
+{
+	emulator::attrib_save();
+	exclude_clone_orig = exclude_clone_effective;
+}
+bool systems::attrib_set(const string& value0, const string& value1)
+{
+	if (emulator::attrib_set(value0, value1))
+		return true;
+
+	if (value0 == "clone") {
+		if (!tristate(exclude_clone_orig, value1))
+			return false;
+	} else {
+		return false;
+	}
+	return true;
+}
+void systems::attrib_get(adv_conf* config_context, const char* section, const char* tag)
+{
+	conf_string_set(config_context, section, tag, ("missing " + tristate(exclude_missing_orig)).c_str());
+	conf_string_set(config_context, section, tag, ("clone " + tristate(exclude_clone_orig)).c_str());
+}
+bool systems::filter(const game& g) const
+{
+	if (!emulator::filter(g))
+		return false;
+
+	if (exclude_clone_effective == exclude && g.parent_get()!=0)
+			return false;
+	if (exclude_clone_effective == exclude_not && g.parent_get()==0)
+		return false;
+
+	return true;
+}
+void systems::cache(const game_set& gar, const game& g) const
+{
+	emulator::cache(gar, g);
 }
 
 bool systems::tree_get() const
 {
-	return false;
+	return exclude_clone_effective == exclude;
+	//return false;
 }
 
 string systems::type_get() const
 {
 	return "systems";
+}
+
+bool systems::load_data(const game_set& gar)
+{
+	return true;
 }
 
 bool systems::load_cfg(const game_set& gar, bool quiet)
@@ -3211,11 +3277,6 @@ bool systems::load_cfg(const game_set& gar, bool quiet)
 	config_title_path = list_abs(list_import(user_title_path), ref_dir);
 	config_icon_path = list_abs(list_import(user_icon_path), ref_dir);
 
-	return true;
-}
-
-bool systems::load_data(const game_set& gar)
-{
 	return true;
 }
 

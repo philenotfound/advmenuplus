@@ -284,6 +284,7 @@ void config_state::conf_register(adv_conf* config_context)
 {
 	// MENU SYSTEMS
 	conf_bool_register_default(config_context, "menu_systems", 0);
+	conf_string_register_multi(config_context, "menu_systems_attrib");
 	conf_string_register_default(config_context, "menu_systems_altss", "");
 	conf_string_register_default(config_context, "menu_systems_flyers", "");
 	conf_string_register_default(config_context, "menu_systems_cabinets", "");
@@ -633,6 +634,24 @@ static bool config_load_menu_systems(adv_conf* config_context, const string& tag
 	menusystems = new systems("MENU SYSTEMS", "", "");
 	
 	return conf_bool_get_default(config_context, tag.c_str());
+}
+//
+static bool config_load_iterator_menu_systems_attrib(adv_conf* config_context, const string& tag, pmenu_systems& menusystems)
+{
+	adv_conf_iterator i;
+	conf_iterator_begin(&i, config_context, tag.c_str());
+	while (!conf_iterator_is_end(&i)) {
+		string s, a0, a1;
+		s = conf_iterator_string_get(&i);
+		if (!config_split(s, a0, a1))
+			return false;
+		if (!menusystems->attrib_set(a0, a1)) {
+			config_error_a(s);
+			return false;
+		}
+		conf_iterator_next(&i);
+	}
+	return true;
 }
 //
 static bool config_load_menu_systems_set(adv_conf* config_context, const string& tag, pmenu_systems& menusystems, void (emulator::*set)(const string& s))
@@ -1100,6 +1119,8 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 
 	// MENU SYSTEMS
 	menu_systems_activated = config_load_menu_systems(config_context, "menu_systems", menu_systems);
+	if (!config_load_iterator_menu_systems_attrib(config_context, "menu_systems_attrib", menu_systems))
+		return false;
 	if (!config_load_menu_systems_set(config_context, "menu_systems_altss", menu_systems, &systems::user_alts_path_set))
 		return false;
 	if (!config_load_menu_systems_set(config_context, "menu_systems_flyers", menu_systems, &systems::user_flyer_path_set))
@@ -1550,6 +1571,8 @@ bool config_state::save(adv_conf* config_context) const
 
 	// MENU SYSTEMS
 	conf_bool_set(config_context, "", "menu_systems", menu_systems_activated);
+	conf_remove(config_context, "", "menu_systems_attrib");
+	menu_systems->attrib_get(config_context, "", "menu_systems_attrib");
 	
 	// REM SELECTED ---------------------------------------------------------------------------
 
@@ -1677,6 +1700,9 @@ void config_state::restore_load()
 	menu_rel_effective = menu_rel_orig;
 	lock_effective = lock_orig;
 	video_orientation_effective = video_orientation_orig;
+	// Menu Systems
+	menu_systems->config_get().restore_load();
+	menu_systems->attrib_load();
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {
 		(*i)->config_get().restore_load();
 		(*i)->attrib_load();
@@ -1696,6 +1722,8 @@ void config_state::restore_save_default()
 	menu_rel_orig = menu_rel_effective;
 	lock_orig = lock_effective;
 	video_orientation_orig = video_orientation_effective;
+	// Menu Systems
+	menu_systems->attrib_save();
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {
 		(*i)->attrib_save();
 	}
@@ -1705,6 +1733,7 @@ void config_state::restore_save()
 {
 	restore_save_default();
 
+	menu_systems->config_get().restore_save();
 	for(pemulator_container::const_iterator i=emu.begin();i!=emu.end();++i) {
 		(*i)->config_get().restore_save();
 	}

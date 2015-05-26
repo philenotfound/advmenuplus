@@ -462,6 +462,9 @@ emulator* run_emu_select(config_state& rs)
 		emu = ch.begin()->desc_get();
 	}
 
+	if (rs.menu_systems->user_name_get() == emu)
+		return rs.menu_systems;
+	
 	for(pemulator_container::const_iterator j = rs.emu_active.begin();j!=rs.emu_active.end();++j) {
 		if ((*j)->user_name_get() == emu) {
 			return *j;

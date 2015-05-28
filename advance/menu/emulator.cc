@@ -3017,7 +3017,7 @@ bool generic::load_info(game_set& gar)
 	info_t token = info_token_get();
 	while (token!=info_eof) {
 		if (token != info_symbol) return false;
-		bool isgame = strcmp(info_text_get(), "game")==0;
+		bool isgame = strcmp(info_text_get(), "game")==0 || strcmp(info_text_get(), "emu")==0;
 		if (isgame) {
 			if (info_token_get() != info_open) return false;
 
@@ -3181,89 +3181,19 @@ bool generic::run(const game& g, const game* bios, unsigned orientation, bool se
 // MENU SYSTEMS
 
 systems::systems(const string& Aname, const string& Aexe_path, const string& Acmd_arg)
-	: emulator(Aname, Aexe_path, Acmd_arg)
+	: generic(Aname, Aexe_path, Acmd_arg)
 {
-	exclude_clone_orig = exclude;
 }
 
-int systems::attrib_run(int x, int y)
-{
-	choice_bag ch;
-
-	ch.insert(ch.end(), choice("Present or Missing", " Only\tPresent", " Only\tMissing", exclude_missing_effective, 0));
-	ch.insert(ch.end(), choice("Parent or Clone", " Only\tParent", " Only\tClone", exclude_clone_effective, 0));
-
-	choice_bag::iterator i = ch.begin();
-
-	int key = ch.run(" " + user_name_get() + " Filters", x, y, ATTRIB_CHOICE_DX, i);
-
-	if (key == EVENT_ENTER) {
-		exclude_missing_effective = ch[0].tristate_get();
-		exclude_clone_effective = ch[1].tristate_get();
-	}
-
-	return key;
-	//return 0;
-}
-void systems::attrib_load()
-{
-	emulator::attrib_load();
-	exclude_clone_effective = exclude_clone_orig;
-}
-void systems::attrib_save()
-{
-	emulator::attrib_save();
-	exclude_clone_orig = exclude_clone_effective;
-}
-bool systems::attrib_set(const string& value0, const string& value1)
-{
-	if (emulator::attrib_set(value0, value1))
-		return true;
-
-	if (value0 == "clone") {
-		if (!tristate(exclude_clone_orig, value1))
-			return false;
-	} else {
-		return false;
-	}
-	return true;
-}
 void systems::attrib_get(adv_conf* config_context, const char* section, const char* tag)
 {
 	conf_string_set(config_context, section, tag, ("missing " + tristate(exclude_missing_orig)).c_str());
 	conf_string_set(config_context, section, tag, ("clone " + tristate(exclude_clone_orig)).c_str());
 }
-bool systems::filter(const game& g) const
-{
-	if (!emulator::filter(g))
-		return false;
-
-	if (exclude_clone_effective == exclude && g.parent_get()!=0)
-			return false;
-	if (exclude_clone_effective == exclude_not && g.parent_get()==0)
-		return false;
-
-	return true;
-}
-void systems::cache(const game_set& gar, const game& g) const
-{
-	emulator::cache(gar, g);
-}
-
-bool systems::tree_get() const
-{
-	return exclude_clone_effective == exclude;
-	//return false;
-}
 
 string systems::type_get() const
 {
 	return "systems";
-}
-
-bool systems::load_data(const game_set& gar)
-{
-	return true;
 }
 
 bool systems::load_cfg(const game_set& gar, bool quiet)
@@ -3280,82 +3210,6 @@ bool systems::load_cfg(const game_set& gar, bool quiet)
 	return true;
 }
 
-bool systems::load_info(game_set& gar)
-{
-	info_t token = info_token_get();
-	while (token!=info_eof) {
-		if (token != info_symbol) return false;
-		bool isgame = strcmp(info_text_get(), "emu")==0 || strcmp(info_text_get(), "game")==0;
-		if (isgame) {
-			if (info_token_get() != info_open) return false;
-
-			string name;
-			string description;
-			string manufacturer;
-			string year;
-			string cloneof;
-
-			token = info_token_get();
-			while (token != info_close) {
-				if (token != info_symbol)
-					return false;
-				if (strcmp(info_text_get(), "name")==0) {
-					if (info_token_get() != info_symbol) return false;
-					name = user_name_get() + "/" + info_text_get();
-				} else if (strcmp(info_text_get(), "description")==0) {
-					if (info_token_get() != info_string) return false;
-					description = info_text_get();
-				} else if (strcmp(info_text_get(), "manufacturer")==0) {
-					if (info_token_get() != info_string) return false;
-					manufacturer = info_text_get();
-				} else if (strcmp(info_text_get(), "year")==0) {
-					if (info_token_get() != info_symbol) return false;
-					year = info_text_get();
-				} else if (strcmp(info_text_get(), "cloneof")==0) {
-					if (info_token_get() != info_symbol) return false;
-					cloneof = user_name_get() + "/" + info_text_get();
-				} else {
-					if (info_skip_value() == info_error) return false;
-				}
-				token = info_token_get();
-			}
-			if (name.length()) {
-				game g;
-				g.emulator_set(this);
-				g.name_set(name);
-				game_set::const_iterator i = gar.find(g);
-				if (i!=gar.end()) {
-					if (description.length())
-						i->auto_description_set(description);
-					if (manufacturer.length())
-						(const_cast<game&>(*i)).manufacturer_set(manufacturer);
-					if (year.length())
-						(const_cast<game&>(*i)).year_set(year);
-					if (cloneof.length())
-						(const_cast<game&>(*i)).cloneof_set(cloneof);
-				} else {
-					if (description.length())
-						g.auto_description_set(description);
-					if (manufacturer.length())
-						g.manufacturer_set(manufacturer);
-					if (year.length())
-						g.year_set(year);
-					if (cloneof.length())
-						g.cloneof_set(cloneof);
-					g.size_set(1); //para indentificar los juegos como missing deben tener algun tamaño
-					gar.insert(g);
-				}
-			}
-		} else {
-			if (info_skip_value() == info_error)
-				return false;
-		}
-		token = info_token_get();
-	}
-
-	return true;
-}
-
 bool systems::load_game(game_set& gar, bool quiet)
 {
 	// XML
@@ -3368,7 +3222,7 @@ bool systems::load_game(game_set& gar, bool quiet)
 			target_err("Error opening the '%s' information file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
 			return false;
 		}
-		if (!load_xml(f, gar)) {
+		if (!generic::load_xml(f, gar)) {
 			f.close();
 			target_err("Error reading the '%s' information from file '%s'.\n", user_name_get().c_str(), cpath_export(xml_file));
 			return false;
@@ -3389,7 +3243,7 @@ bool systems::load_game(game_set& gar, bool quiet)
 			return false;
 		}
 		info_init(info_ext_get, info_ext_unget, &f);
-		if (!load_info(gar)) {
+		if (!generic::load_info(gar)) {
 			info_done();
 			f.close();
 			target_err("Error reading the '%s' information from file '%s' at row %d column %d.\n", user_name_get().c_str(), cpath_export(info_file), info_row_get()+1, info_col_get()+1);
@@ -3401,11 +3255,6 @@ bool systems::load_game(game_set& gar, bool quiet)
 		log_std(("%s: missing info %s\n", user_name_get().c_str(), cpath_export(info_file)));
 	}
 	
-	return true;
-}
-
-bool systems::load_software(game_set&, bool quiet)
-{
 	return true;
 }
 

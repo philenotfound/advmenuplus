@@ -1824,12 +1824,17 @@ listmode_t config_state::mode_get()
 }
 
 // REM SELECTED
+string config_state::namepos_get() 
+{
+	string list_name = config_normalize(include_favorites_get());
+	string emu_name = config_normalize(*include_emu_get().begin());
+	string menu_systems_name = config_normalize(menu_systems->user_name_get());
+	return (emu_name == menu_systems_name) ? emu_name : list_name + "/" + emu_name;
+}
 //get base
 int config_state::menu_base_get()
 {
-	string lista = config_normalize(include_favorites_get());
-	string emu = config_normalize(*include_emu_get().begin());
-	string namepos = (emu == "menu_systems") ? emu : lista + "/" + emu; 
+	string namepos = namepos_get();
 
 	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
 		if((*i)->name == namepos)
@@ -1840,10 +1845,8 @@ int config_state::menu_base_get()
 //get rel
 int config_state::menu_rel_get()
 {
-	string lista = config_normalize(include_favorites_get());
-	string emu = config_normalize(*include_emu_get().begin());
-	string namepos = (emu == "menu_systems") ? emu : lista + "/" + emu; 
-
+	string namepos = namepos_get();
+	
 	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
 		if((*i)->name == namepos)
 			return (*i)->rel;
@@ -1853,9 +1856,7 @@ int config_state::menu_rel_get()
 //get pos
 void config_state::menu_pos_get(int& base, int& rel)
 {
-	string lista = config_normalize(include_favorites_get());
-	string emu = config_normalize(*include_emu_get().begin());
-	string namepos = (emu == "menu_systems") ? emu : lista + "/" + emu; 
+	string namepos = namepos_get();
 
 	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
 		if((*i)->name == namepos) {
@@ -1868,9 +1869,7 @@ void config_state::menu_pos_get(int& base, int& rel)
 //set pos
 void config_state::menu_pos_set(int& base, int& rel)
 {
-	string lista = config_normalize(include_favorites_get());
-	string emu = config_normalize(*include_emu_get().begin());
-	string namepos = (emu == "menu_systems") ? emu : lista + "/" + emu; 
+	string namepos = namepos_get();
 
 	for(ppos_selected_container::const_iterator i=rem_pos.begin();i!=rem_pos.end();++i) {
 		if((*i)->name == namepos) {

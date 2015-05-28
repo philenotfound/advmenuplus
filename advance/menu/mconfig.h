@@ -309,6 +309,7 @@ public:
 	// REM SELECTED
 	bool rem_selected;									///< Indica si recordar el juego seleccionado
 	ppos_selected_container rem_pos;		///< Contenedor de las posiciones del juego seleccionado por pares list/emu
+	std::string namepos_get();
 	void menu_pos_get(int& base, int& rel);	///< Devuelve por referencia la posicion del juego seleccionado actual
 	void menu_pos_set(int& base, int& rel);	///< Asigna la posicion del juego seleccionado actual
 	int menu_base_get();								///< Devuelve la posicion base del juego seleccionado actual

@@ -2213,8 +2213,8 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		if (!rs.lock_effective) {
 			// eventos desactivados si MenuSystems listado
 			if (!rs.menu_systems->state_get()) {
+				// eventos desactivados si MenuSystems activado
 				if (!rs.menu_systems_activated) {
-					// eventos desactivados si MenuSystems activado
 					switch (key) {
 						case EVENT_EMU_PRE :				//F6
 						case EVENT_EMU_NEXT :				//F7
@@ -3225,8 +3225,8 @@ static int run_menu_layout(config_state& rs, bool flipxy, menu_array& gc, sort_i
 		if (!rs.lock_effective) {
 			// eventos desactivados si MenuSystems listado
 			if (!rs.menu_systems->state_get()) {
+				// eventos desactivados si MenuSystems activado
 				if (!rs.menu_systems_activated) {
-					// eventos desactivados si MenuSystems activado
 					switch (key) {
 						case EVENT_EMU_NEXT :
 						case EVENT_EMU_PRE :

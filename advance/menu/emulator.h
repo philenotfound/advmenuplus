@@ -438,30 +438,14 @@ public:
 };
 
 // MENU SYSTEMS
-class systems : public emulator {
-protected:
-	tristate_t exclude_clone_effective;
-	tristate_t exclude_clone_orig;
-	
-	bool load_info(game_set& gar);
-	bool load_xml(std::istream& is, game_set& gar);
+class systems : public generic {
 public:
 	systems(const std::string& Aname, const std::string& Aexe_path, const std::string& Acmd_arg);
 
-	virtual int attrib_run(int x, int y);
-	virtual bool tree_get() const;
-
-	virtual void attrib_load();
-	virtual void attrib_save();
-	virtual bool attrib_set(const std::string& value0, const std::string& value1);
 	virtual void attrib_get(adv_conf* config_context, const char* section, const char* tag);
-	virtual bool filter(const game& g) const;
-	virtual void cache(const game_set& gar, const game& g) const;
 
 	virtual bool load_cfg(const game_set& gar, bool quiet);
-	virtual bool load_data(const game_set& gar);
 	virtual bool load_game(game_set& gar, bool quiet);
-	virtual bool load_software(game_set& gar, bool quiet);
 
 	virtual std::string type_get() const;
 };
